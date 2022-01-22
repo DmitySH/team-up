@@ -1,0 +1,7 @@
+html, body {
+    margin: 0;
+    font-size: 100%;
+    background: #fff;
+    font-family: 'Lato', sans-serif;
+    scroll-behavior: smooth;
+}
