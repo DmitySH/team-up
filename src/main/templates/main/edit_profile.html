@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование профиля</title>
+</head>
+<body>
+<div align="center">
+    <h2>
+        Редактирование
+    </h2>
+    <form method="post" action="{% url 'edit_profile' slug=user.username %}">
+        {% csrf_token %}
+        {% for field in form_profile %}
+            <div>
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field }}
+                {% if field.help_text %}
+                    <p>{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        {% for field in form_user %}
+            <div>
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field }}
+                {% if field.help_text %}
+                    <p>{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Изменить</button>
+    </form>
+</div>
+</body>
+</html>

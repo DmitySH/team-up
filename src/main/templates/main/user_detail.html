@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+{% block title %}Аккаунт{% endblock %}
+{% block content %}
+    <ul>
+        <li>
+            <img style="width: 200px" src="{{ profile.photo.url }}" alt="Фото профиля">
+        </li>
+        <li>Фамилия: {{ user_.last_name }}</li>
+        <li>Имя: {{ user_.first_name }}</li>
+        {% if profile.patronymic %}
+            <li>Отчество: {{ profile.patronymic }}</li>
+        {% endif %}
+    </ul>
+{% endblock %}
