@@ -82,9 +82,25 @@ class Profile(models.Model):
         (DOESNT_MATTER, DOESNT_MATTER),
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE,
+    # Sex choices codes:
+    MALE = True
+    FEMALE = False
+
+    SEX_CHOICES = (
+        (None, 'Не указывать'),
+        (MALE, 'Мужской'),
+        (FEMALE, 'Женский'),
+    )
+
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
                                 related_name='profile'
                                 )
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if self.user:
+            self.user.delete()
 
     patronymic = models.CharField('Отчество', max_length=30, blank=True)
     photo = models.ImageField('Фотография', upload_to='profile_photos/',
@@ -97,27 +113,21 @@ class Profile(models.Model):
     cv = models.FileField('Резюме', upload_to='cvs', null=True, blank=True,
                           validators=[FileExtensionValidator(['pdf', 'docx'])])
 
-    belbin = models.ForeignKey(BelbinTest,
-                               verbose_name='Результат теста по Белбину',
-                               on_delete=models.SET_NULL,
-                               related_name='profiles',
-                               null=True,
-                               blank=True
-                               )
-    mbti = models.ForeignKey(MBTITest,
-                             verbose_name='Результат теста Майерса-Бриггса',
-                             on_delete=models.SET_NULL,
-                             related_name='profiles',
-                             null=True,
-                             blank=True
-                             )
-    lsq = models.ForeignKey(LSQTest,
-                            verbose_name='Результат теста Хони-Мамфорда',
-                            on_delete=models.SET_NULL,
-                            related_name='profiles',
-                            null=True,
-                            blank=True
-                            )
+    belbin = models.ManyToManyField(BelbinTest,
+                                    verbose_name='Результат теста по Белбину',
+                                    related_name='profiles',
+                                    blank=True
+                                    )
+    mbti = models.ManyToManyField(MBTITest,
+                                  verbose_name='Результат теста Майерса-Бриггса',
+                                  related_name='profiles',
+                                  blank=True
+                                  )
+    lsq = models.ManyToManyField(LSQTest,
+                                 verbose_name='Результат теста Хони-Мамфорда',
+                                 related_name='profiles',
+                                 blank=True
+                                 )
 
     remote = models.CharField('Возможность работать не удаленно',
                               choices=REMOTE_CHOICES,
@@ -125,13 +135,14 @@ class Profile(models.Model):
                               default='',
                               blank=True
                               )
-    is_male = models.BooleanField('Пол', default=None, null=True, blank=True)
-    specialization = models.ForeignKey(Specialization,
-                                       verbose_name='Специализация',
-                                       on_delete=models.SET_NULL,
-                                       null=True,
-                                       blank=True
-                                       )
+    is_male = models.BooleanField('Пол',
+                                  choices=SEX_CHOICES,
+                                  default=None,
+                                  null=True, blank=True)
+    specialization = models.ManyToManyField(Specialization,
+                                            verbose_name='Специализация',
+                                            blank=True
+                                            )
     city = models.CharField('Город', max_length=50, blank=True)
     age = models.PositiveSmallIntegerField('Возраст',
                                            validators=[
@@ -151,7 +162,7 @@ class Profile(models.Model):
                     )
 
     def get_absolute_url(self):
-        return reverse('user_detail', kwargs={'slug': self.user.username})
+        return reverse('profile_detail', kwargs={'slug': self.user.username})
 
     class Meta:
         verbose_name = 'Профиль'
@@ -163,7 +174,8 @@ class ExecutorOffer(models.Model):
     Предложение работника.
     """
 
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,
+    profile = models.OneToOneField(Profile,
+                                   on_delete=models.CASCADE,
                                    related_name='executor_offer'
                                    )
     description = models.TextField('Описание')
@@ -250,12 +262,10 @@ class WorkerSlot(models.Model):
                                                   ],
                                                   default=40
                                                   )
-    role = models.ForeignKey(BelbinTest,
-                             verbose_name='Роли по Белбину',
-                             on_delete=models.SET_NULL,
-                             related_name='worker_slots',
-                             null=True
-                             )
+    role = models.ManyToManyField(BelbinTest,
+                                  verbose_name='Роли по Белбину',
+                                  related_name='worker_slots',
+                                  )
 
     specialization = models.ManyToManyField(Specialization,
                                             verbose_name='Специализации',
