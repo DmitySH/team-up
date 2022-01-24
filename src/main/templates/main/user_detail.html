@@ -3,12 +3,83 @@
 {% block content %}
     <ul>
         <li>
-            <img style="width: 200px" src="{{ profile.photo.url }}" alt="Фото профиля">
+            <img style="width: 200px" src="{{ profile.photo.url }}"
+                 alt="Фото профиля">
         </li>
         <li>Фамилия: {{ user_.last_name }}</li>
         <li>Имя: {{ user_.first_name }}</li>
         {% if profile.patronymic %}
             <li>Отчество: {{ profile.patronymic }}</li>
+        {% endif %}
+        <li>Описание:
+            {% if profile.description %}
+                {{ profile.description }}
+            {% else %}
+                Пользователь не рассказывает о себе
+            {% endif %}
+        </li>
+        <li>
+            {% if profile.cv %}
+                <a href="{{ profile.cv.url }}">Открыть резюме</a>
+            {% else %}
+                Резюме: Не загружено
+            {% endif %}
+        </li>
+        <li>
+            {% if profile.belbin.count > 0 %}
+                Роли по Белбину:
+                <ol>
+                    {% for role in profile.belbin.all %}
+                        <li>{{ role }}</li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                Пользователь не прошел тестирование по Белбину
+            {% endif %}
+        </li>
+        <li>
+            {% if profile.mbti.count > 0 %}
+                Роли по Майерсу-Бриггсу:
+                <ol>
+                    {% for role in profile.mbti.all %}
+                        <li>{{ role }}</li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                Пользователь не прошел тестирование по Майерсу-Бриггсу
+            {% endif %}
+        </li>
+        <li>
+            {% if profile.lsq.count > 0 %}
+                Роли по Хони-Мамфорду:
+                <ol>
+                    {% for role in profile.lsq.all %}
+                        <li>{{ role }}</li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                Пользователь не прошел тестирование по Хони-Мамфорду
+            {% endif %}
+        </li>
+        {% if profile.remote %}
+            <li>
+                Предпочитает работать: {{ profile.get_remote_value }}
+            </li>
+        {% endif %}
+        {% if profile.specialization.count > 0 %}
+            <li>Специализации:
+                <ol>
+                    {% for spec in profile.specialization.all %}
+                        <li>{{ spec }}</li>
+                    {% endfor %}
+                </ol>
+            </li>
+        {% endif %}
+        {% if profile.city %}
+            <li>Город: {{ profile.city }}</li>
+        {% endif %}
+        {% if profile.age %}
+            <li>Возраст: {{ profile.age }} лет</li>
         {% endif %}
     </ul>
 {% endblock %}
