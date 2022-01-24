@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator, \
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 
 # Tests' models.
@@ -71,16 +72,14 @@ class Profile(models.Model):
     Пользователь сайта (расширение модели user).
     """
 
-    # Remote choices codes:
-    WANTS_WORK_ONLINE = 'Предпочитаю удаленную работу'
-    WANTS_WORK_OFFLINE = 'Предпочитаю работу в офисе'
-    DOESNT_MATTER = 'Могу работать как онлайн, так и оффлайн'
+    class RemoteChoices(models.IntegerChoices):
+        __empty__ = _('Не указывать')
+        ONLINE = 1, _('Онлайн')
+        ONLINE_AND_OFFLINE = 2, _('И онлайн, и оффлайн')
+        OFFLINE = 3, _('Оффлайн')
 
-    REMOTE_CHOICES = (
-        (WANTS_WORK_ONLINE, WANTS_WORK_ONLINE),
-        (WANTS_WORK_OFFLINE, WANTS_WORK_OFFLINE),
-        (DOESNT_MATTER, DOESNT_MATTER),
-    )
+    def get_remote_value(self):
+        return self.RemoteChoices.choices[self.remote][1]
 
     # Sex choices codes:
     MALE = True
@@ -129,16 +128,18 @@ class Profile(models.Model):
                                  blank=True
                                  )
 
-    remote = models.CharField('Возможность работать не удаленно',
-                              choices=REMOTE_CHOICES,
-                              max_length=40,
-                              default='',
-                              blank=True
-                              )
+    remote = models.PositiveSmallIntegerField(
+        'Удаленная работа',
+        choices=RemoteChoices.choices,
+        blank=True,
+        null=True
+    )
+
     is_male = models.BooleanField('Пол',
                                   choices=SEX_CHOICES,
                                   default=None,
-                                  null=True, blank=True)
+                                  null=True,
+                                  blank=True)
     specialization = models.ManyToManyField(Specialization,
                                             verbose_name='Специализация',
                                             blank=True
@@ -202,12 +203,13 @@ class Project(models.Model):
     """
 
     # Remote choices codes:
-    ONLINE = 'Требуется присутствие'
-    OFFLINE = 'Присутствие не требуется'
+    OFFLINE = True
+    ONLINE = False
 
     REMOTE_CHOICES = (
-        (ONLINE, ONLINE),
-        (OFFLINE, OFFLINE),
+        (None, 'Не указывать'),
+        (OFFLINE, 'Требуется присутствие'),
+        (ONLINE, 'Присутствие не требуется'),
     )
 
     title = models.CharField('Название', max_length=200)
@@ -219,12 +221,12 @@ class Project(models.Model):
                                               ]
                                               )
     city = models.CharField('Город', max_length=50, blank=True)
-    remote = models.CharField('Требуется работать не удаленно',
-                              choices=REMOTE_CHOICES,
-                              max_length=40,
-                              default='',
-                              blank=True
-                              )
+    offline = models.BooleanField('Возможность работы онлайн',
+                                  choices=REMOTE_CHOICES,
+                                  default=None,
+                                  null=True,
+                                  blank=True
+                                  )
     verified = models.BooleanField('Подтвержден', default=False)
 
     required_specialization = models.ManyToManyField(Specialization,
