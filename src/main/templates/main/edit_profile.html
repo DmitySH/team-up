@@ -9,7 +9,7 @@
     <h2>
         Редактирование
     </h2>
-    <form method="post" action="{% url 'edit_profile' slug=user.username %}">
+    <form method="post" enctype="multipart/form-data" action="{% url 'edit_profile' slug=user.username %}">
         {% csrf_token %}
         {% for field in form_profile %}
             <div>

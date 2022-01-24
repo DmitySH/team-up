@@ -101,7 +101,8 @@ class Profile(models.Model):
         if self.user:
             self.user.delete()
 
-    patronymic = models.CharField('Отчество', max_length=30, blank=True)
+    patronymic = models.CharField('Отчество', max_length=30, blank=True,
+                                  default='', null=True)
     photo = models.ImageField('Фотография', upload_to='profile_photos/',
                               default='profile_photos/empty.png',
                               blank=True)

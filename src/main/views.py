@@ -95,9 +95,12 @@ class UserEditView(View):
                 slug != request.user.username:
             raise PermissionDenied
         form = UserEditForm(request.POST, instance=request.user)
-        form_profile = ProfileEditForm(request.POST,
+        form_profile = ProfileEditForm(request.POST, request.FILES,
                                        instance=request.user.profile)
-        if form.is_valid and form_profile.is_valid:
+        if form.is_valid() and form_profile.is_valid():
+            if not form_profile.cleaned_data['photo']:
+                request.user.profile.photo = 'profile_photos/empty.png'
+                request.user.profile.save()
             form.save()
             form_profile.save()
             return redirect('profile_detail', slug=request.user.username)
