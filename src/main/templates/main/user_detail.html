@@ -1,7 +1,11 @@
 {% extends 'main/base.html' %}
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
-    <ul>
+    <a class="btn btn-light action-button" role="button"
+       href="{% url 'edit_profile' slug=user.username %}">
+        <b>Редактировать профиль</b>
+    </a>
+    <ul style="margin-top: 20px">
         <li>
             <img style="width: 200px" src="{{ profile.photo.url }}"
                  alt="Фото профиля">
@@ -26,7 +30,7 @@
             {% endif %}
         </li>
         <li>
-            {% if profile.belbin.count > 0 %}
+            {% if profile.belbin.exists %}
                 Роли по Белбину:
                 <ol>
                     {% for role in profile.belbin.all %}
@@ -38,7 +42,7 @@
             {% endif %}
         </li>
         <li>
-            {% if profile.mbti.count > 0 %}
+            {% if profile.mbti.exists %}
                 Роли по Майерсу-Бриггсу:
                 <ol>
                     {% for role in profile.mbti.all %}
@@ -50,7 +54,7 @@
             {% endif %}
         </li>
         <li>
-            {% if profile.lsq.count > 0 %}
+            {% if profile.lsq.exists %}
                 Роли по Хони-Мамфорду:
                 <ol>
                     {% for role in profile.lsq.all %}
@@ -66,7 +70,7 @@
                 Предпочитает работать: {{ profile.get_remote_value }}
             </li>
         {% endif %}
-        {% if profile.specialization.count > 0 %}
+        {% if profile.specialization.exists %}
             <li>Специализации:
                 <ol>
                     {% for spec in profile.specialization.all %}
