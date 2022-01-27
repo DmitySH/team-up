@@ -255,7 +255,9 @@ class WorkerSlot(models.Model):
 
     profile = models.ForeignKey(Profile, verbose_name='Профиль работника',
                                 on_delete=models.CASCADE,
-                                related_name='worker_slots'
+                                related_name='worker_slots',
+                                null=True,
+                                blank=True
                                 )
     description = models.TextField('Описание')
     salary = models.PositiveIntegerField('Зарплата', null=True, blank=True)
