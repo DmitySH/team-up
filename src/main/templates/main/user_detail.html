@@ -39,6 +39,9 @@
                 </ol>
             {% else %}
                 Пользователь не прошел тестирование по Белбину
+                {% if user.username == user_.username %}
+                    <a href="{% url 'belbin_test' %}">Пройти тест</a>
+                {% endif %}
             {% endif %}
         </li>
         <li>

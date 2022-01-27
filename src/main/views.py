@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView
 
+from ..base.services import *
+from ..base.constants import *
 from .forms import *
 from .models import *
 
@@ -45,6 +45,10 @@ class UserDetailView(DetailView):
     template_name = 'main/user_detail.html'
     context_object_name = 'user_'
 
+    def get(self, request, *args, **kwargs):
+        check_auth(request)
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context['profile'] = Profile.objects.get(user_id=context['user_'])
@@ -71,16 +75,14 @@ class UserFormView(View):
             # todo: uncomment
             # user = authenticate(username=username, password=raw_password)
             # login(request, user)
-            return HttpResponseRedirect(user.profile.get_absolute_url())
+            return redirect(user.profile.get_absolute_url())
         return render(request, 'main/register.html',
                       context={'user_form': user_form})
 
 
 class UserEditView(View):
     def get(self, request, slug):
-        if not request.user.is_authenticated or \
-                slug != request.user.username:
-            raise PermissionDenied
+        check_slug_auth(request, slug)
 
         form = UserEditForm(instance=request.user)
         form_profile = ProfileEditForm(instance=request.user.profile)
@@ -91,9 +93,8 @@ class UserEditView(View):
         return render(request, 'main/edit_profile.html', args)
 
     def post(self, request, slug):
-        if not request.user.is_authenticated or \
-                slug != request.user.username:
-            raise PermissionDenied
+        check_slug_auth(request, slug)
+
         form = UserEditForm(request.POST, instance=request.user)
         form_profile = ProfileEditForm(request.POST, request.FILES,
                                        instance=request.user.profile)
@@ -114,3 +115,44 @@ class UserEditView(View):
 class MainPageView(View):
     def get(self, request):
         return render(request, 'main/main_page.html')
+
+
+class BelbinTestFormView(View):
+    def get(self, request):
+        check_auth(request)
+
+        belbin_forms = [BelbinPartForm(prefix=f'form{i + 1}') for i in
+                        range(len(TestQuestions.belbin))]
+        for i, form in enumerate(belbin_forms):
+            change_labels(form, TestQuestions.belbin[i])
+
+        return render(request, 'main/test.html',
+                      context={'forms': belbin_forms})
+
+    def post(self, request):
+        check_auth(request)
+
+        belbin_forms = [BelbinPartForm(request.POST, prefix=f'form{i + 1}') for
+                        i in range(len(TestQuestions.belbin))]
+        for i, form in enumerate(belbin_forms):
+            change_labels(form, TestQuestions.belbin[i])
+
+        correct = True
+
+        for form in belbin_forms:
+            if not form.is_valid() or not form.validate_sum():
+                correct = False
+
+        if correct:
+            roles = analize_belbin(
+                [form.cleaned_data for form in belbin_forms])
+            roles = roles[::-1]
+            print(roles)
+            for role in roles:
+                request.user.profile.belbin.add(
+                    BelbinTest.objects.get(role=role))
+            request.user.profile.save()
+            return redirect(request.user.profile.get_absolute_url())
+
+        return render(request, 'main/test.html',
+                      context={'forms': belbin_forms})
