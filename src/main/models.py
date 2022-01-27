@@ -111,7 +111,8 @@ class Profile(models.Model):
                                    blank=True
                                    )
     cv = models.FileField('Резюме', upload_to='cvs', null=True, blank=True,
-                          validators=[FileExtensionValidator(['pdf', 'docx'])])
+                          validators=[
+                              FileExtensionValidator(['pdf', 'docx', 'doc'])])
 
     belbin = models.ManyToManyField(BelbinTest,
                                     verbose_name='Результат теста по Белбину',
@@ -204,8 +205,8 @@ class Project(models.Model):
     """
 
     # Remote choices codes:
-    OFFLINE = True
-    ONLINE = False
+    OFFLINE = False
+    ONLINE = True
 
     REMOTE_CHOICES = (
         (None, 'Не указывать'),
