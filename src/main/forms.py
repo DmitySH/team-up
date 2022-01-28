@@ -84,3 +84,27 @@ class MBTIPartForm(forms.Form):
     answer7 = forms.TypedChoiceField(required=True, initial=1,
                                      coerce=lambda x: int(x))
 
+
+class LSQPartForm(forms.Form):
+    NO_YES_CHOICES = (
+        (None, '-----'),
+        (0, _('Нет')),
+        (1, _('Да')),
+    )
+    answer1 = forms.TypedChoiceField(required=True, initial=0,
+                                     choices=NO_YES_CHOICES,
+                                     coerce=lambda x: int(x)
+                                     )
+    answer2 = forms.TypedChoiceField(required=True, initial=1,
+                                     choices=NO_YES_CHOICES,
+                                     coerce=lambda x: int(x)
+
+                                     )
+    answer3 = forms.TypedChoiceField(required=True, initial=1,
+                                     choices=NO_YES_CHOICES,
+                                     coerce=lambda x: int(x)
+                                     )
+    answer4 = forms.TypedChoiceField(required=True, initial=0,
+                                     choices=NO_YES_CHOICES,
+                                     coerce=lambda x: int(x)
+                                     )

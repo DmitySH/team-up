@@ -1,0 +1,26 @@
+{% extends 'main/base.html' %}
+{% block title %}Тест{% endblock %}
+{% block content %}
+    <div align="left">
+        <h2>Прохождение теста белбина</h2>
+        <form method="post" action="{% url 'lsq_test' %}">
+            {% csrf_token %}
+            {% for form in forms %}
+                {% if form.error %}
+                    {{ form.error }}
+                {% endif %}
+                {% for field in form %}
+                    <div>
+                        {{ field.errors }}
+                        {{ field }}
+                        {{ field.label_tag }}
+
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+{% endblock %}

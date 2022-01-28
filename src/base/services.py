@@ -19,7 +19,7 @@ def change_labels(form, labels):
         form[field].label = labels[i]
 
 
-def analize_belbin(data):
+def analyze_belbin(data):
     result = {
         'Исполнитель': data[0]['answer6'] + data[1]['answer0'] \
                        + data[2]['answer7'] + data[3]['answer3'] \
@@ -71,7 +71,7 @@ def change_choices(form, choices):
         form.fields[field].choices = choices[i]
 
 
-def analize_mbti(data):
+def analyze_mbti(data):
     result = [
         (
             ['Экстраверт', 0],
@@ -126,6 +126,30 @@ def analize_mbti(data):
             result[3][0][1] += 1
         else:
             result[3][1][1] += 1
+
+    return [
+        item[0][0] if item[0][1] > item[1][1] else item[1][0] for item in
+        result
+    ]
+
+
+def analyze_lsq(data):
+    result = [
+        (
+            ['Деятель', 0],
+            ['Теоретик', 0]
+        ),
+        (
+            ['Прагматик', 0],
+            ['Рефлексирующий', 0]
+        ),
+    ]
+
+    for form in data:
+        result[0][0][1] += form['answer1']
+        result[1][1][1] += form['answer2']
+        result[0][1][1] += form['answer3']
+        result[1][0][1] += form['answer4']
 
     return [
         item[0][0] if item[0][1] > item[1][1] else item[1][0] for item in

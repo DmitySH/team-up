@@ -47,11 +47,11 @@
         <li>
             {% if profile.mbti.exists %}
                 Роли по Майерсу-Бриггсу:
-                <ol>
+                <ul>
                     {% for role in profile.mbti.all %}
                         <li>{{ role }}</li>
                     {% endfor %}
-                </ol>
+                </ul>
             {% else %}
                 Пользователь не прошел тестирование по Майерсу-Бриггсу
                 {% if user.username == user_.username %}
@@ -69,6 +69,9 @@
                 </ol>
             {% else %}
                 Пользователь не прошел тестирование по Хони-Мамфорду
+                {% if user.username == user_.username %}
+                    <a href="{% url 'lsq_test' %}">Пройти тест</a>
+                {% endif %}
             {% endif %}
         </li>
         {% if profile.remote %}
@@ -78,11 +81,11 @@
         {% endif %}
         {% if profile.specialization.exists %}
             <li>Специализации:
-                <ol>
+                <ul>
                     {% for spec in profile.specialization.all %}
                         <li>{{ spec }}</li>
                     {% endfor %}
-                </ol>
+                </ul>
             </li>
         {% endif %}
         {% if profile.city %}
