@@ -54,6 +54,9 @@
                 </ol>
             {% else %}
                 Пользователь не прошел тестирование по Майерсу-Бриггсу
+                {% if user.username == user_.username %}
+                    <a href="{% url 'mbti_test' %}">Пройти тест</a>
+                {% endif %}
             {% endif %}
         </li>
         <li>

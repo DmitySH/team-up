@@ -126,7 +126,7 @@ class BelbinTestFormView(View):
         for i, form in enumerate(belbin_forms):
             change_labels(form, TestQuestions.belbin[i])
 
-        return render(request, 'main/test.html',
+        return render(request, 'main/belbin_test.html',
                       context={'forms': belbin_forms})
 
     def post(self, request):
@@ -146,13 +146,54 @@ class BelbinTestFormView(View):
         if correct:
             roles = analize_belbin(
                 [form.cleaned_data for form in belbin_forms])
-            roles = roles[::-1]
-            print(roles)
+
             for role in roles:
                 request.user.profile.belbin.add(
                     BelbinTest.objects.get(role=role))
             request.user.profile.save()
             return redirect(request.user.profile.get_absolute_url())
 
-        return render(request, 'main/test.html',
+        return render(request, 'main/belbin_test.html',
                       context={'forms': belbin_forms})
+
+
+class MBTITestFormView(View):
+    def get(self, request):
+        check_auth(request)
+
+        mbti_forms = [MBTIPartForm(prefix=f'form{i + 1}') for i in
+                        range(len(TestQuestions.mbti))]
+        for i, form in enumerate(mbti_forms):
+            change_labels(form, TestQuestions.mbti[i])
+            change_choices(form, TestChoices.mbti[i])
+
+        return render(request, 'main/mbti_test.html',
+                      context={'forms': mbti_forms})
+
+    def post(self, request):
+        check_auth(request)
+
+        mbti_forms = [MBTIPartForm(request.POST, prefix=f'form{i + 1}') for
+                        i in range(len(TestQuestions.mbti))]
+        for i, form in enumerate(mbti_forms):
+            change_labels(form, TestQuestions.mbti[i])
+            change_choices(form, TestChoices.mbti[i])
+
+        correct = True
+
+        for form in mbti_forms:
+            if not form.is_valid():
+                correct = False
+
+        if correct:
+            roles = analize_mbti(
+                [form.cleaned_data for form in mbti_forms])
+
+            for role in roles:
+                request.user.profile.mbti.add(
+                    MBTITest.objects.get(role=role))
+            request.user.profile.save()
+            return redirect(request.user.profile.get_absolute_url())
+
+        return render(request, 'main/mbti_test.html',
+                      context={'forms': mbti_forms})

@@ -11,5 +11,7 @@ urlpatterns = [
          name='edit_profile'),
     path('register/', views.UserFormView.as_view(), name='register'),
     path('profile/belbintest/', views.BelbinTestFormView.as_view(), name='belbin_test'),
+    path('profile/mbtitest/', views.MBTITestFormView.as_view(),
+         name='mbti_test'),
 
 ]
