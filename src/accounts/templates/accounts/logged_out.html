@@ -1,0 +1,12 @@
+{% extends 'accounts_base.html' %}
+{% block main %}
+    <div class="card">
+        <div style="text-align: center" class="card-body">
+            <p>Вы вышли!</p>
+            <p><a href="{% url 'login' %}">Зайти
+                снова</a></p>
+            <p><a href="{% url 'main_page' %}">Главная
+                страница</a></p>
+        </div>
+    </div>
+{% endblock %}

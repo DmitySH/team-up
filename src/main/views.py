@@ -11,34 +11,6 @@ from .forms import *
 from .models import *
 
 
-class MyLogoutView(LogoutView):
-    next_page = '/'
-
-
-class LoginView(View):
-    def get(self, request):
-        form = AuthForm()
-        return render(request, 'main/login.html', context={'form': form})
-
-    def post(self, request):
-        form = AuthForm(request.POST)
-
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-
-            if user:
-                if user.is_active:
-                    login(request, user)
-                    return redirect('profile_detail', slug=username)
-                else:
-                    form.add_error('__all__', 'Пользователь в бане!')
-            else:
-                form.add_error('__all__', 'Неверные данные!')
-        return render(request, 'main/login.html', context={'form': form})
-
-
 class UserDetailView(DetailView):
     model = User
     slug_field = 'username'
@@ -53,31 +25,6 @@ class UserDetailView(DetailView):
         context = super().get_context_data()
         context['profile'] = Profile.objects.get(user_id=context['user_'])
         return context
-
-
-class UserFormView(View):
-    def get(self, request):
-        user_form = RegisterForm()
-        return render(request, 'main/register.html',
-                      context={'user_form': user_form})
-
-    def post(self, request):
-        user_form = RegisterForm(request.POST)
-
-        if user_form.is_valid():
-            user = user_form.save()
-            Profile.objects.create(
-                user=user,
-                patronymic=user_form.cleaned_data.get('patronymic')
-            )
-            username = user_form.cleaned_data.get('username')
-            raw_password = user_form.cleaned_data.get('password1')
-            # todo: uncomment
-            # user = authenticate(username=username, password=raw_password)
-            # login(request, user)
-            return redirect(user.profile.get_absolute_url())
-        return render(request, 'main/register.html',
-                      context={'user_form': user_form})
 
 
 class UserEditView(View):

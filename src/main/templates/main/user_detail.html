@@ -1,10 +1,16 @@
 {% extends 'main/base.html' %}
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
-    <a class="btn btn-light action-button" role="button"
-       href="{% url 'edit_profile' slug=user.username %}">
-        <b>Редактировать профиль</b>
-    </a>
+    {% if user_.username == user.username %}
+        <a class="btn btn-light action-button" role="button"
+           href="{% url 'edit_profile' slug=user.username %}">
+            <b>Редактировать профиль</b>
+        </a>
+        <a class="btn btn-light action-button" role="button"
+           href="{% url 'password_change' %}">
+            <b>Сменить пароль</b>
+        </a>
+    {% endif %}
     <ul style="margin-top: 20px">
         <li>
             <img style="width: 200px" src="{{ profile.photo.url }}"
