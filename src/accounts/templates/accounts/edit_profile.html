@@ -1,0 +1,19 @@
+{% extends 'accounts_base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}Аккаунт{% endblock %}
+{% block card_col %}col-6-lg{% endblock %}
+{% block main %}
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Редактирование профиля</h4>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                {{ form_profile|crispy }}
+                <button type="submit" class="btn btn-primary btn-block">
+                    Изменить
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

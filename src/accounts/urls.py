@@ -10,4 +10,6 @@ urlpatterns = [
          name='password_change'),
     path('password-change/done/', views.MyPasswordChangeDoneView.as_view(),
          name='password_change_done'),
+    path('profiles/<str:slug>/edit/', views.UserEditView.as_view(),
+         name='edit_profile'),
 ]

@@ -27,36 +27,6 @@ class UserDetailView(DetailView):
         return context
 
 
-class UserEditView(View):
-    def get(self, request, slug):
-        check_slug_auth(request, slug)
-
-        form = UserEditForm(instance=request.user)
-        form_profile = ProfileEditForm(instance=request.user.profile)
-        args = {
-            'form_user': form,
-            'form_profile': form_profile,
-        }
-        return render(request, 'main/edit_profile.html', args)
-
-    def post(self, request, slug):
-        check_slug_auth(request, slug)
-
-        form = UserEditForm(request.POST, instance=request.user)
-        form_profile = ProfileEditForm(request.POST, request.FILES,
-                                       instance=request.user.profile)
-        if form.is_valid() and form_profile.is_valid():
-            if not form_profile.cleaned_data['photo']:
-                request.user.profile.photo = 'profile_photos/empty.png'
-                request.user.profile.save()
-            form.save()
-            form_profile.save()
-            return redirect('profile_detail', slug=request.user.username)
-        args = {
-            'form_user': form,
-            'form_profile': form_profile,
-        }
-        return render(request, 'main/edit_profile.html', args)
 
 
 class MainPageView(View):
