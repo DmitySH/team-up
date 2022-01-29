@@ -1,0 +1,17 @@
+{% extends 'tests_base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}Тест{% endblock %}
+{% block card_col %}
+    col-8
+{% endblock %}
+{% block main %}
+    <h2>Прохождение теста Хони и Мамфорда</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for form in forms %}
+            {{ form|crispy }}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-block">Отправить
+        </button>
+    </form>
+{% endblock %}

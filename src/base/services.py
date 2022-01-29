@@ -1,5 +1,3 @@
-import types
-
 from django.core.exceptions import PermissionDenied
 
 

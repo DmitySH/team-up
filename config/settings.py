@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Web apps
     'src.main',
     'src.accounts',
+    'src.tests',
 
     # Oher apps
     'crispy_forms',

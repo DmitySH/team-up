@@ -1,0 +1,23 @@
+<!doctype  html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="{% block card_col %}col-4{% endblock %}">
+            <h1 class="text-center"><a
+                    style="color: #000 !important; text-decoration:none"
+                    href="/">TeamUp</a>
+            </h1>
+            {% block main %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</body>

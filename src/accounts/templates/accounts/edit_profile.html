@@ -8,7 +8,7 @@
             <h4 class="card-title">Редактирование профиля</h4>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form|crispy }}
+                {{ form_user|crispy }}
                 {{ form_profile|crispy }}
                 <button type="submit" class="btn btn-primary btn-block">
                     Изменить

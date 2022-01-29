@@ -61,9 +61,9 @@ class RegisterView(View):
 
             username = user_form.cleaned_data.get('username')
             raw_password = user_form.cleaned_data.get('password1')
-            # todo: uncomment
-            # user = authenticate(username=username, password=raw_password)
-            # login(request, user)
+
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
             return redirect(user.profile.get_absolute_url())
         return render(request, 'accounts/register.html',
                       context={'user_form': user_form})

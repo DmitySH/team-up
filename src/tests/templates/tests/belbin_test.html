@@ -1,0 +1,19 @@
+{% extends 'tests_base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}Тест{% endblock %}
+{% block card_col %}
+    col-6-lg
+{% endblock %}
+{% block main %}
+    <h2>Прохождение теста белбина</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for form in forms %}
+            {{ form|crispy }}
+            <hr>
+            <hr>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-block">Отправить
+        </button>
+    </form>
+{% endblock %}

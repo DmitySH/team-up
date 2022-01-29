@@ -11,31 +11,31 @@
             <b>Сменить пароль</b>
         </a>
     {% endif %}
-    <ul style="margin-top: 20px">
-        <li>
+    <ul style="margin-top: 20px" class="list-group">
+        <li class="list-group-item">
             <img style="width: 200px" src="{{ profile.photo.url }}"
                  alt="Фото профиля">
         </li>
-        <li>Фамилия: {{ user_.last_name }}</li>
-        <li>Имя: {{ user_.first_name }}</li>
+        <li class="list-group-item">Фамилия: {{ user_.last_name }}</li>
+        <li class="list-group-item">Имя: {{ user_.first_name }}</li>
         {% if profile.patronymic %}
-            <li>Отчество: {{ profile.patronymic }}</li>
+            <li class="list-group-item">Отчество: {{ profile.patronymic }}</li>
         {% endif %}
-        <li>Описание:
+        <li class="list-group-item">Описание:
             {% if profile.description %}
                 {{ profile.description }}
             {% else %}
                 Пользователь не рассказывает о себе
             {% endif %}
         </li>
-        <li>
+        <li class="list-group-item">
             {% if profile.cv %}
                 <a href="{{ profile.cv.url }}">Открыть резюме</a>
             {% else %}
                 Резюме: Не загружено
             {% endif %}
         </li>
-        <li>
+        <li class="list-group-item">
             {% if profile.belbin.exists %}
                 Роли по Белбину:
                 <ol>
@@ -50,7 +50,7 @@
                 {% endif %}
             {% endif %}
         </li>
-        <li>
+        <li class="list-group-item">
             {% if profile.mbti.exists %}
                 Роли по Майерсу-Бриггсу:
                 <ul>
@@ -65,7 +65,7 @@
                 {% endif %}
             {% endif %}
         </li>
-        <li>
+        <li class="list-group-item">
             {% if profile.lsq.exists %}
                 Роли по Хони-Мамфорду:
                 <ol>
@@ -81,12 +81,12 @@
             {% endif %}
         </li>
         {% if profile.remote %}
-            <li>
+            <li class="list-group-item">
                 Предпочитает работать: {{ profile.get_remote_value }}
             </li>
         {% endif %}
         {% if profile.specialization.exists %}
-            <li>Специализации:
+            <li class="list-group-item">Специализации:
                 <ul>
                     {% for spec in profile.specialization.all %}
                         <li>{{ spec }}</li>
@@ -95,10 +95,10 @@
             </li>
         {% endif %}
         {% if profile.city %}
-            <li>Город: {{ profile.city }}</li>
+            <li class="list-group-item">Город: {{ profile.city }}</li>
         {% endif %}
         {% if profile.age %}
-            <li>Возраст: {{ profile.age }} лет</li>
+            <li class="list-group-item">Возраст: {{ profile.age }} лет</li>
         {% endif %}
     </ul>
 {% endblock %}
