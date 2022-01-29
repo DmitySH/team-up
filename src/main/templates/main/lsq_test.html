@@ -3,7 +3,7 @@
 {% block content %}
     <div align="left">
         <h2>Прохождение теста белбина</h2>
-        <form method="post" action="{% url 'lsq_test' %}">
+        <form method="post">
             {% csrf_token %}
             {% for form in forms %}
                 {% if form.error %}

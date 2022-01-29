@@ -6,8 +6,7 @@
             Редактирование профиля {{ user.username }}
         </h3>
     
-        <form method="post" enctype="multipart/form-data"
-              action="{% url 'edit_profile' slug=user.username %}">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form_user %}
                 <div>
