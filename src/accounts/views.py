@@ -8,7 +8,7 @@ from django.contrib.auth.views import PasswordChangeView, \
 
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm
-from src.base.services import check_slug_auth
+from src.base.services import check_auth
 from src.main.models import Profile
 
 
@@ -78,9 +78,8 @@ class MyPasswordChangeDoneView(PasswordChangeDoneView):
 
 
 class UserEditView(View):
-    def get(self, request, slug):
-        check_slug_auth(request, slug)
-
+    def get(self, request):
+        check_auth(request)
         form = UserEditForm(instance=request.user)
         form_profile = ProfileEditForm(instance=request.user.profile)
 
@@ -90,8 +89,8 @@ class UserEditView(View):
         }
         return render(request, 'accounts/edit_profile.html', args)
 
-    def post(self, request, slug):
-        check_slug_auth(request, slug)
+    def post(self, request):
+        check_auth(request)
 
         form = UserEditForm(request.POST, instance=request.user)
         form_profile = ProfileEditForm(request.POST, request.FILES,

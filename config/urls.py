@@ -6,8 +6,8 @@ from config import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('src.main.urls')),
     path('', include('src.accounts.urls')),
+    path('', include('src.main.urls')),
     path('', include('src.tests.urls')),
 
 ]

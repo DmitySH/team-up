@@ -121,6 +121,12 @@ class Profile(models.Model):
                     second_name=self.patronymic
                     )
 
+    def offer(self):
+        try:
+            return self.executor_offer
+        except Exception:
+            return None
+
     def get_absolute_url(self):
         return reverse('profile_detail', kwargs={'slug': self.user.username})
 
