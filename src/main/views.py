@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from .forms import ExecutorOfferForm
 from src.base.services import *
@@ -28,12 +28,12 @@ class MainPageView(View):
         return render(request, 'main/main_page.html')
 
 
-class ExecutorOfferView(View):
+class ExecutorOfferFormView(View):
     def get(self, request):
         check_auth(request)
 
         form = ExecutorOfferForm(instance=request.user.profile.offer())
-        return render(request, 'main/executor_offer.html',
+        return render(request, 'main/executor_offer_form.html',
                       context={'form': form})
 
     def post(self, request):
@@ -49,7 +49,7 @@ class ExecutorOfferView(View):
             )
             return redirect('profile_detail', slug=request.user.username)
 
-        return render(request, 'main/executor_offer.html',
+        return render(request, 'main/executor_offer_form.html',
                       context={'form': form})
 
 
@@ -59,3 +59,9 @@ def delete_offer(request):
         if offer:
             offer.delete()
     return redirect(request.user.profile.get_absolute_url())
+
+
+class ExecutorOfferListView(ListView):
+    model = ExecutorOffer
+    queryset = ExecutorOffer.objects.all()
+    template_name = 'main/executor_offer_list.html'
