@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from .forms import ExecutorOfferForm
+from .forms import ExecutorOfferForm, ProjectForm
 from src.base.services import *
 from .models import *
 
@@ -61,7 +61,42 @@ def delete_offer(request):
     return redirect(request.user.profile.get_absolute_url())
 
 
+def delete_project(request):
+    if request.POST:
+        project = request.user.profile.profile_statuses.get(
+            status__value='Создатель').project
+        if project:
+            project.delete()
+    return redirect(request.user.profile.get_absolute_url())
+
+
 class ExecutorOfferListView(ListView):
     model = ExecutorOffer
     queryset = ExecutorOffer.objects.all()
     template_name = 'main/executor_offer_list.html'
+
+
+class ProjectFormView(View):
+    def get(self, request):
+        check_auth(request)
+
+        form = ProjectForm()
+        return render(request, 'main/project_form.html',
+                      context={'form': form})
+
+    def post(self, request):
+        check_auth(request)
+        form = ProjectForm(request.POST)
+
+        if form.is_valid():
+            project = form.save()
+            ProfileProjectStatus.objects.create(profile=request.user.profile,
+                                                project=project,
+                                                status=Status.objects.get(
+                                                    value='Создатель')
+                                                )
+
+            return redirect('profile_detail', slug=request.user.username)
+
+        return render(request, 'main/project_form.html',
+                      context={'form': form})

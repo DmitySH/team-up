@@ -1,6 +1,7 @@
 {% extends 'main_base.html' %}
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
+    {% load filters %}
     <div>
         {% if user_.username == user.username %}
             <a class="btn btn-light action-button" role="button"
@@ -106,8 +107,8 @@
             {% endif %}
         </ul>
     </div>
-    <div>
-        {% if user_.username == user.username %}
+    {% if user_.username == user.username %}
+        <div>
             <a class="btn btn-light action-button" role="button"
                href="{% url 'executor_offer' %}">
                 <b>{% if not profile.executor_offer %}Создать
@@ -122,7 +123,21 @@
                     </button>
                 </form>
             {% endif %}
-        {% endif %}
-    </div>
-
+        </div>
+        <div>
+            {% if not profile|leader %}
+                <a class="btn btn-light action-button" role="button"
+                   href="{% url 'create_project' %}">
+                    <b>Создать проект</b>
+                </a>
+            {% else %}
+                <form method="post" action="{% url 'delete_project' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-light action-button">
+                        <b>Удалить проект</b>
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

@@ -16,3 +16,8 @@ def index_from_one(indexable, i):
 @register.filter(name='iter')
 def itter(gen):
     return next(gen)
+
+
+@register.filter(name='leader')
+def check_leader(profile):
+    return profile.profile_statuses.filter(status__value='Создатель').exists()
