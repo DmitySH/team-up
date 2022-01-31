@@ -11,9 +11,19 @@
             <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
-                <button type="submit" class="btn btn-primary btn-block">Сохранить
+                <button type="submit" class="btn btn-primary btn-block">
+                    Сохранить
                 </button>
             </form>
+            {% if form.initial %}
+                <form style="margin-top: 40px" method="post"
+                      action="{% url 'delete_offer' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-block">
+                        <b>Удалить</b>
+                    </button>
+                </form>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -54,6 +54,7 @@ class ExecutorOfferFormView(View):
 
 
 def delete_offer(request):
+    check_auth(request)
     if request.POST:
         offer = request.user.profile.offer()
         if offer:
@@ -62,6 +63,7 @@ def delete_offer(request):
 
 
 def delete_project(request):
+    check_auth(request)
     if request.POST:
         project = request.user.profile.project()
         if project:

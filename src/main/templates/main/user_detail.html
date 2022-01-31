@@ -115,14 +115,6 @@
                 {% else %}Редактировать
                 {% endif %}предложение работника</b>
             </a>
-            {% if profile.executor_offer %}
-                <form method="post" action="{% url 'delete_offer' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-light action-button">
-                        <b>Удалить предложение</b>
-                    </button>
-                </form>
-            {% endif %}
         </div>
         <div>
             <a class="btn btn-light action-button" role="button"
@@ -131,14 +123,6 @@
                 {% else %}Редактировать
                 {% endif %}проект</b>
             </a>
-            {% if profile.project %}
-                <form method="post" action="{% url 'delete_project' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-light action-button">
-                        <b>Удалить проект</b>
-                    </button>
-                </form>
-            {% endif %}
         </div>
     {% endif %}
 {% endblock %}
