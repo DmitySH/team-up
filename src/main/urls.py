@@ -13,5 +13,6 @@ urlpatterns = [
     path('project/', views.ProjectFormView.as_view(),
          name='project'),
     path('projects/', views.ProjectListView.as_view(), name='project_list'),
-
+    path('projects/<str:slug>/', views.ProjectDetailView.as_view(),
+         name='project_detail'),
 ]

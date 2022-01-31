@@ -1,0 +1,50 @@
+{% extends 'main_base.html' %}
+{% block title %}Проект{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="justify-content-center">
+            <h1 class="page-header text-center">
+                <b>Проект {{ project.title }}</b></h1>
+            <ul class="list-group">
+                <li class="list-group-item text-center">
+                    <h4 class="text-center">Описание:</h4>
+                    {{ project.description }}
+                </li>
+                {% if project.city %}
+                    <li class="list-group-item">
+                        <h4 class="text-center">Город:</h4>
+                        <h5 class="text-center">{{ project.city }}
+                            (
+                            {% if project.online is not None %}
+                                {{ project.get_remote_value }}
+                            {% endif %}
+                            )
+                        </h5>
+                    </li>
+                {% endif %}
+                <li class="list-group-item">
+                    <h4 class="text-center">Вакантных мест:</h4>
+                    <h5 class="text-center">{{ project.vacant }}</h5>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="text-center">Требуются специализации:</h4>
+                    <br>
+                    <ol class="text-center list-group">
+                        {% for spec in project.required_specialization.all %}
+                            <li class="list-group-item text-center">{{ spec }}</li>
+                        {% endfor %}
+                    </ol>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="text-center">Требуются роли по Белбину:</h4>
+                    <br>
+                    <ol class="text-center list-group">
+                        {% for role in  project.required_belbin.all %}
+                            <li class="list-group-item  text-center">{{ role }}</li>
+                        {% endfor %}
+                    </ol>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

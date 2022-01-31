@@ -1,6 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from src.accounts.models import Profile, Specialization
 from src.tests.models import BelbinTest, MBTITest, LSQTest
@@ -80,6 +81,9 @@ class Project(models.Model):
 
     def __str__(self):
         return 'Проект {project}'.format(project=self.title)
+
+    def get_absolute_url(self):
+        return reverse('project_detail', kwargs={'slug': self.title})
 
     class Meta:
         verbose_name = 'Проект'
