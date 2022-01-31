@@ -1,0 +1,68 @@
+{% extends 'main_base.html' %}
+{% block title %}Проекты{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-start">
+            {% for project in project_list %}
+                <div class="col-6 card">
+                    <div class="card-body">
+                        <ul class="list-group text-center">
+                            <li class="list-group-item">
+                                <b>{{ project.title }}</b>
+                            </li>
+                            <li class="list-group-item">
+                                Описание:
+                                <br>
+                                {{ project.description }}
+                            </li>
+                            {% if project.city %}
+                                <li class="list-group-item">
+                                    Город:
+                                    <br>
+                                    {{ project.city }}
+                                </li>
+                            {% endif %}
+                            <li class="list-group-item">
+                                Вакантных мест:
+                                <br>
+                                {{ project.vacant }}
+                            </li>
+                            {% if project.online is not None%}
+                                <li class="list-group-item">
+                                    {{ project.get_remote_value }}
+                                </li>
+                            {% endif %}
+
+                            <li class="list-group-item">
+                                Требуются специализации:
+                                <br>
+                                <ol>
+                                    {% for spec in project.required_specialization.all %}
+                                        <li class="list-group-item">{{ spec }}</li>
+                                    {% endfor %}
+                                </ol>
+                            </li>
+                            <li class="list-group-item">
+                                Требуются роли по Белбину:
+                                <br>
+                                <ol>
+                                    {% for role in  project.required_belbin.all %}
+                                        <li class="list-group-item">{{ role }}</li>
+                                    {% endfor %}
+                                </ol>
+                            </li>
+{#                            <li class="list-group-item">#}
+{#                                <a href="{{ offer.profile.get_absolute_url }}">#}
+{#                                    <button type="button"#}
+{#                                            class="btn btn-primary">#}
+{#                                        Перейти в профиль#}
+{#                                    </button>#}
+{#                                </a>#}
+{#                            </li>#}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

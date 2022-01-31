@@ -12,5 +12,6 @@ urlpatterns = [
     path('workers/', views.ExecutorOfferListView.as_view(), name='offer_list'),
     path('project/', views.ProjectFormView.as_view(),
          name='project'),
+    path('projects/', views.ProjectListView.as_view(), name='project_list'),
 
 ]

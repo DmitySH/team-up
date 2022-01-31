@@ -106,3 +106,9 @@ class ProjectFormView(View):
 
         return render(request, 'main/project_form.html',
                       context={'form': form})
+
+
+class ProjectListView(ListView):
+    model = Project
+    queryset = Project.objects.all()
+    template_name = 'main/project_list.html'

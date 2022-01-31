@@ -30,6 +30,7 @@
                             {% if offer.profile.specialization.exists %}
                                 <li class="list-group-item">
                                     Специализации:
+                                    <br>
                                     <ul>
                                         {% for spec in offer.profile.specialization.all %}
                                             <li class="list-group-item">{{ spec }}</li>
@@ -39,6 +40,7 @@
                             {% endif %}
                             {% if offer.profile.belbin.exists %}
                                 <li class="list-group-item">
+                                    <br>
                                     Роли по Белбину:
                                     <ol>
                                         {% for role in offer.profile.belbin.all %}

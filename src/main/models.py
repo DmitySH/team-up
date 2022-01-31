@@ -48,6 +48,10 @@ class Project(models.Model):
         (ONLINE, 'Присутствие не требуется'),
     )
 
+    def get_remote_value(self):
+        return self.REMOTE_CHOICES[2][1] if self.online else \
+            self.REMOTE_CHOICES[1][1]
+
     title = models.CharField('Название', max_length=200)
     description = models.TextField('Описание')
     vacant = models.PositiveSmallIntegerField('Вакантных мест',
@@ -57,12 +61,12 @@ class Project(models.Model):
                                               ]
                                               )
     city = models.CharField('Город', max_length=50, blank=True)
-    offline = models.BooleanField('Возможность работы онлайн',
-                                  choices=REMOTE_CHOICES,
-                                  default=None,
-                                  null=True,
-                                  blank=True
-                                  )
+    online = models.BooleanField('Возможность работы онлайн',
+                                 choices=REMOTE_CHOICES,
+                                 default=None,
+                                 null=True,
+                                 blank=True
+                                 )
     verified = models.BooleanField('Подтвержден', default=False)
 
     required_specialization = models.ManyToManyField(Specialization,
