@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="{% static 'css/footer_style.css' %}"
           type="text/css"
           media="all">
+    <link rel="stylesheet" href="{% static 'css/sidebar_style.css' %}"
+          type="text/css"
+          media="all">
     <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700"
           rel="stylesheet">
@@ -35,10 +38,14 @@
 <div style="background-color: rgba(0, 0, 0, 0); margin-top: 0;">
     {% include 'include/header.html' %}
 </div>
+<div>
+    {% block sidebar %}
+    {% endblock %}
+</div>
 <div class="container">
     {% block content %}
 
-{% endblock content %}
+    {% endblock content %}
 </div>
 <div>
     {% include 'include/footer.html' %}

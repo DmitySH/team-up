@@ -1,7 +1,6 @@
 {% extends 'main_base.html' %}
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
-    {% load filters %}
     <div>
         {% if user_.username == user.username %}
             <a class="btn btn-light action-button" role="button"
