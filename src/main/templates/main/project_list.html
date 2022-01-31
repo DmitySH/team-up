@@ -27,16 +27,15 @@
                                 <br>
                                 {{ project.vacant }}
                             </li>
-                            {% if project.online is not None%}
+                            {% if project.online is not None %}
                                 <li class="list-group-item">
                                     {{ project.get_remote_value }}
                                 </li>
                             {% endif %}
-
                             <li class="list-group-item">
                                 Требуются специализации:
                                 <br>
-                                <ol>
+                                <ol class="text-center list-group">
                                     {% for spec in project.required_specialization.all %}
                                         <li class="list-group-item">{{ spec }}</li>
                                     {% endfor %}
@@ -45,20 +44,20 @@
                             <li class="list-group-item">
                                 Требуются роли по Белбину:
                                 <br>
-                                <ol>
+                                <ol class="text-center list-group">
                                     {% for role in  project.required_belbin.all %}
                                         <li class="list-group-item">{{ role }}</li>
                                     {% endfor %}
                                 </ol>
                             </li>
-{#                            <li class="list-group-item">#}
-{#                                <a href="{{ offer.profile.get_absolute_url }}">#}
-{#                                    <button type="button"#}
-{#                                            class="btn btn-primary">#}
-{#                                        Перейти в профиль#}
-{#                                    </button>#}
-{#                                </a>#}
-{#                            </li>#}
+                            <li class="list-group-item">
+                                <a href="{{ project.get_absolute_url }}">
+                                    <button type="button"
+                                            class="btn btn-primary">
+                                        Перейти к проекту
+                                    </button>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

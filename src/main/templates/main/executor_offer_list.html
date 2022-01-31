@@ -31,7 +31,7 @@
                                 <li class="list-group-item">
                                     Специализации:
                                     <br>
-                                    <ul>
+                                    <ul class="text-center list-group">
                                         {% for spec in offer.profile.specialization.all %}
                                             <li class="list-group-item">{{ spec }}</li>
                                         {% endfor %}
@@ -42,11 +42,11 @@
                                 <li class="list-group-item">
                                     <br>
                                     Роли по Белбину:
-                                    <ol>
+                                    <ul class="text-center list-group">
                                         {% for role in offer.profile.belbin.all %}
                                             <li class="list-group-item">{{ role }}</li>
                                         {% endfor %}
-                                    </ol>
+                                    </ul>
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
