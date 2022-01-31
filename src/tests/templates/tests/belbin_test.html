@@ -1,6 +1,6 @@
 {% extends 'tests_base.html' %}
 {% load crispy_forms_filters %}
-{% block title %}Тест{% endblock %}
+{% block title %}Тест Белбина{% endblock %}
 {% block card_col %}
     col-6-lg
 {% endblock %}
@@ -9,7 +9,14 @@
     <form method="post">
         {% csrf_token %}
         {% for form in forms %}
-            {{ form|crispy }}
+            {% if form.error %}
+                <p style="color: #a32727">{{ form.error }}</p>
+            {% endif %}
+            <div style="outline: 2px solid
+                    {% if form.error %}#a32727 {% else %} #fff {% endif %};
+                    border: 10px solid #fff; border-radius: 10px;">
+                {{ form|crispy }}
+            </div>
             <hr>
             <hr>
         {% endfor %}
