@@ -10,7 +10,7 @@ urlpatterns = [
     path('profile/delete-offer', views.delete_offer, name='delete_offer'),
     path('profile/delete-project', views.delete_project, name='delete_project'),
     path('workers/', views.ExecutorOfferListView.as_view(), name='offer_list'),
-    path('create-project/', views.ProjectFormView.as_view(),
-         name='create_project'),
+    path('project/', views.ProjectFormView.as_view(),
+         name='project'),
 
 ]

@@ -63,8 +63,7 @@ def delete_offer(request):
 
 def delete_project(request):
     if request.POST:
-        project = request.user.profile.profile_statuses.get(
-            status__value='Создатель').project
+        project = request.user.profile.project()
         if project:
             project.delete()
     return redirect(request.user.profile.get_absolute_url())
@@ -80,21 +79,26 @@ class ProjectFormView(View):
     def get(self, request):
         check_auth(request)
 
-        form = ProjectForm()
+        form = ProjectForm(instance=request.user.profile.project())
         return render(request, 'main/project_form.html',
                       context={'form': form})
 
     def post(self, request):
         check_auth(request)
-        form = ProjectForm(request.POST)
+        project = request.user.profile.project()
+
+        form = ProjectForm(request.POST, instance=project)
 
         if form.is_valid():
-            project = form.save()
-            ProfileProjectStatus.objects.create(profile=request.user.profile,
-                                                project=project,
-                                                status=Status.objects.get(
-                                                    value='Создатель')
-                                                )
+            if project:
+                form.save()
+            else:
+                project = form.save()
+                ProfileProjectStatus.objects.create(
+                    profile=request.user.profile,
+                    project=project,
+                    status=Status.objects.get(
+                        value='Создатель'))
 
             return redirect('profile_detail', slug=request.user.username)
 

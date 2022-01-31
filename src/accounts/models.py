@@ -127,6 +127,13 @@ class Profile(models.Model):
         except Exception:
             return None
 
+    def project(self):
+        leader_status = self.profile_statuses.filter(status__value='Создатель')
+        if leader_status.exists():
+            return leader_status.first().project
+        else:
+            return None
+
     def get_absolute_url(self):
         return reverse('profile_detail', kwargs={'slug': self.user.username})
 

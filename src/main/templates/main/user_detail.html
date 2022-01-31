@@ -125,12 +125,13 @@
             {% endif %}
         </div>
         <div>
-            {% if not profile|leader %}
-                <a class="btn btn-light action-button" role="button"
-                   href="{% url 'create_project' %}">
-                    <b>Создать проект</b>
-                </a>
-            {% else %}
+            <a class="btn btn-light action-button" role="button"
+               href="{% url 'project' %}">
+                <b>{% if not profile.project %}Создать
+                {% else %}Редактировать
+                {% endif %}проект</b>
+            </a>
+            {% if profile.project %}
                 <form method="post" action="{% url 'delete_project' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-light action-button">
