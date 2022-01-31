@@ -72,7 +72,7 @@ def delete_project(request):
 
 class ExecutorOfferListView(ListView):
     model = ExecutorOffer
-    queryset = ExecutorOffer.objects.all()
+    queryset = ExecutorOffer.objects.all().select_related('profile')
     template_name = 'main/executor_offer_list.html'
 
 

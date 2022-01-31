@@ -57,7 +57,7 @@
             </li>
             <li class="list-group-item">
                 {% if profile.mbti.exists %}
-                    Роли по Майерсу-Бриггсу:
+                    Роли по Майерс-Бриггсу:
                     <ul>
                         {% for role in profile.mbti.all %}
                             <li>{{ role }}</li>
@@ -73,11 +73,11 @@
             <li class="list-group-item">
                 {% if profile.lsq.exists %}
                     Роли по Хони-Мамфорду:
-                    <ol>
+                    <ul>
                         {% for role in profile.lsq.all %}
                             <li>{{ role }}</li>
                         {% endfor %}
-                    </ol>
+                    </ul>
                 {% else %}
                     Пользователь не прошел тестирование по Хони-Мамфорду
                     {% if user.username == user_.username %}

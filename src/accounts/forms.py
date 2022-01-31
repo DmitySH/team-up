@@ -48,4 +48,4 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         exclude = (
-            'user', 'verified', 'specialization', 'belbin', 'mbti', 'lsq')
+            'user', 'verified', 'belbin', 'mbti', 'lsq')

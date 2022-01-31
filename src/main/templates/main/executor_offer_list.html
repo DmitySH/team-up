@@ -27,6 +27,26 @@
                                 {{ offer.work_hours }}
                                 часов в неделю
                             </li>
+                            {% if offer.profile.specialization.exists %}
+                                <li class="list-group-item">
+                                    Специализации:
+                                    <ul>
+                                        {% for spec in offer.profile.specialization.all %}
+                                            <li class="list-group-item">{{ spec }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endif %}
+                            {% if offer.profile.belbin.exists %}
+                                <li class="list-group-item">
+                                    Роли по Белбину:
+                                    <ol>
+                                        {% for role in offer.profile.belbin.all %}
+                                            <li class="list-group-item">{{ role }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </li>
+                            {% endif %}
                             <li class="list-group-item">
                                 <a href="{{ offer.profile.get_absolute_url }}">
                                     <button type="button"
