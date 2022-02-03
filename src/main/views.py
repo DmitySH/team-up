@@ -68,10 +68,76 @@ def delete_project(request):
     return redirect(request.user.profile.get_absolute_url())
 
 
-class ExecutorOfferListView(ListView):
+class SpecializationsBelbin:
+    def get_specializations(self):
+        return Specialization.objects.all()
+
+    def get_belbin(self):
+        return BelbinTest.objects.all()
+
+
+class ExecutorFilterExtention(SpecializationsBelbin):
+    def get_cities(self):
+        return sorted([x for x in set(map(lambda x: x[0],
+                                          Profile.objects.all().values_list(
+                                              'city'))) if x])
+
+    def get_remote(self):
+        return sorted(
+            [x for x in map(lambda x: x[1], Profile.RemoteChoices.choices)
+             if x != 'Не указывать'])
+
+
+class ExecutorOfferListView(ListView, ExecutorFilterExtention):
     model = ExecutorOffer
-    queryset = ExecutorOffer.objects.all().select_related('profile')
     template_name = 'main/executor_offer_list.html'
+
+    def get_queryset(self):
+        if self.request.GET:
+            queryset = self.make_filter()
+        else:
+            queryset = ExecutorOffer.objects.all().select_related('profile')
+
+        return queryset
+
+    def make_filter(self):
+        # remote_chosen = [item[0] for item in Project.REMOTE_CHOICES
+        #                  if item[1] in self.request.GET.getlist('remote')]
+        #
+        # if not self.request.GET.getlist('remote'):
+        #     remote = Q()
+        # elif None in remote_chosen:
+        #     remote = Q(online__isnull=True) | Q(online__in=remote_chosen)
+        # else:
+        #     remote = Q(id__in=[]) | Q(online__in=remote_chosen)
+        #
+        def convert_remote(remote):
+            if remote == 'Онлайн':
+                return 1
+            if remote == 'И онлайн, и оффлайн':
+                return 2
+            if remote == 'Оффлайн':
+                return 3
+
+        cities = Q() if not self.request.GET.getlist('city') \
+            else Q(profile__city__in=self.request.GET.getlist('city'))
+        remote = Q() if not self.request.GET.getlist('remote') \
+            else Q(profile__remote__in=[convert_remote(x) for x in
+                                        self.request.GET.getlist('remote')])
+        roles = Q() if not self.request.GET.getlist('role') \
+            else Q(profile__belbin__role__in=self.request.GET.getlist('role'))
+        specializations = Q() if not self.request.GET.getlist('specialization') \
+            else Q(profile__specialization__name__in=self.request.GET.getlist(
+            'specialization'))
+        age = Q(
+            profile__age__range=(int(self.request.GET.get('min-age') or 14),
+                                 int(self.request.GET.get('max-age') or 100)
+                                 )) | Q(profile__age__isnull=True)
+        queryset = ExecutorOffer.objects.filter(
+            cities & remote & roles & specializations & age
+        ).distinct()
+
+        return queryset
 
 
 class ProjectFormView(View):
@@ -105,17 +171,11 @@ class ProjectFormView(View):
                       context={'form': form})
 
 
-class ProjectFilterExtention:
+class ProjectFilterExtention(SpecializationsBelbin):
     def get_cities(self):
         return sorted(list(set(map(lambda x: x[0],
                                    Project.objects.all().values_list(
                                        'city')))))
-
-    def get_specializations(self):
-        return Specialization.objects.all()
-
-    def get_belbin(self):
-        return BelbinTest.objects.all()
 
     def get_remote(self):
         return sorted(list(map(lambda x: x[1], Project.REMOTE_CHOICES)))
