@@ -133,7 +133,6 @@ class ProjectListView(ListView, ProjectFilterExtention):
                     'search'))
 
         elif self.request.GET and self.request.GET.get('search') != '':
-
             queryset = self.make_filter()
         else:
             queryset = Project.objects.all()
