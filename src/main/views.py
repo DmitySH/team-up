@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView, ListView
@@ -104,18 +105,59 @@ class ProjectFormView(View):
                       context={'form': form})
 
 
-class ProjectListView(ListView):
+class ProjectFilterExtention:
+    def get_cities(self):
+        return sorted(list(set(map(lambda x: x[0],
+                                   Project.objects.all().values_list(
+                                       'city')))))
+
+    def get_specializations(self):
+        return Specialization.objects.all()
+
+    def get_belbin(self):
+        return BelbinTest.objects.all()
+
+    def get_remote(self):
+        return sorted(list(map(lambda x: x[1], Project.REMOTE_CHOICES)))
+
+
+class ProjectListView(ListView, ProjectFilterExtention):
     model = Project
     queryset = Project.objects.all()
     template_name = 'main/project_list.html'
+
+    def get_queryset(self):
+        print(self.request.GET)
+        if self.request.GET.get('search'):
+            print('fsdf')
+            return Project.objects.filter(
+                title__icontains=self.request.GET.get(
+                    'search'))
+
+        elif self.request.GET and self.request.GET.get(
+                'search') != '':
+            remote_chosen = [item[0] for item in Project.REMOTE_CHOICES
+                             if item[1] in self.request.GET.getlist('remote')]
+
+            null_remote = Q(
+                online__isnull=True) if None in remote_chosen else Q(id__in=[])
+
+            queryset = Project.objects.filter(
+                Q(city__in=self.request.GET.getlist('city')) |
+                Q(required_specialization__name__in=self.request.GET.getlist(
+                    'specialization')) |
+                Q(required_belbin__role__in=self.request.GET.getlist(
+                    'role')) |
+                Q(online__in=remote_chosen) | null_remote
+
+            ).distinct()
+        else:
+            queryset = Project.objects.all()
+
+        return queryset
 
 
 class ProjectDetailView(DetailView):
     model = Project
     slug_field = 'title'
     template_name = 'main/project_detail.html'
-
-
-
-
-
