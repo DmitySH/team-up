@@ -1,7 +1,9 @@
 {% extends 'main_base.html' %}
 {% block title %}Проекты{% endblock %}
-{% block content %}
+{% block sidebar %}
     {% include 'include/project_filter.html' %}
+{% endblock %}
+{% block content %}
     <div class="container">
         <div class="row justify-content-md-start">
             {% for project in project_list %}

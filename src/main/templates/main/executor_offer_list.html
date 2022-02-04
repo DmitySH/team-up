@@ -1,7 +1,9 @@
 {% extends 'main_base.html' %}
 {% block title %}Предложения{% endblock %}
-{% block content %}
+{% block sidebar %}
     {% include 'include/executor_filter.html' %}
+{% endblock %}
+{% block content %}
     <div class="container">
         <div class="row justify-content-md-start">
             {% for offer in executoroffer_list %}

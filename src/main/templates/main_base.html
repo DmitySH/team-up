@@ -36,19 +36,25 @@
           crossorigin="anonymous">
 </head>
 <body>
-<div style="background-color: rgba(0, 0, 0, 0); margin-top: 0;">
-    {% include 'include/header.html' %}
-</div>
-<div>
-    {% block sidebar %}
-    {% endblock %}
-</div>
-<div class="container">
-    {% block content %}
+<div id="page" class="page">
+    <div class="main-banner bg" id="home"
+         style="background-color: rgba(0, 0, 0, 0); margin-top: 0px;">
+        {% include 'include/header.html' %}
+    </div>
+    <div class="row">
+        {% block sidebar %}
+        {% endblock sidebar %}
 
-    {% endblock content %}
-</div>
-<div>
+        <div class="container">
+            <section class="ab-info-main py-md-5 py-4 editContent"
+                     style="padding-left: 3rem; padding-right: 3rem;">
+                <div class="container-fluid py-md-3">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+            </section>
+        </div>
+    </div>
     {% include 'include/footer.html' %}
 </div>
 </body>

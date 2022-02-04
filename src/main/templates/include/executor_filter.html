@@ -1,82 +1,95 @@
-{% extends 'include/sidebar.html' %}
-{% block filters %}
-    <div>
-        <form action="{% url 'offer_list' %}" method="get">
-            <div class="left-side my-4">
-                <h3 class="sear-head editContent">Специализации</h3>
-                <ul class="w3layouts-box-list">
-                    {% for specialization in view.get_specializations %}
+<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark"
+     style="width: 280px;">
+    <form action="{% url 'offer_list' %}" method="get">
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li>
+                <div class="left-side my-4">
+                    <h3 class="sear-head editContent">Специализации</h3>
+                    <ul class="w3layouts-box-list">
+                        {% for specialization in view.get_specializations %}
+                            <li class="editContent">
+                                <input type="checkbox" class="checked"
+                                       name="specialization"
+                                       value="{{ specialization }}">
+                                <span class="span editContent">{{ specialization }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <div class="left-side my-4">
+                    <h3 class="sear-head editContent">Роли по Белбину</h3>
+                    <ul class="w3layouts-box-list">
+                        {% for role in view.get_belbin %}
+                            <li class="editContent">
+                                <input type="checkbox" class="checked"
+                                       name="role"
+                                       value="{{ role }}">
+                                <span class="span editContent">{{ role }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <div class="left-side my-4">
+                    <h3 class="sear-head editContent">Возможность удаленной
+                        работы</h3>
+                    <ul class="w3layouts-box-list">
+                        {% for remote in view.get_remote %}
+                            <li class="editContent">
+                                <input type="checkbox" class="checked"
+                                       name="remote"
+                                       value="{{ remote }}">
+                                <span class="span editContent">{{ remote }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <div class="left-side">
+                    <h3 class="sear-head editContent">Город</h3>
+                    <ul class="w3layouts-box-list">
+                        {% for city in view.get_cities %}
+                            <li class="editContent">
+                                <input type="checkbox" class="checked"
+                                       name="city"
+                                       value="{{ city }}">
+                                <span class="span editContent">{{ city }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <div class="left-side">
+                    <h3 class="sear-head editContent">Возраст</h3>
+                    <ul class="w3layouts-box-list">
                         <li class="editContent">
-                            <input type="checkbox" class="checked"
-                                   name="specialization"
-                                   value="{{ specialization }}">
-                            <span class="span editContent">{{ specialization }}</span>
+                            <label for="min-age">От</label>
+                            <input type="number"
+                                   name="min-age"
+                                   value="14"
+                                   min="14"
+                                   max="100">
                         </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="left-side my-4">
-                <h3 class="sear-head editContent">Роли по Белбину</h3>
-                <ul class="w3layouts-box-list">
-                    {% for role in view.get_belbin %}
                         <li class="editContent">
-                            <input type="checkbox" class="checked"
-                                   name="role"
-                                   value="{{ role }}">
-                            <span class="span editContent">{{ role }}</span>
+                            <label for="max-age">До</label>
+                            <input type="number"
+                                   name="max-age"
+                                   value="100"
+                                   min="14"
+                                   max="100">
                         </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="left-side my-4">
-                <h3 class="sear-head editContent">Возможность удаленной
-                    работы</h3>
-                <ul class="w3layouts-box-list">
-                    {% for remote in view.get_remote %}
-                        <li class="editContent">
-                            <input type="checkbox" class="checked"
-                                   name="remote"
-                                   value="{{ remote }}">
-                            <span class="span editContent">{{ remote }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="left-side">
-                <h3 class="sear-head editContent">Город</h3>
-                <ul class="w3layouts-box-list">
-                    {% for city in view.get_cities %}
-                        <li class="editContent">
-                            <input type="checkbox" class="checked"
-                                   name="city"
-                                   value="{{ city }}">
-                            <span class="span editContent">{{ city }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="left-side">
-                <h3 class="sear-head editContent">Возраст</h3>
-                <ul class="w3layouts-box-list">
-                    <li class="editContent">
-                        <label for="min-age">От</label>
-                        <input type="number"
-                               name="min-age"
-                               value="14"
-                               min="14"
-                               max="100">
-                    </li>
-                    <li class="editContent">
-                        <label for="max-age">До</label>
-                        <input type="number"
-                               name="max-age"
-                               value="100"
-                               min="14"
-                               max="100">
-                    </li>
-                </ul>
-            </div>
-            <button type="submit">Найти</button>
-        </form>
-    </div>
-{% endblock %}
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        <button type="submit">Найти</button>
+    </form>
+</div>
+
+
+
