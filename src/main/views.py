@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from .forms import ExecutorOfferForm, ProjectForm
+from .forms import ExecutorOfferForm, ProjectForm, WorkerSlotForm
 from src.base.services import *
 from .models import *
 
@@ -22,6 +22,7 @@ class UserDetailView(DetailView):
 
 class MainPageView(View):
     def get(self, request):
+        # WorkerSlot.objects.all().first().delete()
         return render(request, 'main/main_page.html')
 
 
@@ -68,6 +69,19 @@ def delete_project(request):
     return redirect(request.user.profile.get_absolute_url())
 
 
+def delete_slot(request, pk):
+    check_auth(request)
+    if request.POST:
+        slot = WorkerSlot.objects.filter(id=pk).first()
+        if slot:
+            slot.delete()
+    project = request.user.profile.project()
+    if project:
+        return redirect('project_detail', slug=project.title)
+    else:
+        return redirect('main_page')
+
+
 class SpecializationsBelbin:
     def get_specializations(self):
         return Specialization.objects.all()
@@ -101,16 +115,6 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtention):
         return queryset
 
     def make_filter(self):
-        # remote_chosen = [item[0] for item in Project.REMOTE_CHOICES
-        #                  if item[1] in self.request.GET.getlist('remote')]
-        #
-        # if not self.request.GET.getlist('remote'):
-        #     remote = Q()
-        # elif None in remote_chosen:
-        #     remote = Q(online__isnull=True) | Q(online__in=remote_chosen)
-        # else:
-        #     remote = Q(id__in=[]) | Q(online__in=remote_chosen)
-        #
         def convert_remote(remote):
             if remote == 'Онлайн':
                 return 1
@@ -229,3 +233,35 @@ class ProjectDetailView(DetailView):
     model = Project
     slug_field = 'title'
     template_name = 'main/project_detail.html'
+
+
+class WorkerSlotFormView(View):
+    def get(self, request, slug, pk):
+        check_auth(request)
+        check_own_project(request, slug)
+        slot = Project.objects.get(title=slug).team.filter(id=pk).first()
+        form = WorkerSlotForm(instance=slot)
+        return render(request, 'main/worker_slot_form.html',
+                      context={'form': form})
+
+    def post(self, request, slug, pk):
+        check_auth(request)
+        check_own_project(request, slug)
+        project = Project.objects.get(title=slug)
+        slot = project.team.filter(id=pk).first()
+
+        form = WorkerSlotForm(request.POST, instance=slot)
+
+        if form.is_valid():
+            if slot:
+                form.save()
+            else:
+                slot = form.save()
+                slot.project = project
+                slot.profile = None
+                slot.save()
+
+            return redirect('project_detail', slug=slug)
+
+        return render(request, 'main/worker_slot_form.html',
+                      context={'form': form})

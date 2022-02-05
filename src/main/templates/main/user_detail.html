@@ -2,100 +2,100 @@
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
     <div class="container">
-            <ul style="margin-top: 20px" class="list-group">
+        <ul style="margin-top: 20px" class="list-group">
+            <li class="list-group-item">
+                <img style="height: 250px; max-width: 500px"
+                     src="{{ profile.photo.url }}"
+                     alt="Фото профиля">
+            </li>
+            <li class="list-group-item">Фамилия: {{ user_.last_name }}</li>
+            <li class="list-group-item">Имя: {{ user_.first_name }}</li>
+            {% if profile.patronymic %}
                 <li class="list-group-item">
-                    <img style="height: 250px; max-width: 500px"
-                         src="{{ profile.photo.url }}"
-                         alt="Фото профиля">
-                </li>
-                <li class="list-group-item">Фамилия: {{ user_.last_name }}</li>
-                <li class="list-group-item">Имя: {{ user_.first_name }}</li>
-                {% if profile.patronymic %}
-                    <li class="list-group-item">
-                        Отчество: {{ profile.patronymic }}</li>
+                    Отчество: {{ profile.patronymic }}</li>
+            {% endif %}
+            <li class="list-group-item">Описание:
+                {% if profile.description %}
+                    {{ profile.description }}
+                {% else %}
+                    Пользователь не рассказывает о себе
                 {% endif %}
-                <li class="list-group-item">Описание:
-                    {% if profile.description %}
-                        {{ profile.description }}
-                    {% else %}
-                        Пользователь не рассказывает о себе
+            </li>
+            <li class="list-group-item">
+                {% if profile.cv %}
+                    <a href="{{ profile.cv.url }}">Открыть резюме</a>
+                {% else %}
+                    Резюме: Не загружено
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                {% if profile.belbin.exists %}
+                    Роли по Белбину:
+                    <ol>
+                        {% for role in profile.belbin.all %}
+                            <li>{{ role }}</li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    Пользователь не прошел тестирование по Белбину
+                    {% if user.username == user_.username %}
+                        <a href="{% url 'belbin_test' %}">Пройти тест</a>
                     {% endif %}
-                </li>
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                {% if profile.mbti.exists %}
+                    Роли по Майерс-Бриггсу:
+                    <ul>
+                        {% for role in profile.mbti.all %}
+                            <li>{{ role }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Пользователь не прошел тестирование по Майерсу-Бриггсу
+                    {% if user.username == user_.username %}
+                        <a href="{% url 'mbti_test' %}">Пройти тест</a>
+                    {% endif %}
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                {% if profile.lsq.exists %}
+                    Роли по Хони-Мамфорду:
+                    <ul>
+                        {% for role in profile.lsq.all %}
+                            <li>{{ role }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Пользователь не прошел тестирование по Хони-Мамфорду
+                    {% if user.username == user_.username %}
+                        <a href="{% url 'lsq_test' %}">Пройти тест</a>
+                    {% endif %}
+                {% endif %}
+            </li>
+            {% if profile.remote %}
                 <li class="list-group-item">
-                    {% if profile.cv %}
-                        <a href="{{ profile.cv.url }}">Открыть резюме</a>
-                    {% else %}
-                        Резюме: Не загружено
-                    {% endif %}
+                    Предпочитает работать: {{ profile.get_remote_value }}
                 </li>
-                <li class="list-group-item">
-                    {% if profile.belbin.exists %}
-                        Роли по Белбину:
-                        <ol>
-                            {% for role in profile.belbin.all %}
-                                <li>{{ role }}</li>
-                            {% endfor %}
-                        </ol>
-                    {% else %}
-                        Пользователь не прошел тестирование по Белбину
-                        {% if user.username == user_.username %}
-                            <a href="{% url 'belbin_test' %}">Пройти тест</a>
-                        {% endif %}
-                    {% endif %}
+            {% endif %}
+            {% if profile.specialization.exists %}
+                <li class="list-group-item">Специализации:
+                    <ul>
+                        {% for spec in profile.specialization.all %}
+                            <li>{{ spec }}</li>
+                        {% endfor %}
+                    </ul>
                 </li>
-                <li class="list-group-item">
-                    {% if profile.mbti.exists %}
-                        Роли по Майерс-Бриггсу:
-                        <ul>
-                            {% for role in profile.mbti.all %}
-                                <li>{{ role }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Пользователь не прошел тестирование по Майерсу-Бриггсу
-                        {% if user.username == user_.username %}
-                            <a href="{% url 'mbti_test' %}">Пройти тест</a>
-                        {% endif %}
-                    {% endif %}
+            {% endif %}
+            {% if profile.city %}
+                <li class="list-group-item">Город: {{ profile.city }}</li>
+            {% endif %}
+            {% if profile.age %}
+                <li class="list-group-item">Возраст: {{ profile.age }}
+                    лет
                 </li>
-                <li class="list-group-item">
-                    {% if profile.lsq.exists %}
-                        Роли по Хони-Мамфорду:
-                        <ul>
-                            {% for role in profile.lsq.all %}
-                                <li>{{ role }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Пользователь не прошел тестирование по Хони-Мамфорду
-                        {% if user.username == user_.username %}
-                            <a href="{% url 'lsq_test' %}">Пройти тест</a>
-                        {% endif %}
-                    {% endif %}
-                </li>
-                {% if profile.remote %}
-                    <li class="list-group-item">
-                        Предпочитает работать: {{ profile.get_remote_value }}
-                    </li>
-                {% endif %}
-                {% if profile.specialization.exists %}
-                    <li class="list-group-item">Специализации:
-                        <ul>
-                            {% for spec in profile.specialization.all %}
-                                <li>{{ spec }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
-                {% if profile.city %}
-                    <li class="list-group-item">Город: {{ profile.city }}</li>
-                {% endif %}
-                {% if profile.age %}
-                    <li class="list-group-item">Возраст: {{ profile.age }}
-                        лет
-                    </li>
-                {% endif %}
-            </ul>
+            {% endif %}
+        </ul>
 
         {% if user_.username == user.username %}
             <div class="row justify-content-md-start">
@@ -122,12 +122,20 @@
                 </div>
                 <div class="col-6 card align-middle">
                     <a class="btn btn-light action-button" role="button"
-                       href="{% url 'project' %}">
+                       href="{% url 'project_form' %}">
                         <b>{% if not profile.project %}Создать
                         {% else %}Редактировать
                         {% endif %}проект</b>
                     </a>
                 </div>
+                {% if profile.project %}
+                    <div class="col-6 card align-middle">
+                        <a class="btn btn-light action-button" role="button"
+                           href="{% url 'project_detail' slug=profile.project.title %}">
+                            <b>Перейти к проекту</b>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     </div>

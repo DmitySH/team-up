@@ -1,0 +1,30 @@
+{% extends 'accounts_base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Вакансия
+{% endblock %}
+{% block card_col %}col-lg-6{% endblock %}
+{% block main %}
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Вакансия</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary btn-block">
+                    Сохранить
+                </button>
+            </form>
+            {% if form.initial %}
+                <form style="margin-top: 40px" method="post"
+                      action="{% url 'delete_slot' pk=form.instance.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-block">
+                        <b>Удалить</b>
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

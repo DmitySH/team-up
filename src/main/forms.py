@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import ExecutorOffer, Project
+from .models import ExecutorOffer, Project, WorkerSlot
 
 
 class ExecutorOfferForm(forms.ModelForm):
@@ -23,3 +23,13 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         exclude = ('verified',)
+
+
+class WorkerSlotForm(forms.ModelForm):
+    """
+    Форма создания и изменения слота работника.
+    """
+
+    class Meta:
+        model = WorkerSlot
+        exclude = ('profile', 'project')

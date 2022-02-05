@@ -6,6 +6,14 @@ def check_auth(request):
         raise PermissionDenied
 
 
+def check_own_project(request, slug):
+    if request.user.profile.project():
+        if request.user.profile.project().title != slug:
+            raise PermissionDenied
+    else:
+        raise PermissionDenied
+
+
 def check_slug_auth(request, slug):
     check_auth(request)
     if not request.user.username == slug:

@@ -127,8 +127,8 @@ class WorkerSlot(models.Model):
                                 )
 
     def __str__(self):
-        return 'Слот работника {profile}' \
-            .format(profile=self.profile.user.username)
+        return 'Слот в проекте {project}' \
+            .format(project=self.project)
 
     class Meta:
         verbose_name = 'Слот работника'
