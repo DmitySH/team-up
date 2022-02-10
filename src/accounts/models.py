@@ -56,7 +56,6 @@ class Profile(models.Model):
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
         if self.user:
-            print('sdfsdfsdf')
             self.user.delete()
 
     patronymic = models.CharField('Отчество', max_length=30, blank=True,
