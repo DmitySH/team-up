@@ -26,14 +26,11 @@ class LoginView(View):
             password = form.cleaned_data['password']
             user = authenticate(username=username, password=password)
 
-            if User.objects.get(username=username).is_active:
-                if user:
-                    login(request, user)
-                    return redirect('profile_detail', slug=username)
-                else:
-                    form.add_error('__all__', 'Неверные данные!')
+            if user:
+                login(request, user)
+                return redirect('profile_detail', slug=username)
             else:
-                form.add_error('__all__', 'Пользователь в бане!')
+                form.add_error('__all__', 'Неверные данные!')
 
         return render(request, 'accounts/login.html',
                       context={'form': form})
