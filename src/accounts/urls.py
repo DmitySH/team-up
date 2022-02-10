@@ -12,4 +12,8 @@ urlpatterns = [
          name='password_change_done'),
     path('profile/edit/', views.UserEditView.as_view(),
          name='edit_profile'),
+    path('profile/invitations/', views.InvitationsView.as_view(),
+         name='invitations'),
+    path('profile/invitations/accept/<int:slot>/', views.accept_invite,
+         name='accept_invite'),
 ]

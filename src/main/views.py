@@ -255,10 +255,9 @@ class WorkerSlotFormView(View):
             if slot:
                 form.save()
             else:
-                slot = form.save()
-                slot.project = project
-                slot.profile = None
-                slot.save()
+                form.instance.project = project
+                form.instance.profile = None
+                form.save()
 
             return redirect('project_detail', slug=slug)
 
@@ -284,7 +283,6 @@ def invite_profile(request, title, profile, slot_pk):
 
     if request.POST:
         try:
-            project = Project.objects.get(title=title)
             profile = Profile.objects.get(user__username=profile)
             slot = WorkerSlot.objects.get(id=slot_pk)
         except ObjectDoesNotExist:
@@ -292,14 +290,13 @@ def invite_profile(request, title, profile, slot_pk):
 
         if not ProfileProjectStatus.objects.filter(
                 profile=profile,
-                project=project,
+                worker_slot=slot,
                 status=Status.objects.get(
                     value='Приглашен')):
             ProfileProjectStatus.objects.create(
                 profile=profile,
-                project=project,
+                worker_slot=slot,
                 status=Status.objects.get(
                     value='Приглашен'))
 
     return redirect(request.user.profile.get_absolute_url())
-# TODO: добавить в модель статуса поле слот, в который приглашают

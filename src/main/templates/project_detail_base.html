@@ -52,7 +52,16 @@
                     <div class="card-body">
                         <ul class="list-group text-center">
                             <li class="list-group-item">
-                                {{ slot.profile }}
+                                {% if slot.profile %}
+                                    <a href="{{ slot.profile.get_absolute_url }}">
+                                        <button type="button"
+                                                class="btn">
+                                            {{ slot.profile }}
+                                        </button>
+                                    </a>
+                                {% else %}
+                                    Место свободно
+                                {% endif %}
                             </li>
                             <li class="list-group-item">
                                 Описание:

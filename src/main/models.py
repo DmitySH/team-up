@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from src.accounts.models import Profile, Specialization
+from src.accounts.models import Profile, Specialization, Status
 from src.tests.models import BelbinTest, MBTITest, LSQTest
 
 
@@ -141,24 +141,6 @@ class WorkerSlot(models.Model):
     class Meta:
         verbose_name = 'Слот работника'
         verbose_name_plural = 'Слоты работника'
-
-
-# У кого есть ForeignKey, у того будет РОВНО ОДНА связь. К кому идет - у того
-# будет много их.
-
-class Status(models.Model):
-    """
-    Статусы пользователей в проекте.
-    """
-
-    value = models.CharField('Статус в проекте', max_length=20)
-
-    def __str__(self):
-        return self.value
-
-    class Meta:
-        verbose_name = 'Статус в проекте'
-        verbose_name_plural = 'Статусы в проекте'
 
 
 class ProfileProjectStatus(models.Model):

@@ -24,6 +24,21 @@ class Specialization(models.Model):
         verbose_name_plural = 'Специализации'
 
 
+class Status(models.Model):
+    """
+    Статусы пользователей в проекте.
+    """
+
+    value = models.CharField('Статус в проекте', max_length=20)
+
+    def __str__(self):
+        return self.value
+
+    class Meta:
+        verbose_name = 'Статус в проекте'
+        verbose_name_plural = 'Статусы в проекте'
+
+
 class Profile(models.Model):
     """
     Пользователь сайта (расширение модели user).
@@ -136,6 +151,12 @@ class Profile(models.Model):
 
     def get_absolute_url(self):
         return reverse('profile_detail', kwargs={'slug': self.user.username})
+
+    def get_invited_slots(self):
+        invitations = self.profile_statuses.filter(
+            status=Status.objects.get(value='Приглашен'))
+        slots = [relation.worker_slot for relation in invitations]
+        return slots
 
     class Meta:
         verbose_name = 'Профиль'

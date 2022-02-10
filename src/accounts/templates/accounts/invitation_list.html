@@ -1,0 +1,80 @@
+{% extends 'main_base.html' %}
+{% block title %}Приглашения{% endblock %}
+{% block content %}
+    <div class="justify-content-center">
+        {% if slots %}
+            <h1 class="page-header text-center">
+                <b>Ваши приглашения</b></h1>
+            <div class="row justify-content-md-start">
+                {% for slot in slots %}
+                    <div class="col-6 card">
+                        <div class="card-body">
+                            <ul class="list-group text-center">
+                                <li class="list-group-item">
+                                    <a href="{{ slot.project.get_absolute_url }}">
+                                        <button type="button"
+                                                class="btn">
+                                            Проект
+                                            {{ slot.project }}
+                                        </button>
+                                    </a>
+                                </li>
+                                <li class="list-group-item">
+                                    Описание:
+                                    <br>
+                                    {{ slot.description }}
+                                </li>
+                                {% if slot.salary %}
+                                    <li class="list-group-item">
+                                        Получать:
+                                        <br>
+                                        {{ slot.salary }}
+                                    </li>
+                                {% endif %}
+                                <li class="list-group-item">
+                                    Работа
+                                    {{ slot.work_hours }}
+                                    часов в неделю
+                                </li>
+                                {% if slot.specialization.exists %}
+                                    <li class="list-group-item">
+                                        Специализации:
+                                        <br>
+                                        <ul class="text-center list-group">
+                                            {% for spec in slot.specialization.all %}
+                                                <li class="list-group-item">{{ spec }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                                {% if slot.role.exists %}
+                                    <li class="list-group-item">
+                                        <br>
+                                        Роли по Белбину:
+                                        <ul class="text-center list-group">
+                                            {% for role in slot.role.all %}
+                                                <li class="list-group-item">{{ role }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                                <li class="list-group-item">
+                                    <form method="post"
+                                            action="{% url 'accept_invite' slot=slot.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-success">
+                                            Принять
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>Пока приглашений нет</h1>
+        {% endif %}
+    </div>
+{% endblock %}

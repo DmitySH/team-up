@@ -8,8 +8,9 @@ from django.contrib.auth.views import PasswordChangeView, \
 
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm
+from src.accounts.models import Status
 from src.base.services import check_auth
-from src.main.models import Profile
+import src.main.models as main_models
 
 
 class LoginView(View):
@@ -51,7 +52,7 @@ class RegisterView(View):
 
         if user_form.is_valid():
             user = user_form.save()
-            Profile.objects.create(
+            main_models.Profile.objects.create(
                 user=user,
                 patronymic=user_form.cleaned_data.get('patronymic')
             )
@@ -106,3 +107,28 @@ class UserEditView(View):
             'form_profile': form_profile,
         }
         return render(request, 'accounts/edit_profile.html', args)
+
+
+class InvitationsView(View):
+    def get(self, request):
+        check_auth(request)
+        slots = request.user.profile.get_invited_slots()
+
+        return render(request, 'accounts/invitation_list.html',
+                      context={'slots': slots})
+
+
+def accept_invite(request, slot):
+    check_auth(request)
+    if request.POST:
+        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
+        if slot and slot in request.user.profile.get_invited_slots():
+            slot.profile = request.user.profile
+            other_invites = main_models.ProfileProjectStatus.objects.filter(
+                worker_slot=slot,
+                status=Status.objects.get(
+                    value='Приглашен'))
+            other_invites.delete()
+            slot.save()
+
+    return redirect(request.user.profile.get_absolute_url())
