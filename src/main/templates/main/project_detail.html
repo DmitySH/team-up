@@ -1,119 +1,19 @@
-{% extends 'main_base.html' %}
-{% block title %}Проект{% endblock %}
-{% block content %}
-    <div class="justify-content-center">
-        <h1 class="page-header text-center">
-            <b>Проект {{ project.title }}</b></h1>
-        <ul class="list-group">
-            <li class="list-group-item text-center">
-                <h4 class="text-center">Описание:</h4>
-                {{ project.description }}
-            </li>
-            {% if project.city %}
-                <li class="list-group-item">
-                    <h4 class="text-center">Город:</h4>
-                    <h5 class="text-center">{{ project.city }}
-                        (
-                        {% if project.online is not None %}
-                            {{ project.get_remote_value }}
-                        {% endif %}
-                        )
-                    </h5>
-                </li>
-            {% endif %}
-            <li class="list-group-item">
-                <h4 class="text-center">Вакантных мест:</h4>
-                <h5 class="text-center">{{ project.vacant }}</h5>
-            </li>
-            <li class="list-group-item">
-                <h4 class="text-center">Требуются специализации:</h4>
-                <br>
-                <ol class="text-center list-group">
-                    {% for spec in project.required_specialization.all %}
-                        <li class="list-group-item text-center">{{ spec }}</li>
-                    {% endfor %}
-                </ol>
-            </li>
-            <li class="list-group-item">
-                <h4 class="text-center">Требуются роли по Белбину:</h4>
-                <br>
-                <ol class="text-center list-group">
-                    {% for role in  project.required_belbin.all %}
-                        <li class="list-group-item  text-center">{{ role }}</li>
-                    {% endfor %}
-                </ol>
-            </li>
-        </ul>
-        <h3 style="text-align: center">Текущая команда</h3>
-        <div class="row justify-content-md-start">
-            {% for slot in project.team.all %}
-                <div class="col-6 card">
-                    <div class="card-body">
-                        <ul class="list-group text-center">
-                            <li class="list-group-item">
-                                {{ slot.profile }}
-                            </li>
-                            <li class="list-group-item">
-                                Описание:
-                                <br>
-                                {{ slot.description }}
-                            </li>
-                            {% if slot.salary %}
-                                <li class="list-group-item">
-                                    Получает:
-                                    <br>
-                                    {{ slot.salary }}
-                                </li>
-                            {% endif %}
-                            <li class="list-group-item">
-                                Работает
-                                {{ slot.work_hours }}
-                                часов в неделю
-                            </li>
-                            {% if slot.specialization.exists %}
-                                <li class="list-group-item">
-                                    Специализации:
-                                    <br>
-                                    <ul class="text-center list-group">
-                                        {% for spec in slot.specialization.all %}
-                                            <li class="list-group-item">{{ spec }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% endif %}
-                            {% if slot.role.exists %}
-                                <li class="list-group-item">
-                                    <br>
-                                    Роли по Белбину:
-                                    <ul class="text-center list-group">
-                                        {% for role in slot.role.all %}
-                                            <li class="list-group-item">{{ role }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% endif %}
-                            {% if user.profile.project.title == project.title %}
-                                <li class="list-group-item">
-                                    <a href="{% url 'worker_slot_form' slug=project.title pk=slot.pk %}">
-                                        <button type="button"
-                                                class="btn btn-primary">
-                                            Редактировать
-                                        </button>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        {% if user.profile.project.title == project.title %}
-            <div class="col-6 card align-middle">
-                <a class="btn btn-light action-button" role="button"
-                   href="{% url 'worker_slot_form' slug=project.title pk=1 %}">
-                    <b>Создать вакансию</b>
-                </a>
-            </div>
-        {% endif %}
+{% extends 'project_detail_base.html' %}
+{% block downcard %}
+    <li class="list-group-item">
+        <a href="{% url 'worker_slot_form' slug=project.title pk=slot.pk %}">
+            <button type="button"
+                    class="btn btn-primary">
+                Редактировать
+            </button>
+        </a>
+    </li>
+{% endblock %}
+{% block buttons %}
+    <div class="col-6 card align-middle">
+        <a class="btn btn-light action-button" role="button"
+           href="{% url 'worker_slot_form' slug=project.title pk=1 %}">
+            <b>Создать вакансию</b>
+        </a>
     </div>
 {% endblock %}

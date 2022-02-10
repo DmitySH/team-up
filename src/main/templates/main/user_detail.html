@@ -137,6 +137,15 @@
                     </div>
                 {% endif %}
             </div>
+        {% elif  user.profile.project %}
+            <div class="row justify-content-md-start">
+                <div class="col-6 card align-middle">
+                    <a class="btn btn-light action-button" role="button"
+                       href="{% url 'project_invite' title=user.profile.project.title profile=profile.user.username %}">
+                        <b>Пригласить в проект</b>
+                    </a>
+                </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

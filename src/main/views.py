@@ -1,4 +1,6 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView, ListView
@@ -266,3 +268,42 @@ class WorkerSlotFormView(View):
 
         return render(request, 'main/worker_slot_form.html',
                       context={'form': form})
+
+
+class ProjectInviteView(View):
+    def get(self, request, title, profile):
+        check_auth(request)
+        check_own_project(request, title)
+        try:
+            project = Project.objects.get(title=title)
+        except ObjectDoesNotExist:
+            raise Http404
+        return render(request, 'main/project_invite.html',
+                      context={'project': project, 'username': profile})
+
+
+def invite_profile(request, title, profile, slot_pk):
+    check_auth(request)
+    check_own_project(request, title)
+
+    if request.POST:
+        try:
+            project = Project.objects.get(title=title)
+            profile = Profile.objects.get(user__username=profile)
+            slot = WorkerSlot.objects.get(id=slot_pk)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if not ProfileProjectStatus.objects.filter(
+                profile=profile,
+                project=project,
+                status=Status.objects.get(
+                    value='Приглашен')):
+            ProfileProjectStatus.objects.create(
+                profile=profile,
+                project=project,
+                status=Status.objects.get(
+                    value='Приглашен'))
+
+    return redirect(request.user.profile.get_absolute_url())
+# TODO: добавить в модель статуса поле слот, в который приглашают
