@@ -13,11 +13,12 @@
                 <li class="list-group-item">
                     <h4 class="text-center">Город:</h4>
                     <h5 class="text-center">{{ project.city }}
-                        (
                         {% if project.online is not None %}
+                            (
                             {{ project.get_remote_value }}
+                            )
                         {% endif %}
-                        )
+
                     </h5>
                 </li>
             {% endif %}

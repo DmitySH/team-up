@@ -53,6 +53,14 @@ class Project(models.Model):
         return self.REMOTE_CHOICES[2][1] if self.online else \
             self.REMOTE_CHOICES[1][1]
 
+    owner = models.ForeignKey(
+        Profile,
+        verbose_name='Владелец',
+        on_delete=models.CASCADE,
+        related_name='projects',
+        null=True
+    )
+
     title = models.CharField('Название', max_length=200)
     description = models.TextField('Описание')
     vacant = models.PositiveSmallIntegerField('Вакантных мест',
@@ -158,12 +166,12 @@ class ProfileProjectStatus(models.Model):
     Статусы для вовлеченных в проект пользователей.
     """
 
-    project = models.ForeignKey(Project,
-                                verbose_name='Проект',
-                                on_delete=models.CASCADE,
-                                related_name='profile_statuses',
-                                null=True
-                                )
+    worker_slot = models.ForeignKey(WorkerSlot,
+                                    verbose_name='Слот работника',
+                                    on_delete=models.CASCADE,
+                                    related_name='profile_statuses',
+                                    null=True
+                                    )
     profile = models.ForeignKey(Profile,
                                 verbose_name='Профиль',
                                 on_delete=models.CASCADE,
@@ -178,11 +186,14 @@ class ProfileProjectStatus(models.Model):
                                )
 
     def __str__(self):
-        return '{username} в проекте {project} имеет статус {status}'.format(
-            username=self.profile.user.username,
-            project=self.project.title,
-            status=self.status.value
-        )
+        try:
+            return '{username} в проекте {project} имеет статус {status}'.format(
+                username=self.profile.user.username,
+                project=self.worker_slot.project.title,
+                status=self.status.value
+            )
+        except AttributeError:
+            return self.status.value
 
     class Meta:
         verbose_name = 'Статус вовлеченных в проект пользователей'

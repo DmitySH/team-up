@@ -22,7 +22,7 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        exclude = ('verified',)
+        exclude = ('verified', 'owner')
 
 
 class WorkerSlotForm(forms.ModelForm):

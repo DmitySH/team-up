@@ -115,10 +115,11 @@ class Profile(models.Model):
     verified = models.BooleanField('Подтвержден', default=False)
 
     def __str__(self):
-        return '{surname} {name} {second_name}' \
+        return '({username}) {surname} {name} {second_name}' \
             .format(surname=self.user.last_name,
                     name=self.user.first_name,
-                    second_name=self.patronymic
+                    second_name=self.patronymic,
+                    username=self.user.username
                     )
 
     def offer(self):
@@ -128,10 +129,9 @@ class Profile(models.Model):
             return None
 
     def project(self):
-        leader_status = self.profile_statuses.filter(status__value='Создатель')
-        if leader_status.exists():
-            return leader_status.first().project
-        else:
+        try:
+            return self.projects.first()
+        except ObjectDoesNotExist:
             return None
 
     def get_absolute_url(self):

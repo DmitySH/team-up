@@ -160,17 +160,13 @@ class ProjectFormView(View):
         project = request.user.profile.project()
 
         form = ProjectForm(request.POST, instance=project)
-
         if form.is_valid():
             if project:
                 form.save()
             else:
-                project = form.save()
-                ProfileProjectStatus.objects.create(
-                    profile=request.user.profile,
-                    project=project,
-                    status=Status.objects.get(
-                        value='Создатель'))
+                print(form.cleaned_data)
+                form.instance.owner = request.user.profile
+                form.save()
 
             return redirect('profile_detail', slug=request.user.username)
 
