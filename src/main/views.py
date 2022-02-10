@@ -22,7 +22,6 @@ class UserDetailView(DetailView):
 
 class MainPageView(View):
     def get(self, request):
-        # WorkerSlot.objects.all().first().delete()
         return render(request, 'main/main_page.html')
 
 
@@ -71,11 +70,13 @@ def delete_project(request):
 
 def delete_slot(request, pk):
     check_auth(request)
+    project = request.user.profile.project()
     if request.POST:
         slot = WorkerSlot.objects.filter(id=pk).first()
-        if slot:
+        if slot and slot.project == project:
             slot.delete()
-    project = request.user.profile.project()
+        else:
+            raise PermissionDenied
     if project:
         return redirect('project_detail', slug=project.title)
     else:
