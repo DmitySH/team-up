@@ -299,4 +299,4 @@ def invite_profile(request, title, profile, slot_pk):
                 status=Status.objects.get(
                     value='Приглашен'))
 
-    return redirect(request.user.profile.get_absolute_url())
+    return redirect('offer_list')

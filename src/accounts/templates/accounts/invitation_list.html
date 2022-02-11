@@ -60,11 +60,21 @@
                                 {% endif %}
                                 <li class="list-group-item">
                                     <form method="post"
-                                            action="{% url 'accept_invite' slot=slot.id %}">
+                                          action="{% url 'accept_invite' slot=slot.id %}">
                                         {% csrf_token %}
                                         <button type="submit"
                                                 class="btn btn-success">
                                             Принять
+                                        </button>
+                                    </form>
+                                </li>
+                                <li class="list-group-item">
+                                    <form method="post"
+                                          action="{% url 'decline_invite' slot=slot.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-danger">
+                                            Отказаться
                                         </button>
                                     </form>
                                 </li>

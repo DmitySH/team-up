@@ -131,4 +131,19 @@ def accept_invite(request, slot):
             other_invites.delete()
             slot.save()
 
-    return redirect(request.user.profile.get_absolute_url())
+    return redirect('invitations')
+
+
+def decline_invite(request, slot):
+    check_auth(request)
+    if request.POST:
+        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
+        if slot and slot in request.user.profile.get_invited_slots():
+            invite = main_models.ProfileProjectStatus.objects.filter(
+                worker_slot=slot,
+                profile=request.user.profile,
+                status=Status.objects.get(
+                    value='Приглашен'))
+            invite.delete()
+
+    return redirect('invitations')
