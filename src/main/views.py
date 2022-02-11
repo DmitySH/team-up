@@ -8,6 +8,7 @@ from django.views.generic import DetailView, ListView
 from .forms import ExecutorOfferForm, ProjectForm, WorkerSlotForm
 from src.base.services import *
 from .models import *
+from ..base.bencmarks import query_debugger
 
 
 class UserDetailView(DetailView):
@@ -265,7 +266,7 @@ class WorkerSlotFormView(View):
                       context={'form': form})
 
 
-class ProjectInviteView(View):
+class ProjectInvitesView(View):
     def get(self, request, title, profile):
         check_auth(request)
         check_own_project(request, title)
@@ -275,6 +276,26 @@ class ProjectInviteView(View):
             raise Http404
         return render(request, 'main/project_invite.html',
                       context={'project': project, 'username': profile})
+
+
+class AppliedProfiles(View):
+    def get(self, request, title, slot_pk):
+        check_auth(request)
+        check_own_project(request, title)
+        try:
+            slot = WorkerSlot.objects.get(id=slot_pk)
+            applies = ProfileProjectStatus.objects.filter(
+                worker_slot=slot,
+                status=Status.objects.get(
+                    value='Ожидает')).select_related('profile',
+                                                     'profile__executor_offer')
+            profiles = [apply.profile for apply in applies]
+
+        except ObjectDoesNotExist:
+            raise Http404
+        return render(request, 'main/applied_profiles_list.html',
+                      context={'profiles': profiles,
+                               'slot': slot})
 
 
 def invite_profile(request, title, profile, slot_pk):
@@ -292,10 +313,11 @@ def invite_profile(request, title, profile, slot_pk):
             worker_slot=slot,
             status=Status.objects.get(
                 value='Ожидает'))
-        same_applies.delete()
         if same_applies:
-            same_applies.first().status = Status.objects.get(
+            applied = same_applies.first()
+            applied.status = Status.objects.get(
                 value='Приглашен')
+            applied.save()
         else:
             ProfileProjectStatus.objects.get_or_create(
                 profile=profile,
@@ -329,3 +351,25 @@ def apply_for_slot(request, title, profile, slot_pk):
                 value='Ожидает'))
 
     return redirect('project_detail', slug=title)
+
+
+def decline_apply(request, title, profile, slot_pk):
+    check_auth(request)
+    check_own_project(request, title)
+
+    if request.POST:
+        try:
+            profile = Profile.objects.get(user__username=profile)
+            slot = WorkerSlot.objects.get(id=slot_pk)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if slot in profile.get_applied_slots():
+            apply = ProfileProjectStatus.objects.get(
+                worker_slot=slot,
+                profile=profile,
+                status=Status.objects.get(
+                    value='Ожидает'))
+            apply.delete()
+
+    return redirect(request.META.get('HTTP_REFERER'))

@@ -154,13 +154,15 @@ class Profile(models.Model):
 
     def get_invited_slots(self):
         invitations = self.profile_statuses.filter(
-            status=Status.objects.get(value='Приглашен'))
+            status=Status.objects.get(value='Приглашен')).select_related(
+            'worker_slot')
         slots = [relation.worker_slot for relation in invitations]
         return slots
 
     def get_applied_slots(self):
         applies = self.profile_statuses.filter(
-            status=Status.objects.get(value='Ожидает'))
+            status=Status.objects.get(value='Ожидает')).select_related(
+            'worker_slot')
         slots = [relation.worker_slot for relation in applies]
         return slots
 

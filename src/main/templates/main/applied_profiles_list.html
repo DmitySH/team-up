@@ -1,0 +1,93 @@
+{% extends 'main_base.html' %}
+{% block title %}Ожидают{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-md-start">
+            {% if profiles %}
+                {% for profile in profiles %}
+                    <div class="col-6 card">
+                        <div class="card-body">
+                            <ul class="list-group text-center">
+                                <li class="list-group-item">
+                                    {{ profile }}
+                                </li>
+                                {% if profile.executor_offer %}
+
+                                    <li class="list-group-item">
+                                        Описание:
+                                        <br>
+                                        {{ profile.executor_offer.description }}
+                                    </li>
+                                    {% if profile.executor_offer.salary %}
+                                        <li class="list-group-item">
+                                            Рассчитывает получать:
+                                            <br>
+                                            {{ profile.executor_offer.salary }}
+                                        </li>
+                                    {% endif %}
+                                    <li class="list-group-item">
+                                        Хочет работать
+                                        {{ profile.executor_offer.work_hours }}
+                                        часов в неделю
+                                    </li>
+                                    {% if profile.specialization.exists %}
+                                        <li class="list-group-item">
+                                            Специализации:
+                                            <br>
+                                            <ul class="text-center list-group">
+                                                {% for spec in profile.specialization.all %}
+                                                    <li class="list-group-item">{{ spec }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.belbin.exists %}
+                                        <li class="list-group-item">
+                                            <br>
+                                            Роли по Белбину:
+                                            <ul class="text-center list-group">
+                                                {% for role in profile.belbin.all %}
+                                                    <li class="list-group-item">{{ role }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                                <li class="list-group-item">
+                                    <a href="{{ profile.get_absolute_url }}">
+                                        <button type="button"
+                                                class="btn btn-primary">
+                                            Перейти в профиль
+                                        </button>
+                                    </a>
+                                </li>
+                                <li class="list-group-item">
+                                    <form method="post"
+                                          action="{% url 'slot_invite' title=slot.project.title profile=profile.user.username slot_pk=slot.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-success">
+                                            Принять
+                                        </button>
+                                    </form>
+                                </li>
+                                <li class="list-group-item">
+                                    <form method="post"
+                                          action="{% url 'decline_apply' title=slot.project.title profile=slot.profile.user.username slot_pk=slot.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-danger">
+                                            Отказать
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h1>Здесь пока пусто</h1>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
