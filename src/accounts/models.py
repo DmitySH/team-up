@@ -158,6 +158,12 @@ class Profile(models.Model):
         slots = [relation.worker_slot for relation in invitations]
         return slots
 
+    def get_applied_slots(self):
+        applies = self.profile_statuses.filter(
+            status=Status.objects.get(value='Ожидает'))
+        slots = [relation.worker_slot for relation in applies]
+        return slots
+
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'

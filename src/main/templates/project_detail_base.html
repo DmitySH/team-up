@@ -102,10 +102,9 @@
                                     </ul>
                                 </li>
                             {% endif %}
-                            {% if user.profile.project.title == project.title %}
-                                {% block downcard %}
-                                {% endblock downcard %}
-                            {% endif %}
+                            {% block downcard %}
+
+                            {% endblock downcard %}
                         </ul>
                     </div>
                 </div>

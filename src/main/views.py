@@ -287,16 +287,45 @@ def invite_profile(request, title, profile, slot_pk):
             slot = WorkerSlot.objects.get(id=slot_pk)
         except ObjectDoesNotExist:
             raise Http404
-
-        if not ProfileProjectStatus.objects.filter(
-                profile=profile,
-                worker_slot=slot,
-                status=Status.objects.get(
-                    value='Приглашен')):
-            ProfileProjectStatus.objects.create(
+        same_applies = ProfileProjectStatus.objects.filter(
+            profile=profile,
+            worker_slot=slot,
+            status=Status.objects.get(
+                value='Ожидает'))
+        same_applies.delete()
+        if same_applies:
+            same_applies.first().status = Status.objects.get(
+                value='Приглашен')
+        else:
+            ProfileProjectStatus.objects.get_or_create(
                 profile=profile,
                 worker_slot=slot,
                 status=Status.objects.get(
                     value='Приглашен'))
 
     return redirect('offer_list')
+
+
+def apply_for_slot(request, title, profile, slot_pk):
+    check_auth(request)
+
+    if request.POST:
+        try:
+            slot = WorkerSlot.objects.get(id=slot_pk)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if ProfileProjectStatus.objects.filter(
+                profile=request.user.profile,
+                worker_slot=slot,
+                status=Status.objects.get(
+                    value='Приглашен')):
+            return redirect('invitations')
+
+        ProfileProjectStatus.objects.get_or_create(
+            profile=request.user.profile,
+            worker_slot=slot,
+            status=Status.objects.get(
+                value='Ожидает'))
+
+    return redirect('project_detail', slug=title)

@@ -1,13 +1,25 @@
 {% extends 'project_detail_base.html' %}
 {% block downcard %}
-    <li class="list-group-item">
-        <a href="{% url 'worker_slot_form' slug=project.title pk=slot.pk %}">
-            <button type="button"
-                    class="btn btn-primary">
-                Редактировать
-            </button>
-        </a>
-    </li>
+    {% if user.profile.project.title == project.title %}
+        <li class="list-group-item">
+            <a href="{% url 'worker_slot_form' slug=project.title pk=slot.pk %}">
+                <button type="button"
+                        class="btn btn-primary">
+                    Редактировать
+                </button>
+            </a>
+        </li>
+    {% else %}
+        <li class="list-group-item">
+            <form method="post"
+                  action="{% url 'slot_apply' title=project.title profile=user.username slot_pk=slot.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-dark btn-block">
+                    <b>Оставить заявку</b>
+                </button>
+            </form>
+        </li>
+    {% endif %}
 {% endblock %}
 {% block buttons %}
     <div class="col-6 card align-middle">

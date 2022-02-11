@@ -112,10 +112,12 @@ class UserEditView(View):
 class InvitationsView(View):
     def get(self, request):
         check_auth(request)
-        slots = request.user.profile.get_invited_slots()
-
+        invited_slots = request.user.profile.get_invited_slots()
+        applied_slots = request.user.profile.get_applied_slots()
         return render(request, 'accounts/invitation_list.html',
-                      context={'slots': slots})
+                      context={'invited_slots': invited_slots,
+                               'applied_slots': applied_slots
+                               })
 
 
 def accept_invite(request, slot):
@@ -139,11 +141,26 @@ def decline_invite(request, slot):
     if request.POST:
         slot = main_models.WorkerSlot.objects.filter(id=slot).first()
         if slot and slot in request.user.profile.get_invited_slots():
-            invite = main_models.ProfileProjectStatus.objects.filter(
+            invite = main_models.ProfileProjectStatus.objects.get(
                 worker_slot=slot,
                 profile=request.user.profile,
                 status=Status.objects.get(
                     value='Приглашен'))
             invite.delete()
+
+    return redirect('invitations')
+
+
+def retract_invite(request, slot):
+    check_auth(request)
+    if request.POST:
+        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
+        if slot and slot in request.user.profile.get_applied_slots():
+            apply = main_models.ProfileProjectStatus.objects.get(
+                worker_slot=slot,
+                profile=request.user.profile,
+                status=Status.objects.get(
+                    value='Ожидает'))
+            apply.delete()
 
     return redirect('invitations')

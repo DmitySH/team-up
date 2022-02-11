@@ -18,4 +18,6 @@ urlpatterns = [
          name='accept_invite'),
     path('profile/invitations/decline/<int:slot>/', views.decline_invite,
          name='decline_invite'),
+    path('profile/invitations/retract/<int:slot>/', views.retract_invite,
+         name='retract_invite'),
 ]
