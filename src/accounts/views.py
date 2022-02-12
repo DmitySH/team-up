@@ -1,17 +1,17 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView, \
     PasswordChangeDoneView
+from django.views.generic import DetailView
 
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm
-from src.accounts.models import Status
+from src.accounts.models import Status, Profile
 from src.base.services import check_auth, get_object_or_404
-import src.main.models as main_models
+from src.main.models import ProfileProjectStatus, WorkerSlot
 
 
 class LoginView(View):
@@ -53,7 +53,7 @@ class RegisterView(View):
 
         if user_form.is_valid():
             user = user_form.save()
-            main_models.Profile.objects.create(user=user)
+            Profile.objects.create(user=user)
 
             username = user_form.cleaned_data.get('username')
             raw_password = user_form.cleaned_data.get('password1')
@@ -63,6 +63,18 @@ class RegisterView(View):
             return redirect(user.profile.get_absolute_url())
         return render(request, 'accounts/register.html',
                       context={'user_form': user_form})
+
+
+class UserDetailView(DetailView):
+    model = User
+    slug_field = 'username'
+    template_name = 'accounts/user_detail.html'
+    context_object_name = 'user_'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['profile'] = Profile.objects.get(user_id=context['user_'])
+        return context
 
 
 class MyPasswordChangeView(PasswordChangeView):
@@ -121,11 +133,11 @@ class InvitationsView(View):
 def accept_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
 
         if slot in request.user.profile.get_invited_slots():
             slot.profile = request.user.profile
-            other_invites = main_models.ProfileProjectStatus.objects.filter(
+            other_invites = ProfileProjectStatus.objects.filter(
                 worker_slot=slot,
                 status=Status.objects.get(
                     value='Приглашен'))
@@ -138,10 +150,10 @@ def accept_invite(request, slot):
 def decline_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
 
         if slot in request.user.profile.get_invited_slots():
-            invite = main_models.ProfileProjectStatus.objects.get(
+            invite = ProfileProjectStatus.objects.get(
                 worker_slot=slot,
                 profile=request.user.profile,
                 status=Status.objects.get(
@@ -154,10 +166,10 @@ def decline_invite(request, slot):
 def retract_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
 
         if slot in request.user.profile.get_applied_slots():
-            apply = main_models.ProfileProjectStatus.objects.get(
+            apply = ProfileProjectStatus.objects.get(
                 worker_slot=slot,
                 profile=request.user.profile,
                 status=Status.objects.get(
