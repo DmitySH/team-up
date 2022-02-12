@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404
+from django.shortcuts import _get_queryset
 
 
 def check_auth(request):
@@ -172,15 +173,17 @@ def analyze_lsq(data):
     ]
 
 
-def get_object_or_none(query):
+def get_object_or_none(klass, *args, **kwargs):
+    queryset = _get_queryset(klass)
+    if not hasattr(queryset, 'get'):
+        klass__name = klass.__name__ if isinstance(klass,
+                                                   type) \
+            else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_none must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
     try:
-        return query
-    except ObjectDoesNotExist:
+        return queryset.get(*args, **kwargs)
+    except queryset.model.DoesNotExist:
         return None
-
-
-def get_object_or_404(query):
-    try:
-        return query
-    except ObjectDoesNotExist:
-        raise Http404
