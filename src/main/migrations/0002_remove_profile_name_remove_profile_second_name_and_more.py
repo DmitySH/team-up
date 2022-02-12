@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0001_initial'),
     ]
@@ -25,6 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='patronymic',
-            field=models.CharField(blank=True, max_length=35, verbose_name='Отчество'),
+            field=models.CharField(blank=True, max_length=35,
+                                   verbose_name='Отчество'),
         ),
     ]

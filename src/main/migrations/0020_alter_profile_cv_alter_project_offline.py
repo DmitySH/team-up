@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0019_alter_profile_patronymic'),
     ]
@@ -14,11 +13,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='cv',
-            field=models.FileField(blank=True, null=True, upload_to='cvs', validators=[django.core.validators.FileExtensionValidator(['pdf', 'docx', 'doc'])], verbose_name='Резюме'),
+            field=models.FileField(blank=True, null=True, upload_to='cvs',
+                                   validators=[
+                                       django.core.validators.FileExtensionValidator(
+                                           ['pdf', 'docx', 'doc'])],
+                                   verbose_name='Резюме'),
         ),
         migrations.AlterField(
             model_name='project',
             name='offline',
-            field=models.BooleanField(blank=True, choices=[(None, 'Не указывать'), (False, 'Требуется присутствие'), (True, 'Присутствие не требуется')], default=None, null=True, verbose_name='Возможность работы онлайн'),
+            field=models.BooleanField(blank=True,
+                                      choices=[(None, 'Не указывать'), (
+                                      False, 'Требуется присутствие'), (True,
+                                                                        'Присутствие не требуется')],
+                                      default=None, null=True,
+                                      verbose_name='Возможность работы онлайн'),
         ),
     ]

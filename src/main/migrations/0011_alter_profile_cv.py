@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0010_alter_profile_photo'),
     ]
@@ -14,6 +13,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='cv',
-            field=models.FileField(blank=True, null=True, upload_to='cvs', validators=[django.core.validators.FileExtensionValidator(['pdf', 'docx'])], verbose_name='Резюме'),
+            field=models.FileField(blank=True, null=True, upload_to='cvs',
+                                   validators=[
+                                       django.core.validators.FileExtensionValidator(
+                                           ['pdf', 'docx'])],
+                                   verbose_name='Резюме'),
         ),
     ]

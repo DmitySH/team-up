@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import PasswordChangeView, \
+    PasswordChangeDoneView
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.contrib.auth.views import PasswordChangeView, \
-    PasswordChangeDoneView
 from django.views.generic import DetailView, ListView
 
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \

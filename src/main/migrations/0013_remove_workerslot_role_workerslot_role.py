@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0012_remove_profile_belbin_profile_belbin_and_more'),
     ]
@@ -17,6 +16,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='workerslot',
             name='role',
-            field=models.ManyToManyField(null=True, related_name='worker_slots', to='main.BelbinTest', verbose_name='Роли по Белбину'),
+            field=models.ManyToManyField(null=True,
+                                         related_name='worker_slots',
+                                         to='main.BelbinTest',
+                                         verbose_name='Роли по Белбину'),
         ),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('accounts', '0002_status_alter_profile_options'),
     ]
@@ -12,6 +11,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='profile',
-            options={'verbose_name': 'Профиль', 'verbose_name_plural': 'Профили'},
+            options={'verbose_name': 'Профиль',
+                     'verbose_name_plural': 'Профили'},
         ),
     ]

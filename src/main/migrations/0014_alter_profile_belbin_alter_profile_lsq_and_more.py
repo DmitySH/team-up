@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0013_remove_workerslot_role_workerslot_role'),
     ]
@@ -13,26 +12,35 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='belbin',
-            field=models.ManyToManyField(blank=True, related_name='profiles', to='main.BelbinTest', verbose_name='Результат теста по Белбину'),
+            field=models.ManyToManyField(blank=True, related_name='profiles',
+                                         to='main.BelbinTest',
+                                         verbose_name='Результат теста по Белбину'),
         ),
         migrations.AlterField(
             model_name='profile',
             name='lsq',
-            field=models.ManyToManyField(blank=True, related_name='profiles', to='main.LSQTest', verbose_name='Результат теста Хони-Мамфорда'),
+            field=models.ManyToManyField(blank=True, related_name='profiles',
+                                         to='main.LSQTest',
+                                         verbose_name='Результат теста Хони-Мамфорда'),
         ),
         migrations.AlterField(
             model_name='profile',
             name='mbti',
-            field=models.ManyToManyField(blank=True, related_name='profiles', to='main.MBTITest', verbose_name='Результат теста Майерса-Бриггса'),
+            field=models.ManyToManyField(blank=True, related_name='profiles',
+                                         to='main.MBTITest',
+                                         verbose_name='Результат теста Майерса-Бриггса'),
         ),
         migrations.AlterField(
             model_name='profile',
             name='specialization',
-            field=models.ManyToManyField(blank=True, to='main.Specialization', verbose_name='Специализация'),
+            field=models.ManyToManyField(blank=True, to='main.Specialization',
+                                         verbose_name='Специализация'),
         ),
         migrations.AlterField(
             model_name='workerslot',
             name='role',
-            field=models.ManyToManyField(related_name='worker_slots', to='main.BelbinTest', verbose_name='Роли по Белбину'),
+            field=models.ManyToManyField(related_name='worker_slots',
+                                         to='main.BelbinTest',
+                                         verbose_name='Роли по Белбину'),
         ),
     ]

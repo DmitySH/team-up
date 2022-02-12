@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0028_alter_profileprojectstatus_status_delete_status'),
     ]

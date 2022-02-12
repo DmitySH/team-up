@@ -1,5 +1,4 @@
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import _get_queryset
 
 

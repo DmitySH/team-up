@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0005_alter_profile_specialization'),
     ]
@@ -13,16 +12,19 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='belbintest',
             name='role',
-            field=models.CharField(max_length=30, verbose_name='Роль по Белбину'),
+            field=models.CharField(max_length=30,
+                                   verbose_name='Роль по Белбину'),
         ),
         migrations.AlterField(
             model_name='lsqtest',
             name='role',
-            field=models.CharField(max_length=30, verbose_name='Роль по Хони-Мамфорду'),
+            field=models.CharField(max_length=30,
+                                   verbose_name='Роль по Хони-Мамфорду'),
         ),
         migrations.AlterField(
             model_name='mbtitest',
             name='role',
-            field=models.CharField(max_length=30, verbose_name='Роль по Майерсу-Бриггсу'),
+            field=models.CharField(max_length=30,
+                                   verbose_name='Роль по Майерсу-Бриггсу'),
         ),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0011_alter_profile_cv'),
     ]
@@ -17,12 +16,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='belbin',
-            field=models.ManyToManyField(blank=True, null=True, related_name='profiles', to='main.BelbinTest', verbose_name='Результат теста по Белбину'),
+            field=models.ManyToManyField(blank=True, null=True,
+                                         related_name='profiles',
+                                         to='main.BelbinTest',
+                                         verbose_name='Результат теста по Белбину'),
         ),
         migrations.AlterField(
             model_name='profile',
             name='is_male',
-            field=models.BooleanField(blank=True, choices=[(None, 'Не указывать'), (True, 'Мужской'), (False, 'Женский')], default=None, null=True, verbose_name='Пол'),
+            field=models.BooleanField(blank=True,
+                                      choices=[(None, 'Не указывать'),
+                                               (True, 'Мужской'),
+                                               (False, 'Женский')],
+                                      default=None, null=True,
+                                      verbose_name='Пол'),
         ),
         migrations.RemoveField(
             model_name='profile',
@@ -31,7 +38,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='lsq',
-            field=models.ManyToManyField(blank=True, null=True, related_name='profiles', to='main.LSQTest', verbose_name='Результат теста Хони-Мамфорда'),
+            field=models.ManyToManyField(blank=True, null=True,
+                                         related_name='profiles',
+                                         to='main.LSQTest',
+                                         verbose_name='Результат теста Хони-Мамфорда'),
         ),
         migrations.RemoveField(
             model_name='profile',
@@ -40,7 +50,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='mbti',
-            field=models.ManyToManyField(blank=True, null=True, related_name='profiles', to='main.MBTITest', verbose_name='Результат теста Майерса-Бриггса'),
+            field=models.ManyToManyField(blank=True, null=True,
+                                         related_name='profiles',
+                                         to='main.MBTITest',
+                                         verbose_name='Результат теста Майерса-Бриггса'),
         ),
         migrations.RemoveField(
             model_name='profile',
@@ -49,6 +62,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='profile',
             name='specialization',
-            field=models.ManyToManyField(blank=True, null=True, to='main.Specialization', verbose_name='Специализация'),
+            field=models.ManyToManyField(blank=True, null=True,
+                                         to='main.Specialization',
+                                         verbose_name='Специализация'),
         ),
     ]

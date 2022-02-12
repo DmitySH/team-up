@@ -4,10 +4,10 @@ from django.core.validators import FileExtensionValidator, MinValueValidator, \
     MaxValueValidator
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest, MBTITest, LSQTest
-from django.utils.translation import gettext_lazy as _
 
 
 class Specialization(models.Model):

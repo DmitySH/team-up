@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
 
+from src.base.constants import *
+from src.base.services import *
 from .forms import BelbinPartForm, MBTIPartForm, LSQPartForm
 from .models import LSQTest, BelbinTest, MBTITest
-from src.base.services import *
-from src.base.constants import *
 
 
 class BelbinTestFormView(View):

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -14,8 +13,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BelbinTest',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(max_length=30, verbose_name='Роль по Белбину')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True,
+                                           serialize=False,
+                                           verbose_name='ID')),
+                ('role', models.CharField(max_length=30,
+                                          verbose_name='Роль по Белбину')),
             ],
             options={
                 'verbose_name': 'Роль по Белбину',
@@ -25,8 +27,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='LSQTest',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(max_length=30, verbose_name='Роль по Хони-Мамфорду')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True,
+                                           serialize=False,
+                                           verbose_name='ID')),
+                ('role', models.CharField(max_length=30,
+                                          verbose_name='Роль по Хони-Мамфорду')),
             ],
             options={
                 'verbose_name': 'Роль по Хони-Мамфорду',
@@ -36,8 +41,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MBTITest',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(max_length=30, verbose_name='Роль по Майерсу-Бриггсу')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True,
+                                           serialize=False,
+                                           verbose_name='ID')),
+                ('role', models.CharField(max_length=30,
+                                          verbose_name='Роль по Майерсу-Бриггсу')),
             ],
             options={
                 'verbose_name': 'Роль по Майерсу-Бриггсу',

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('main', '0022_remove_profile_belbin_remove_profile_lsq_and_more'),
     ]
