@@ -73,7 +73,7 @@
                                 </li>
                                 <li class="list-group-item">
                                     <form method="post"
-                                          action="{% url 'decline_apply' title=slot.project.title profile=slot.profile.user.username slot_pk=slot.id %}">
+                                          action="{% url 'decline_apply' title=slot.project.title profile=profile.user.username slot_pk=slot.id %}">
                                         {% csrf_token %}
                                         <button type="submit"
                                                 class="btn btn-danger">
