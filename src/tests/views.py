@@ -27,11 +27,8 @@ class BelbinTestFormView(View):
         for i, form in enumerate(belbin_forms):
             change_labels(form, TestQuestions.belbin[i])
 
-        correct = True
-
-        for form in belbin_forms:
-            if not form.is_valid() or not form.validate_sum():
-                correct = False
+        correct = all(
+            [form.is_valid() and form.validate_sum() for form in belbin_forms])
 
         if correct:
             roles = analyze_belbin(
@@ -69,11 +66,7 @@ class MBTITestFormView(View):
             change_labels(form, TestQuestions.mbti[i])
             change_choices(form, TestChoices.mbti[i])
 
-        correct = True
-
-        for form in mbti_forms:
-            if not form.is_valid():
-                correct = False
+        correct = all([form.is_valid() for form in mbti_forms])
 
         if correct:
             roles = analyze_mbti(
@@ -109,11 +102,7 @@ class LSQTestFormView(View):
         for i, form in enumerate(lsq_forms):
             change_labels(form, TestQuestions.lsq[i])
 
-        correct = True
-
-        for form in lsq_forms:
-            if not form.is_valid():
-                correct = False
+        correct = all([form.is_valid() for form in lsq_forms])
 
         if correct:
             roles = analyze_lsq(
