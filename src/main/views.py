@@ -1,6 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import DetailView, ListView
@@ -8,7 +6,6 @@ from django.views.generic import DetailView, ListView
 from .forms import ExecutorOfferForm, ProjectForm, WorkerSlotForm
 from src.base.services import *
 from .models import *
-from ..base.bencmarks import query_debugger
 
 
 class UserDetailView(DetailView):
@@ -75,8 +72,8 @@ def delete_slot(request, pk):
     check_auth(request)
     project = request.user.profile.project()
     if request.POST:
-        slot = WorkerSlot.objects.filter(id=pk).first()
-        if slot and slot.project == project:
+        slot = get_object_or_404(WorkerSlot.objects.get(id=pk))
+        if slot.project == project:
             slot.delete()
         else:
             raise PermissionDenied
@@ -165,7 +162,6 @@ class ProjectFormView(View):
             if project:
                 form.save()
             else:
-                print(form.cleaned_data)
                 form.instance.owner = request.user.profile
                 form.save()
 
@@ -239,7 +235,9 @@ class WorkerSlotFormView(View):
     def get(self, request, slug, pk):
         check_auth(request)
         check_own_project(request, slug)
-        slot = Project.objects.get(title=slug).team.filter(id=pk).first()
+        slot = get_object_or_none(
+            Project.objects.get(title=slug).team.get(id=pk))
+
         form = WorkerSlotForm(instance=slot)
         return render(request, 'main/worker_slot_form.html',
                       context={'form': form})
@@ -248,7 +246,7 @@ class WorkerSlotFormView(View):
         check_auth(request)
         check_own_project(request, slug)
         project = Project.objects.get(title=slug)
-        slot = project.team.filter(id=pk).first()
+        slot = get_object_or_none(project.team.get(id=pk))
 
         form = WorkerSlotForm(request.POST, instance=slot)
 
@@ -270,10 +268,8 @@ class ProjectInvitesView(View):
     def get(self, request, title, profile):
         check_auth(request)
         check_own_project(request, title)
-        try:
-            project = Project.objects.get(title=title)
-        except ObjectDoesNotExist:
-            raise Http404
+        project = get_object_or_404(Project.objects.get(title=title))
+
         return render(request, 'main/project_invite.html',
                       context={'project': project, 'username': profile})
 
@@ -284,6 +280,8 @@ class AppliedProfiles(View):
         check_own_project(request, title)
         try:
             slot = WorkerSlot.objects.get(id=slot_pk)
+            check_own_slot(request, slot)
+
             applies = ProfileProjectStatus.objects.filter(
                 worker_slot=slot,
                 status=Status.objects.get(
@@ -306,6 +304,7 @@ def invite_profile(request, title, profile, slot_pk):
         try:
             profile = Profile.objects.get(user__username=profile)
             slot = WorkerSlot.objects.get(id=slot_pk)
+            check_own_slot(request, slot)
         except ObjectDoesNotExist:
             raise Http404
         same_applies = ProfileProjectStatus.objects.filter(
@@ -361,6 +360,7 @@ def decline_apply(request, title, profile, slot_pk):
         try:
             profile = Profile.objects.get(user__username=profile)
             slot = WorkerSlot.objects.get(id=slot_pk)
+            check_own_slot(request, slot)
         except ObjectDoesNotExist:
             raise Http404
 

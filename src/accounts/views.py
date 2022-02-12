@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView, \
@@ -9,7 +10,7 @@ from django.contrib.auth.views import PasswordChangeView, \
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm
 from src.accounts.models import Status
-from src.base.services import check_auth
+from src.base.services import check_auth, get_object_or_404
 import src.main.models as main_models
 
 
@@ -52,10 +53,7 @@ class RegisterView(View):
 
         if user_form.is_valid():
             user = user_form.save()
-            main_models.Profile.objects.create(
-                user=user,
-                patronymic=user_form.cleaned_data.get('patronymic')
-            )
+            main_models.Profile.objects.create(user=user)
 
             username = user_form.cleaned_data.get('username')
             raw_password = user_form.cleaned_data.get('password1')
@@ -123,8 +121,9 @@ class InvitationsView(View):
 def accept_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
-        if slot and slot in request.user.profile.get_invited_slots():
+        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+
+        if slot in request.user.profile.get_invited_slots():
             slot.profile = request.user.profile
             other_invites = main_models.ProfileProjectStatus.objects.filter(
                 worker_slot=slot,
@@ -139,8 +138,9 @@ def accept_invite(request, slot):
 def decline_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
-        if slot and slot in request.user.profile.get_invited_slots():
+        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+
+        if slot in request.user.profile.get_invited_slots():
             invite = main_models.ProfileProjectStatus.objects.get(
                 worker_slot=slot,
                 profile=request.user.profile,
@@ -154,8 +154,9 @@ def decline_invite(request, slot):
 def retract_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = main_models.WorkerSlot.objects.filter(id=slot).first()
-        if slot and slot in request.user.profile.get_applied_slots():
+        slot = get_object_or_404(main_models.WorkerSlot.objects.get(id=slot))
+
+        if slot in request.user.profile.get_applied_slots():
             apply = main_models.ProfileProjectStatus.objects.get(
                 worker_slot=slot,
                 profile=request.user.profile,

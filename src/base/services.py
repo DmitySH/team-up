@@ -1,4 +1,5 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.http import Http404
 
 
 def check_auth(request):
@@ -9,6 +10,14 @@ def check_auth(request):
 def check_own_project(request, slug):
     if request.user.profile.project():
         if request.user.profile.project().title != slug:
+            raise PermissionDenied
+    else:
+        raise PermissionDenied
+
+
+def check_own_slot(request, slot):
+    if request.user.profile.project():
+        if slot not in request.user.profile.project().team.all():
             raise PermissionDenied
     else:
         raise PermissionDenied
@@ -161,3 +170,17 @@ def analyze_lsq(data):
         item[0][0] if item[0][1] > item[1][1] else item[1][0] for item in
         result
     ]
+
+
+def get_object_or_none(query):
+    try:
+        return query
+    except ObjectDoesNotExist:
+        return None
+
+
+def get_object_or_404(query):
+    try:
+        return query
+    except ObjectDoesNotExist:
+        raise Http404
