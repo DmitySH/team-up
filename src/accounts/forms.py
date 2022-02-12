@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from src.main.models import Profile
+from src.accounts.models import ExecutorOffer, Profile
 
 
 class AuthForm(forms.Form):
@@ -49,3 +49,15 @@ class ProfileEditForm(forms.ModelForm):
         model = Profile
         exclude = (
             'user', 'verified', 'belbin', 'mbti', 'lsq')
+
+
+class ExecutorOfferForm(forms.ModelForm):
+    """
+    Форма создания и изменения предложения работника.
+    """
+
+    salary = forms.IntegerField(label='Ожидаемая зарплата', required=False)
+
+    class Meta:
+        model = ExecutorOffer
+        exclude = ('profile',)

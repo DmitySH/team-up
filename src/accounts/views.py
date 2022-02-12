@@ -1,17 +1,20 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
-from django.shortcuts import render, redirect
+from django.db.models import Q
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.views import PasswordChangeView, \
     PasswordChangeDoneView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
-    ProfileEditForm
-from src.accounts.models import Status, Profile
-from src.base.services import check_auth, get_object_or_404
-from src.main.models import ProfileProjectStatus, WorkerSlot
+    ProfileEditForm, ExecutorOfferForm
+from src.accounts.models import Status, Profile, ExecutorOffer, \
+    ProfileProjectStatus, Specialization
+from src.base.services import check_auth
+from src.projects.models import WorkerSlot
+from src.tests.models import BelbinTest
 
 
 class LoginView(View):
@@ -133,7 +136,7 @@ class InvitationsView(View):
 def accept_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects, id=slot)
 
         if slot in request.user.profile.get_invited_slots():
             slot.profile = request.user.profile
@@ -150,7 +153,7 @@ def accept_invite(request, slot):
 def decline_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects, id=slot)
 
         if slot in request.user.profile.get_invited_slots():
             invite = ProfileProjectStatus.objects.get(
@@ -166,7 +169,7 @@ def decline_invite(request, slot):
 def retract_invite(request, slot):
     check_auth(request)
     if request.POST:
-        slot = get_object_or_404(WorkerSlot.objects.get(id=slot))
+        slot = get_object_or_404(WorkerSlot.objects, id=slot)
 
         if slot in request.user.profile.get_applied_slots():
             apply = ProfileProjectStatus.objects.get(
@@ -177,3 +180,101 @@ def retract_invite(request, slot):
             apply.delete()
 
     return redirect('invitations')
+
+
+class SpecializationsBelbin:
+    def get_specializations(self):
+        return Specialization.objects.all()
+
+    def get_belbin(self):
+        return BelbinTest.objects.all()
+
+
+class ExecutorOfferFormView(View):
+    def get(self, request):
+        check_auth(request)
+
+        form = ExecutorOfferForm(instance=request.user.profile.offer())
+        return render(request,
+                      'accounts/executor_offer_form.html',
+                      context={'form': form})
+
+    def post(self, request):
+        check_auth(request)
+        form = ExecutorOfferForm(request.POST,
+                                 instance=request.user.profile.offer())
+
+        if form.is_valid():
+            form.cleaned_data['profile'] = request.user.profile
+            ExecutorOffer.objects.update_or_create(
+                profile=form.cleaned_data['profile'],
+                defaults=form.cleaned_data
+            )
+            return redirect('profile_detail', slug=request.user.username)
+
+        return render(request,
+                      'accounts/executor_offer_form.html',
+                      context={'form': form})
+
+
+def delete_offer(request):
+    check_auth(request)
+    if request.POST:
+        offer = request.user.profile.offer()
+        if offer:
+            offer.delete()
+    return redirect(request.user.profile.get_absolute_url())
+
+
+class ExecutorFilterExtention(SpecializationsBelbin):
+    def get_cities(self):
+        return sorted([x for x in set(map(lambda x: x[0],
+                                          Profile.objects.all().values_list(
+                                              'city'))) if x])
+
+    def get_remote(self):
+        return sorted(
+            [x for x in map(lambda x: x[1], Profile.RemoteChoices.choices)
+             if x != 'Не указывать'])
+
+
+class ExecutorOfferListView(ListView, ExecutorFilterExtention):
+    model = ExecutorOffer
+    template_name = 'accounts/executor_offer_list.html'
+
+    def get_queryset(self):
+        if self.request.GET:
+            queryset = self.make_filter()
+        else:
+            queryset = ExecutorOffer.objects.all().select_related('profile')
+
+        return queryset
+
+    def make_filter(self):
+        def convert_remote(remote):
+            if remote == 'Онлайн':
+                return 1
+            if remote == 'И онлайн, и оффлайн':
+                return 2
+            if remote == 'Оффлайн':
+                return 3
+
+        cities = Q() if not self.request.GET.getlist('city') \
+            else Q(profile__city__in=self.request.GET.getlist('city'))
+        remote = Q() if not self.request.GET.getlist('remote') \
+            else Q(profile__remote__in=[convert_remote(x) for x in
+                                        self.request.GET.getlist('remote')])
+        roles = Q() if not self.request.GET.getlist('role') \
+            else Q(profile__belbin__role__in=self.request.GET.getlist('role'))
+        specializations = Q() if not self.request.GET.getlist('specialization') \
+            else Q(profile__specialization__name__in=self.request.GET.getlist(
+            'specialization'))
+        age = Q(
+            profile__age__range=(int(self.request.GET.get('min-age') or 14),
+                                 int(self.request.GET.get('max-age') or 100)
+                                 )) | Q(profile__age__isnull=True)
+        queryset = ExecutorOffer.objects.filter(
+            cities & remote & roles & specializations & age
+        ).distinct()
+
+        return queryset

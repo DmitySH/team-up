@@ -22,4 +22,8 @@ urlpatterns = [
          name='decline_invite'),
     path('profile/invitations/retract/<int:slot>/', views.retract_invite,
          name='retract_invite'),
+    path('profile/offer/', views.ExecutorOfferFormView.as_view(),
+         name='executor_offer'),
+    path('profile/delete-offer', views.delete_offer, name='delete_offer'),
+    path('workers/', views.ExecutorOfferListView.as_view(), name='offer_list'),
 ]

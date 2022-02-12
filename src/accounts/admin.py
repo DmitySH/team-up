@@ -1,18 +1,21 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
-from .models import Profile, Specialization
-from src.main.models import WorkerSlot
+from .models import *
 
 
-# class WorkerSlotInline(admin.StackedInline):
-#     model = WorkerSlot
-#     extra = 1
+@admin.register(Status)
+class StatusAdmin(admin.ModelAdmin):
+    pass
 
 
-# class ProfileInline(admin.StackedInline):
-#     model = Profile
-#     extra = 1
+@admin.register(ProfileProjectStatus)
+class ProfileProjectAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ExecutorOffer)
+class ExecutorOfferAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Profile)
@@ -25,8 +28,8 @@ admin.site.unregister(User)
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    # inlines = [ProfileInline]
     pass
+
 
 @admin.register(Specialization)
 class SpecializationAdmin(admin.ModelAdmin):

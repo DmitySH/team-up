@@ -5,6 +5,7 @@ from django.core.validators import FileExtensionValidator, MinValueValidator, \
 from django.db import models
 from django.urls import reverse
 
+from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest, MBTITest, LSQTest
 from django.utils.translation import gettext_lazy as _
 
@@ -169,3 +170,69 @@ class Profile(models.Model):
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
+
+
+class ProfileProjectStatus(models.Model):
+    """
+    Статусы для вовлеченных в проект пользователей.
+    """
+
+    worker_slot = models.ForeignKey(WorkerSlot,
+                                    verbose_name='Слот работника',
+                                    on_delete=models.CASCADE,
+                                    related_name='profile_statuses',
+                                    null=True
+                                    )
+    profile = models.ForeignKey(Profile,
+                                verbose_name='Профиль',
+                                on_delete=models.CASCADE,
+                                related_name='profile_statuses',
+                                null=True
+                                )
+    status = models.ForeignKey(Status,
+                               verbose_name='Статус',
+                               on_delete=models.SET_NULL,
+                               related_name='profile_statuses',
+                               null=True
+                               )
+
+    def __str__(self):
+        try:
+            return '{username} в проекте {project} имеет статус {status}'.format(
+                username=self.profile.user.username,
+                project=self.worker_slot.project.title,
+                status=self.status.value
+            )
+        except AttributeError:
+            return self.status.value
+
+    class Meta:
+        verbose_name = 'Статус вовлеченных в проект пользователей'
+        verbose_name_plural = 'Статусы вовлеченных в проект пользователей'
+
+
+class ExecutorOffer(models.Model):
+    """
+    Предложение работника.
+    """
+
+    profile = models.OneToOneField(Profile,
+                                   on_delete=models.CASCADE,
+                                   related_name='executor_offer'
+                                   )
+    description = models.TextField('Описание')
+    salary = models.PositiveIntegerField('Зарплата', null=True, blank=True)
+    work_hours = models.PositiveSmallIntegerField('Часы работы в неделю',
+                                                  validators=[
+                                                      MinValueValidator(1),
+                                                      MaxValueValidator(168)
+                                                  ],
+                                                  default=40
+                                                  )
+
+    def __str__(self):
+        return 'Карточка {profile}'.format(profile=self.profile.user.username)
+
+    class Meta:
+        verbose_name = 'Карточка работника'
+        verbose_name_plural = 'Карточки работника'

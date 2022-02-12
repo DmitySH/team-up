@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Web apps
     'src.main',
     'src.accounts',
+    'src.projects',
     'src.tests',
 
     # Oher apps

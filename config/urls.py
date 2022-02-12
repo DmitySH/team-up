@@ -7,9 +7,9 @@ from config import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('src.accounts.urls')),
+    path('', include('src.projects.urls')),
     path('', include('src.main.urls')),
     path('', include('src.tests.urls')),
-
 ]
 
 if settings.DEBUG:
