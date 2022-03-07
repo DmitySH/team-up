@@ -7,14 +7,16 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
+from rest_framework import generics
 
-from src.accounts.forms import AuthForm, RegisterForm, UserEditForm, \
-    ProfileEditForm, ExecutorOfferForm
-from src.accounts.models import Status, Profile, ExecutorOffer, \
-    ProfileProjectStatus, Specialization
 from src.base.services import check_auth
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
+from .forms import AuthForm, RegisterForm, UserEditForm, \
+    ProfileEditForm, ExecutorOfferForm
+from .models import Status, Profile, ExecutorOffer, \
+    ProfileProjectStatus, Specialization
+from .serializers import ProfileDetailSerializer
 
 
 class LoginView(View):
@@ -278,3 +280,11 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtention):
         ).distinct()
 
         return queryset
+
+
+# API views.
+class ProfileDetailAPIView(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileDetailSerializer
+    lookup_field = 'user__username'
+    lookup_url_kwarg = 'slug'

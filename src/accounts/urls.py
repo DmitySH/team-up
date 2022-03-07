@@ -1,6 +1,7 @@
 from django.urls import path
 
-from src.accounts import views
+from . import views
+from .views import ProfileDetailAPIView
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -26,4 +27,9 @@ urlpatterns = [
          name='executor_offer'),
     path('profile/delete-offer', views.delete_offer, name='delete_offer'),
     path('workers/', views.ExecutorOfferListView.as_view(), name='offer_list'),
+]
+
+# API urls.
+urlpatterns += [
+    path('get-profile/<str:slug>/', ProfileDetailAPIView.as_view())
 ]
