@@ -1,7 +1,8 @@
 from django.urls import path
 
 from . import views
-from .views import ProfileDetailAPIView, ProfileUpdateAPIView
+from .views import ProfileDetailAPIView, ProfileUpdateAPIView, \
+    ExecutorOfferUpdateAPIView
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -33,5 +34,7 @@ urlpatterns = [
 urlpatterns += [
     path('get-profile/<str:slug>/', ProfileDetailAPIView.as_view()),
     path('edit-profile/<str:slug>/', ProfileUpdateAPIView.as_view()),
+    path('update-executor-offer/<str:slug>/',
+         ExecutorOfferUpdateAPIView.as_view()),
 
 ]
