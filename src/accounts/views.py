@@ -7,7 +7,10 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from src.base.services import check_auth
 from src.projects.models import WorkerSlot
@@ -16,7 +19,7 @@ from .forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm, ExecutorOfferForm
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
-from .serializers import ProfileDetailSerializer
+from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer
 
 
 class LoginView(View):
@@ -288,3 +291,11 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProfileDetailSerializer
     lookup_field = 'user__username'
     lookup_url_kwarg = 'slug'
+
+
+class ProfileUpdateAPIView(generics.UpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileUpdateSerializer
+    lookup_field = 'user__username'
+    lookup_url_kwarg = 'slug'
+

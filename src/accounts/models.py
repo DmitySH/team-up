@@ -52,6 +52,8 @@ class Profile(models.Model):
         OFFLINE = 3, _('Оффлайн')
 
     def get_remote_value(self):
+        if self.remote is None:
+            return None
         return self.RemoteChoices.choices[self.remote][1]
 
     # Sex choices codes:

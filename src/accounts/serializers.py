@@ -7,7 +7,7 @@ from .models import Profile
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name')
+        fields = ('first_name', 'last_name')
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
@@ -27,3 +27,28 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         exclude = ('is_male',)
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer()
+
+    photo = serializers.CharField()
+    cv = serializers.CharField()
+
+    class Meta:
+        model = Profile
+        fields = (
+            'remote', 'is_male', 'specialization', 'patronymic', 'city',
+            'age', 'description', 'user', 'photo', 'cv'
+        )
+
+    def update(self, instance, validated_data):
+        user = instance.user
+
+        for attr, value in validated_data.pop('user').items():
+            setattr(user, attr, value)
+
+        super(ProfileUpdateSerializer, self).update(instance, validated_data)
+        instance.save()
+
+        return instance
