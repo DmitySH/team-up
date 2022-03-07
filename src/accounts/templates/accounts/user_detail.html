@@ -95,6 +95,10 @@
                     лет
                 </li>
             {% endif %}
+            {% if profile.is_male is not None %}
+                <li class="list-group-item">Пол: {{ profile.get_sex_value }}
+                </li>
+            {% endif %}
         </ul>
 
         {% if user_.username == user.username %}

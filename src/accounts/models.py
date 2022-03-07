@@ -138,6 +138,14 @@ class Profile(models.Model):
                     username=self.user.username
                     )
 
+    def get_sex_value(self):
+        if self.is_male is None:
+            return None
+        if self.is_male:
+            return 'Мужской'
+        else:
+            return 'Женский'
+
     def offer(self):
         try:
             return self.executor_offer
