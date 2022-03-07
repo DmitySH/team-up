@@ -7,6 +7,9 @@ from config import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+    path('auth/', include('djoser.urls.jwt')),
     path('', include('src.accounts.urls')),
     path('', include('src.projects.urls')),
     path('', include('src.main.urls')),
