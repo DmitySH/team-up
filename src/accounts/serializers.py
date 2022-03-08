@@ -63,16 +63,19 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password']
+
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
 class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExecutorOffer
-        # fields = '__all__'
         exclude = ('profile',)
-        extra_kwargs = {
-            'profile': {
-                'validators': [],
-            },
-        }
 
     def create(self, validated_data):
         profile = self.context['request'].user.profile
@@ -84,4 +87,3 @@ class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
                       'profile': profile})
 
         return offer
-

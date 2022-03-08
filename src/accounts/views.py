@@ -1,14 +1,17 @@
+import django.contrib.auth.password_validation as validators
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.views import PasswordChangeView, \
     PasswordChangeDoneView
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from src.base.services import check_auth
@@ -19,7 +22,7 @@ from .forms import AuthForm, RegisterForm, UserEditForm, \
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
 from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
-    ExecutorOfferUpdateSerializer
+    ExecutorOfferUpdateSerializer, ChangePasswordSerializer
 
 
 class LoginView(View):
@@ -302,6 +305,40 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
         return self.request.user.profile
 
 
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            if not user.check_password(
+                    serializer.data.get('old_password')):
+                return Response({'old_password': ['Wrong password']},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            new_pw = serializer.data.get('new_password')
+            try:
+                validators.validate_password(password=new_pw, user=user)
+            except ValidationError as ex:
+                return Response({'new_password': list(ex.messages)},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(new_pw)
+            user.save()
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ExecutorOfferUpdateSerializer
@@ -310,12 +347,10 @@ class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
 class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    # serializer_class = ExecutorOfferUpdateSerializer
-
     def delete(self, request, *args, **kwargs):
         offer = request.user.profile.offer()
         if offer:
             offer.delete()
             return Response(status=status.HTTP_200_OK)
         else:
-            raise NotFound(detail="Error 40", code=404)
+            raise NotFound(detail="Error 404", code=404)

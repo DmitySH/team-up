@@ -1,8 +1,6 @@
 from django.urls import path
 
 from . import views
-from .views import ProfileDetailAPIView, ProfileUpdateAPIView, \
-    ExecutorOfferUpdateAPIView, ExecutorOfferDeleteAPIView
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -32,10 +30,12 @@ urlpatterns = [
 
 # API urls.
 urlpatterns += [
-    path('get-profile/<str:slug>/', ProfileDetailAPIView.as_view()),
-    path('edit-profile/', ProfileUpdateAPIView.as_view()),
+    path('get-profile/<str:slug>/', views.ProfileDetailAPIView.as_view()),
+    path('edit-profile/', views.ProfileUpdateAPIView.as_view()),
     path('update-executor-offer/',
-         ExecutorOfferUpdateAPIView.as_view()),
+         views.ExecutorOfferUpdateAPIView.as_view()),
     path('delete-executor-offer/',
-         ExecutorOfferDeleteAPIView.as_view()),
+         views.ExecutorOfferDeleteAPIView.as_view()),
+    path('change-password/',
+         views.ChangePasswordView.as_view()),
 ]
