@@ -56,17 +56,18 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.pop('user').items():
             setattr(user, attr, value)
 
+        user.save()
         super(ProfileUpdateSerializer, self).update(instance, validated_data)
         instance.save()
 
         return instance
 
 
-class ExecutorOfferCreateSerializer(serializers.ModelSerializer):
+class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExecutorOffer
-        fields = '__all__'
-        # exclude = ('profile',)
+        # fields = '__all__'
+        exclude = ('profile',)
         extra_kwargs = {
             'profile': {
                 'validators': [],
@@ -74,10 +75,13 @@ class ExecutorOfferCreateSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        profile = self.context['request'].user.profile
         offer, _ = ExecutorOffer.objects.update_or_create(
-            profile=validated_data.get('profile'),
+            profile=profile,
             defaults={'description': validated_data.get('description'),
                       'salary': validated_data.get('salary'),
-                      'work_hours': validated_data.get('work_hours')})
+                      'work_hours': validated_data.get('work_hours') or 40,
+                      'profile': profile})
 
         return offer
+

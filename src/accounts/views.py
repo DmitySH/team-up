@@ -7,7 +7,9 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
-from rest_framework import generics
+from rest_framework import generics, permissions, status
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
 from src.base.services import check_auth
 from src.projects.models import WorkerSlot
@@ -17,7 +19,7 @@ from .forms import AuthForm, RegisterForm, UserEditForm, \
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
 from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
-    ExecutorOfferCreateSerializer
+    ExecutorOfferUpdateSerializer
 
 
 class LoginView(View):
@@ -285,6 +287,7 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtention):
 
 # API views.
 class ProfileDetailAPIView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Profile.objects.all()
     serializer_class = ProfileDetailSerializer
     lookup_field = 'user__username'
@@ -292,17 +295,27 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
 
 
 class ProfileUpdateAPIView(generics.UpdateAPIView):
-    queryset = Profile.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileUpdateSerializer
-    lookup_field = 'user__username'
-    lookup_url_kwarg = 'slug'
+
+    def get_object(self):
+        return self.request.user.profile
 
 
 class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
-    queryset = ExecutorOffer.objects.all()
-    serializer_class = ExecutorOfferCreateSerializer
-    lookup_field = 'profile__user__username'
-    lookup_url_kwarg = 'slug'
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ExecutorOfferUpdateSerializer
 
 
+class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    # serializer_class = ExecutorOfferUpdateSerializer
+
+    def delete(self, request, *args, **kwargs):
+        offer = request.user.profile.offer()
+        if offer:
+            offer.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            raise NotFound(detail="Error 40", code=404)
