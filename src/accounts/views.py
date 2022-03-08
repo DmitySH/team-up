@@ -354,3 +354,5 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
             return Response(status=status.HTTP_200_OK)
         else:
             raise NotFound(detail="Error 404", code=404)
+
+

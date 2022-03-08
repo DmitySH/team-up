@@ -34,7 +34,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('is_male',)
+        exclude = ('is_male', 'id')
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -75,7 +75,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExecutorOffer
-        exclude = ('profile',)
+        exclude = ('profile', 'id')
 
     def create(self, validated_data):
         profile = self.context['request'].user.profile
@@ -84,6 +84,7 @@ class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
             defaults={'description': validated_data.get('description'),
                       'salary': validated_data.get('salary'),
                       'work_hours': validated_data.get('work_hours') or 40,
-                      'profile': profile})
+                      'profile': profile}
+        )
 
         return offer

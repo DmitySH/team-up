@@ -30,3 +30,11 @@ urlpatterns = [
     path('projects/<str:slug>/<int:pk>', views.WorkerSlotFormView.as_view(),
          name='worker_slot_form'),
 ]
+
+# API urls.
+urlpatterns += [
+    path('update-project/',
+         views.ProjectUpdateAPIView.as_view()),
+    path('delete-project/',
+         views.ProjectDeleteAPIView.as_view()),
+]

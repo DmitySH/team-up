@@ -4,9 +4,13 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
+from rest_framework import generics, permissions, status
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
+from .serializers import ProjectUpdateSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
@@ -265,3 +269,21 @@ def decline_apply(request, title, profile, slot_pk):
             apply.delete()
 
     return redirect(request.META.get('HTTP_REFERER'))
+
+
+# API views
+class ProjectUpdateAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectUpdateSerializer
+
+
+class ProjectDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        project = request.user.profile.project()
+        if project:
+            project.delete()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            raise NotFound(detail="Error 404", code=404)
