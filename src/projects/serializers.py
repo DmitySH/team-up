@@ -56,8 +56,25 @@ class WorkerSlotUpdateSerializer(serializers.ModelSerializer):
 
 
 class DeleteWorkerSlotSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(required=True)
+
     class Meta:
         model = WorkerSlot
         fields = ['id']
 
-    id = serializers.CharField(required=True)
+
+class ProjectListSerializer(serializers.ModelSerializer):
+    required_belbin = serializers.SlugRelatedField(
+        slug_field='role',
+        many=True,
+        read_only=True
+    )
+    required_specialization = serializers.SlugRelatedField(
+        slug_field='name',
+        many=True,
+        read_only=True)
+    online = serializers.CharField(source='get_remote_value')
+
+    class Meta:
+        model = Project
+        fields = '__all__'

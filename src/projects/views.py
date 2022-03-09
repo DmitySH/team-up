@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer
+    DeleteWorkerSlotSerializer, ProjectListSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
@@ -341,3 +341,8 @@ class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
             return Response(status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectListAPIView(generics.ListAPIView):
+    serializer_class = ProjectListSerializer
+    queryset = Project.objects.all()
