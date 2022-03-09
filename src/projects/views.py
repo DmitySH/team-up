@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
-from .serializers import ProjectUpdateSerializer
+from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
@@ -287,3 +287,29 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
             return Response(status=status.HTTP_200_OK)
         else:
             raise NotFound(detail="Error 404", code=404)
+
+
+class WorkerSlotUpdateAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WorkerSlotUpdateSerializer
+
+    def create(self, request, *args, **kwargs):
+        project = self.request.user.profile.project()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            if not project:
+                return Response('User do not have project',
+                                status=status.HTTP_400_BAD_REQUEST)
+            if 'id' in serializer.validated_data and \
+                    not get_object_or_none(project.team,
+                                           id=serializer.validated_data.get(
+                                               'id', None)
+                                           ):
+                return Response('No such slot in this project',
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save()
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

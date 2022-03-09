@@ -37,4 +37,6 @@ urlpatterns += [
          views.ProjectUpdateAPIView.as_view()),
     path('delete-project/',
          views.ProjectDeleteAPIView.as_view()),
+    path('update-worker-slot/',
+         views.WorkerSlotUpdateAPIView.as_view()),
 ]
