@@ -88,3 +88,9 @@ class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
         )
 
         return offer
+
+
+class ExecutorOfferListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExecutorOffer
+        fields = '__all__'

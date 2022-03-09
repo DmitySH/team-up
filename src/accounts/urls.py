@@ -38,4 +38,6 @@ urlpatterns += [
          views.ExecutorOfferDeleteAPIView.as_view()),
     path('change-password/',
          views.ChangePasswordView.as_view()),
+    path('get-executor-offers/',
+         views.ExecutorOfferListAPIView.as_view()),
 ]

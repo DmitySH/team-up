@@ -22,7 +22,8 @@ from .forms import AuthForm, RegisterForm, UserEditForm, \
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
 from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
-    ExecutorOfferUpdateSerializer, ChangePasswordSerializer
+    ExecutorOfferUpdateSerializer, ChangePasswordSerializer, \
+    ExecutorOfferListSerializer
 
 
 class LoginView(View):
@@ -356,3 +357,6 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
             raise NotFound(detail="Error 404", code=404)
 
 
+class ExecutorOfferListAPIView(generics.ListAPIView):
+    serializer_class = ExecutorOfferListSerializer
+    queryset = ExecutorOffer.objects.all()
