@@ -53,3 +53,11 @@ class WorkerSlotUpdateSerializer(serializers.ModelSerializer):
         slot.role.set(validated_data.get('role'))
 
         return slot
+
+
+class DeleteWorkerSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkerSlot
+        fields = ['id']
+
+    id = serializers.CharField(required=True)
