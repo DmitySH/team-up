@@ -18,15 +18,17 @@
             </a>
         </li>
     {% else %}
-        <li class="list-group-item">
-            <form method="post"
-                  action="{% url 'slot_apply' title=project.title profile=user.username slot_pk=slot.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-dark btn-block">
-                    <b>Оставить заявку</b>
-                </button>
-            </form>
-        </li>
+        {% if user.is_authenticated %}
+            <li class="list-group-item">
+                <form method="post"
+                      action="{% url 'slot_apply' title=project.title profile=user.username slot_pk=slot.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark btn-block">
+                        <b>Оставить заявку</b>
+                    </button>
+                </form>
+            </li>
+        {% endif %}
     {% endif %}
 {% endblock %}
 {% block buttons %}
