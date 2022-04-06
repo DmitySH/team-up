@@ -98,3 +98,13 @@ class InviteSerializer(serializers.Serializer):
 
     slot_id = serializers.IntegerField()
     username = serializers.SlugField()
+
+
+class ApplySerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    slot_id = serializers.IntegerField()

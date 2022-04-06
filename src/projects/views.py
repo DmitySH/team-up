@@ -9,13 +9,13 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .permissions import *
 from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
     DeleteWorkerSlotSerializer, ProjectListSerializer, InviteSerializer, \
-    ProjectDetailSerializer
-from .services import check_same_applies
+    ProjectDetailSerializer, ApplySerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
@@ -208,7 +208,7 @@ def invite_profile(request, title, profile, slot_pk):
             check_own_slot(request, slot)
         except ObjectDoesNotExist:
             raise Http404
-        check_same_applies(profile, slot)
+        services.check_same_applies(profile, slot)
 
     return redirect('offer_list')
 
@@ -358,16 +358,38 @@ class InviteAPIView(APIView):
                 self.check_object_permissions(request, slot)
                 if invited_profile == request.user.profile:
                     return Response(status=status.HTTP_400_BAD_REQUEST,
-                                    data=serializer.data)
+                                    data='Can not invite yourself')
             except ObjectDoesNotExist:
                 return Response(status=status.HTTP_400_BAD_REQUEST,
                                 data=serializer.data)
 
-            check_same_applies(invited_profile, slot)
+            services.check_same_applies(invited_profile, slot)
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data=serializer.data)
 
 
+class ApplyAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request):
+        serializer = ApplySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        slot = get_object_or_none(WorkerSlot.objects,
+                                  id=serializer.validated_data.get('slot_id'))
+        if not slot:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='No such slot')
+
+        if slot in services.get_team(request.user.profile):
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='Can not apply for your project')
+
+        if services.get_invited_status(request.user.profile, slot):
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='User was already invited')
+
+        services.create_waiting_status(request.user.profile, slot)
+        return Response(serializer.data)

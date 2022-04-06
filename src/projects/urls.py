@@ -47,4 +47,6 @@ urlpatterns += [
          views.ProjectListAPIView.as_view()),
     path('invite-profile/',
          views.InviteAPIView.as_view()),
+    path('apply-slot/',
+         views.ApplyAPIView.as_view()),
 ]
