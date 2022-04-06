@@ -3,6 +3,15 @@ from rest_framework import serializers
 from src.projects.models import Project, WorkerSlot
 
 
+class ProjectDetailSerializer(serializers.ModelSerializer):
+    team = serializers.SlugRelatedField(slug_field='id', many=True,
+                                        read_only=True)
+
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+
 class ProjectUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -78,3 +87,14 @@ class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = '__all__'
+
+
+class InviteSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    slot_id = serializers.IntegerField()
+    username = serializers.SlugField()
