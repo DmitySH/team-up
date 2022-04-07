@@ -11,5 +11,18 @@ def accept_slot_invite(slot, profile):
         other_invites.delete()
         slot.save()
         return True
-    else:
-        return False
+
+    return False
+
+
+def decline_slot_invite(slot, profile):
+    if slot in profile.get_invited_slots():
+        invite = ProfileProjectStatus.objects.get(
+            worker_slot=slot,
+            profile=profile,
+            status=Status.objects.get(
+                value='Приглашен'))
+        invite.delete()
+        return True
+
+    return False

@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from src.base.services import check_auth
+from src.base.services import check_auth, get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
 from . import services
@@ -355,38 +355,6 @@ class ExecutorOfferListAPIView(generics.ListAPIView):
     queryset = ExecutorOffer.objects.all()
 
 
-# def accept_invite(request, slot):
-#     check_auth(request)
-#     if request.POST:
-#         slot = get_object_or_404(WorkerSlot.objects, id=slot)
-#
-#         if slot in request.user.profile.get_invited_slots():
-#             slot.profile = request.user.profile
-#             other_invites = ProfileProjectStatus.objects.filter(
-#                 worker_slot=slot,
-#                 status=Status.objects.get(
-#                     value='Приглашен'))
-#             other_invites.delete()
-#             slot.save()
-#
-#     return redirect('invitations')
-#
-#
-# def decline_invite(request, slot):
-#     check_auth(request)
-#     if request.POST:
-#         slot = get_object_or_404(WorkerSlot.objects, id=slot)
-#
-#         if slot in request.user.profile.get_invited_slots():
-#             invite = ProfileProjectStatus.objects.get(
-#                 worker_slot=slot,
-#                 profile=request.user.profile,
-#                 status=Status.objects.get(
-#                     value='Приглашен'))
-#             invite.delete()
-#
-#     return redirect('invitations')
-#
 #
 # def retract_invite(request, slot):
 #     check_auth(request)
@@ -403,6 +371,7 @@ class ExecutorOfferListAPIView(generics.ListAPIView):
 #
 #     return redirect('invitations')
 
+
 class AcceptInviteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -410,7 +379,7 @@ class AcceptInviteAPIView(APIView):
         slot = get_object_or_404(WorkerSlot.objects,
                                  id=slot_id)
 
-        if services.accept_slot_invite(slot, request.user.profile):
+        if slot and services.accept_slot_invite(slot, request.user.profile):
             return Response('Invitation accepted', status=status.HTTP_200_OK)
 
         return Response('User was not invited',
@@ -431,3 +400,14 @@ class AppliedWorkerSlotListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.profile.get_applied_slots()
+
+
+class DeclineInviteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot and services.decline_slot_invite(slot, request.user.profile):
+            return Response('Invite declined')
+
+        return Response('Incorrect data')
