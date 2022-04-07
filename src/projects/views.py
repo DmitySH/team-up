@@ -16,6 +16,7 @@ from .permissions import *
 from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
     DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
+from ..accounts.serializers import ProfileDetailSerializer
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
     get_object_or_none
@@ -384,3 +385,20 @@ class ApplyAPIView(APIView):
 
         services.create_waiting_status(request.user.profile, slot)
         return Response(status=status.HTTP_200_OK, data='Applied for slot')
+
+
+class SlotAppliesAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST
+                            )
+        self.check_object_permissions(request, slot)
+
+        serializer = ProfileDetailSerializer(
+            services.get_applied_for_slot(slot), many=True)
+
+        return Response(serializer.data)

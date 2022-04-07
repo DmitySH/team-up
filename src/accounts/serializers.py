@@ -8,7 +8,7 @@ from ..projects.models import WorkerSlot
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name')
+        fields = ('username', 'first_name', 'last_name')
 
 
 class ExecutorOfferDetailSerializer(serializers.ModelSerializer):
@@ -35,7 +35,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('is_male', 'id')
+        exclude = ('is_male',)
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):

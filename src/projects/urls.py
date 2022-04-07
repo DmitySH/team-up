@@ -49,4 +49,6 @@ urlpatterns += [
          views.InviteAPIView.as_view()),
     path('apply-slot/<int:slot_id>/',
          views.ApplyAPIView.as_view()),
+    path('get_slot_applies/<int:slot_id>',
+         views.SlotAppliesAPIView.as_view()),
 ]
