@@ -1,6 +1,11 @@
 from src.accounts.models import ProfileProjectStatus, Status
 
 
+def update_password(user, new_pw):
+    user.set_password(new_pw)
+    user.save()
+
+
 def accept_slot_invite(slot, profile):
     if slot in profile.get_invited_slots():
         slot.profile = profile

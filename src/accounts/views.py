@@ -10,7 +10,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
 from rest_framework import generics, permissions, status
-from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -304,33 +303,24 @@ class ChangePasswordView(generics.UpdateAPIView):
     model = User
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
-
     def update(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = request.user
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if serializer.is_valid():
-            if not user.check_password(
-                    serializer.data.get('old_password')):
-                return Response({'old_password': ['Wrong password']},
-                                status=status.HTTP_400_BAD_REQUEST)
+        if not user.check_password(
+                serializer.data.get('old_password')):
+            return Response('Wrong old password', status.HTTP_400_BAD_REQUEST)
 
-            new_pw = serializer.data.get('new_password')
-            try:
-                validators.validate_password(password=new_pw, user=user)
-            except ValidationError as ex:
-                return Response({'new_password': list(ex.messages)},
-                                status=status.HTTP_400_BAD_REQUEST)
+        new_pw = serializer.data.get('new_password')
+        try:
+            validators.validate_password(password=new_pw, user=user)
+        except ValidationError as ex:
+            return Response(list(ex.messages),
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            user.set_password(new_pw)
-            user.save()
-
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        services.update_password(user, new_pw)
+        return Response('Password changed')
 
 
 class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
@@ -345,9 +335,9 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
         offer = request.user.profile.offer()
         if offer:
             offer.delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response('Offer deleted', status.HTTP_200_OK)
         else:
-            raise NotFound(detail="Error 404", code=404)
+            return Response('No such offer', status.HTTP_400_BAD_REQUEST)
 
 
 class ExecutorOfferListAPIView(generics.ListAPIView):
@@ -359,8 +349,8 @@ class AcceptInviteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):
-        slot = get_object_or_404(WorkerSlot.objects,
-                                 id=slot_id)
+        slot = get_object_or_none(WorkerSlot.objects,
+                                  id=slot_id)
 
         if slot and services.accept_slot_invite(slot, request.user.profile):
             return Response('Invitation accepted', status=status.HTTP_200_OK)
