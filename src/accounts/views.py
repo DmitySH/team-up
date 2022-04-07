@@ -423,3 +423,11 @@ class InvitedWorkerSlotListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.profile.get_invited_slots()
+
+
+class AppliedWorkerSlotListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = WorkerSlotListSerializer
+
+    def get_queryset(self):
+        return self.request.user.profile.get_applied_slots()
