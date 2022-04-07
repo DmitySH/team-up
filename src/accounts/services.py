@@ -26,3 +26,16 @@ def decline_slot_invite(slot, profile):
         return True
 
     return False
+
+
+def retract_slot_apply(slot, profile):
+    if slot in profile.get_applied_slots():
+        apply = ProfileProjectStatus.objects.get(
+            worker_slot=slot,
+            profile=profile,
+            status=Status.objects.get(
+                value='Ожидает'))
+        apply.delete()
+        return True
+
+    return False

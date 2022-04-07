@@ -48,4 +48,6 @@ urlpatterns += [
          views.AcceptInviteAPIView.as_view()),
     path('decline_invite/<int:slot_id>/',
          views.DeclineInviteAPIView.as_view()),
+    path('retract-apply/<int:slot_id>/',
+         views.RetractInviteAPIView.as_view()),
 ]

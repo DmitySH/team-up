@@ -355,23 +355,6 @@ class ExecutorOfferListAPIView(generics.ListAPIView):
     queryset = ExecutorOffer.objects.all()
 
 
-#
-# def retract_invite(request, slot):
-#     check_auth(request)
-#     if request.POST:
-#         slot = get_object_or_404(WorkerSlot.objects, id=slot)
-#
-#         if slot in request.user.profile.get_applied_slots():
-#             apply = ProfileProjectStatus.objects.get(
-#                 worker_slot=slot,
-#                 profile=request.user.profile,
-#                 status=Status.objects.get(
-#                     value='Ожидает'))
-#             apply.delete()
-#
-#     return redirect('invitations')
-
-
 class AcceptInviteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -409,5 +392,17 @@ class DeclineInviteAPIView(APIView):
         slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
         if slot and services.decline_slot_invite(slot, request.user.profile):
             return Response('Invite declined')
+
+        return Response('Incorrect data')
+
+
+class RetractInviteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+
+        if slot and services.retract_slot_apply(slot, request.user.profile):
+            return Response('Apply retracted')
 
         return Response('Incorrect data')
