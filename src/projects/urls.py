@@ -45,8 +45,8 @@ urlpatterns += [
          views.WorkerSlotDeleteAPIView.as_view()),
     path('get-projects/',
          views.ProjectListAPIView.as_view()),
-    path('invite-profile/',
+    path('invite-profile/<str:username>/<int:slot_id>/',
          views.InviteAPIView.as_view()),
-    path('apply-slot/',
+    path('apply-slot/<int:slot_id>/',
          views.ApplyAPIView.as_view()),
 ]

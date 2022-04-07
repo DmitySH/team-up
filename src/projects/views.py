@@ -14,8 +14,7 @@ from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .permissions import *
 from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer, ProjectListSerializer, InviteSerializer, \
-    ProjectDetailSerializer, ApplySerializer
+    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
@@ -346,39 +345,31 @@ class InviteAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated,
                           IsProjectOwner, IsSlotOwner]
 
-    def post(self, request):
-        serializer = InviteSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                invited_profile = Profile.objects.get(
-                    user__username=serializer.validated_data.get('username'))
+    def post(self, request, username, slot_id):
+        try:
+            invited_profile = Profile.objects.get(
+                user__username=username)
 
-                slot = WorkerSlot.objects.get(
-                    id=serializer.validated_data.get('slot_id'))
-                self.check_object_permissions(request, slot)
-                if invited_profile == request.user.profile:
-                    return Response(status=status.HTTP_400_BAD_REQUEST,
-                                    data='Can not invite yourself')
-            except ObjectDoesNotExist:
+            slot = WorkerSlot.objects.get(
+                id=slot_id)
+            self.check_object_permissions(request, slot)
+            if invited_profile == request.user.profile:
                 return Response(status=status.HTTP_400_BAD_REQUEST,
-                                data=serializer.data)
-
-            services.check_same_applies(invited_profile, slot)
-            return Response(serializer.data)
-        else:
+                                data='Can not invite yourself')
+        except ObjectDoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data=serializer.data)
+                            data='Incorrect data')
+
+        services.check_same_applies(invited_profile, slot)
+        return Response('User was invited')
 
 
 class ApplyAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        serializer = ApplySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+    def post(self, request, slot_id):
         slot = get_object_or_none(WorkerSlot.objects,
-                                  id=serializer.validated_data.get('slot_id'))
+                                  id=slot_id)
         if not slot:
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data='No such slot')
@@ -392,4 +383,4 @@ class ApplyAPIView(APIView):
                             data='User was already invited')
 
         services.create_waiting_status(request.user.profile, slot)
-        return Response(serializer.data)
+        return Response(status=status.HTTP_200_OK, data='Applied for slot')
