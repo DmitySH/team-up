@@ -4,15 +4,19 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
+from .permissions import *
 from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer, ProjectListSerializer
+    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
+from ..accounts.serializers import ProfileDetailSerializer
 from ..accounts.views import SpecializationsBelbin
 from ..base.services import check_own_slot, check_own_project, check_auth, \
     get_object_or_none
@@ -204,22 +208,7 @@ def invite_profile(request, title, profile, slot_pk):
             check_own_slot(request, slot)
         except ObjectDoesNotExist:
             raise Http404
-        same_applies = ProfileProjectStatus.objects.filter(
-            profile=profile,
-            worker_slot=slot,
-            status=Status.objects.get(
-                value='Ожидает'))
-        if same_applies:
-            applied = same_applies.first()
-            applied.status = Status.objects.get(
-                value='Приглашен')
-            applied.save()
-        else:
-            ProfileProjectStatus.objects.get_or_create(
-                profile=profile,
-                worker_slot=slot,
-                status=Status.objects.get(
-                    value='Приглашен'))
+        services.check_same_applies(profile, slot)
 
     return redirect('offer_list')
 
@@ -273,6 +262,14 @@ def decline_apply(request, title, profile, slot_pk):
 
 
 # API views
+class ProjectDetailAPIView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Project.objects.all()
+    serializer_class = ProjectDetailSerializer
+    lookup_field = 'title'
+    lookup_url_kwarg = 'slug'
+
+
 class ProjectUpdateAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectUpdateSerializer
@@ -291,7 +288,7 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
 
 
 class WorkerSlotUpdateAPIView(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
     serializer_class = WorkerSlotUpdateSerializer
 
     def create(self, request, *args, **kwargs):
@@ -317,7 +314,7 @@ class WorkerSlotUpdateAPIView(generics.CreateAPIView):
 
 
 class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
     serializer_class = DeleteWorkerSlotSerializer
 
     def delete(self, request, *args, **kwargs):
@@ -325,9 +322,6 @@ class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
-            if not project:
-                return Response('User does not have project',
-                                status=status.HTTP_400_BAD_REQUEST)
             slot = get_object_or_none(project.team,
                                       id=serializer.validated_data.get(
                                           'id', None)
@@ -346,3 +340,81 @@ class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
 class ProjectListAPIView(generics.ListAPIView):
     serializer_class = ProjectListSerializer
     queryset = Project.objects.all()
+
+
+class InviteAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def post(self, request, username, slot_id):
+        try:
+            invited_profile = Profile.objects.get(
+                user__username=username)
+
+            slot = WorkerSlot.objects.get(
+                id=slot_id)
+            self.check_object_permissions(request, slot)
+            if invited_profile == request.user.profile:
+                return Response(status=status.HTTP_400_BAD_REQUEST,
+                                data='Can not invite yourself')
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='Incorrect data')
+
+        services.check_same_applies(invited_profile, slot)
+        return Response('User was invited')
+
+
+class ApplyAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects,
+                                  id=slot_id)
+        if not slot:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='No such slot')
+
+        if slot in services.get_team(request.user.profile):
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='Can not apply for your project')
+
+        if services.get_invited_status(request.user.profile, slot):
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='User was already invited')
+
+        services.create_waiting_status(request.user.profile, slot)
+        return Response(status=status.HTTP_200_OK, data='Applied for slot')
+
+
+class SlotAppliesAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST
+                            )
+        self.check_object_permissions(request, slot)
+
+        serializer = ProfileDetailSerializer(
+            services.get_applied_for_slot(slot), many=True)
+
+        return Response(serializer.data)
+
+
+class DeclineApplyAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def post(self, request, username, slot_id):
+        profile = get_object_or_none(Profile.objects,
+                                     user__username=username)
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot or not profile:
+            return Response('Incorrect data', status.HTTP_400_BAD_REQUEST)
+
+        self.check_object_permissions(request, slot)
+        services.delete_apply(slot, profile)
+        return Response('Apply declined')

@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from src.base.constants import *
 from src.base.services import *
@@ -117,3 +120,23 @@ class LSQTestFormView(View):
 
         return render(request, 'tests/lsq_test.html',
                       context={'forms': lsq_forms})
+
+
+# API views.
+
+class BelbinProcessAPIView(APIView):
+    def post(self, request):
+        return Response(status=status.HTTP_200_OK,
+                        data=analyze_belbin(request.data['value']))
+
+
+class MBTIProcessAPIView(APIView):
+    def post(self, request):
+        return Response(status=status.HTTP_200_OK,
+                        data=analyze_mbti(request.data['value']))
+
+
+class LSQProcessAPIView(APIView):
+    def post(self, request):
+        return Response(status=status.HTTP_200_OK,
+                        data=analyze_lsq(request.data['value']))

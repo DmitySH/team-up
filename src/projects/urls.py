@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import ProjectDetailAPIView
 
 urlpatterns = [
     path('profile/delete-project', views.delete_project,
@@ -33,6 +34,7 @@ urlpatterns = [
 
 # API urls.
 urlpatterns += [
+    path('get-project/<str:slug>/', ProjectDetailAPIView.as_view()),
     path('update-project/',
          views.ProjectUpdateAPIView.as_view()),
     path('delete-project/',
@@ -43,4 +45,12 @@ urlpatterns += [
          views.WorkerSlotDeleteAPIView.as_view()),
     path('get-projects/',
          views.ProjectListAPIView.as_view()),
+    path('invite-profile/<str:username>/<int:slot_id>/',
+         views.InviteAPIView.as_view()),
+    path('apply-slot/<int:slot_id>/',
+         views.ApplyAPIView.as_view()),
+    path('get_slot_applies/<int:slot_id>/',
+         views.SlotAppliesAPIView.as_view()),
+    path('decline-apply-slot/<str:username>/<int:slot_id>/',
+         views.DeclineApplyAPIView.as_view()),
 ]

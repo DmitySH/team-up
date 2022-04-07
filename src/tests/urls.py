@@ -10,3 +10,10 @@ urlpatterns = [
     path('profile/lsqtest/', views.LSQTestFormView.as_view(),
          name='lsq_test'),
 ]
+
+# API urls.
+urlpatterns += [
+    path('process-belbin/', views.BelbinProcessAPIView.as_view()),
+    path('process-mbti/', views.MBTIProcessAPIView.as_view()),
+    path('process-lsq/', views.LSQProcessAPIView.as_view()),
+]

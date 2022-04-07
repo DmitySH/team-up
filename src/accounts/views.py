@@ -13,17 +13,19 @@ from rest_framework import generics, permissions, status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from src.base.services import check_auth
+from src.base.services import check_auth, get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
+from . import services
 from .forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm, ExecutorOfferForm
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
 from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
     ExecutorOfferUpdateSerializer, ChangePasswordSerializer, \
-    ExecutorOfferListSerializer
+    ExecutorOfferListSerializer, WorkerSlotListSerializer
 
 
 class LoginView(View):
@@ -64,8 +66,7 @@ class RegisterView(View):
         user_form = RegisterForm(request.POST)
 
         if user_form.is_valid():
-            user = user_form.save()
-            Profile.objects.create(user=user)
+            user_form.save()
 
             username = user_form.cleaned_data.get('username')
             raw_password = user_form.cleaned_data.get('password1')
@@ -146,15 +147,7 @@ def accept_invite(request, slot):
     check_auth(request)
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=slot)
-
-        if slot in request.user.profile.get_invited_slots():
-            slot.profile = request.user.profile
-            other_invites = ProfileProjectStatus.objects.filter(
-                worker_slot=slot,
-                status=Status.objects.get(
-                    value='Приглашен'))
-            other_invites.delete()
-            slot.save()
+        services.accept_slot_invite(slot, request.user.profile)
 
     return redirect('invitations')
 
@@ -360,3 +353,56 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
 class ExecutorOfferListAPIView(generics.ListAPIView):
     serializer_class = ExecutorOfferListSerializer
     queryset = ExecutorOffer.objects.all()
+
+
+class AcceptInviteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_404(WorkerSlot.objects,
+                                 id=slot_id)
+
+        if slot and services.accept_slot_invite(slot, request.user.profile):
+            return Response('Invitation accepted', status=status.HTTP_200_OK)
+
+        return Response('User was not invited',
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class InvitedWorkerSlotListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = WorkerSlotListSerializer
+
+    def get_queryset(self):
+        return self.request.user.profile.get_invited_slots()
+
+
+class AppliedWorkerSlotListAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = WorkerSlotListSerializer
+
+    def get_queryset(self):
+        return self.request.user.profile.get_applied_slots()
+
+
+class DeclineInviteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot and services.decline_slot_invite(slot, request.user.profile):
+            return Response('Invite declined')
+
+        return Response('Incorrect data')
+
+
+class RetractInviteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+
+        if slot and services.retract_slot_apply(slot, request.user.profile):
+            return Response('Apply retracted')
+
+        return Response('Incorrect data')
