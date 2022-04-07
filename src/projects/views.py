@@ -402,3 +402,19 @@ class SlotAppliesAPIView(APIView):
             services.get_applied_for_slot(slot), many=True)
 
         return Response(serializer.data)
+
+
+class DeclineApplyAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def post(self, request, username, slot_id):
+        profile = get_object_or_none(Profile.objects,
+                                     user__username=username)
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot or not profile:
+            return Response('Incorrect data', status.HTTP_400_BAD_REQUEST)
+
+        self.check_object_permissions(request, slot)
+        services.delete_apply(slot, profile)
+        return Response('Apply declined')

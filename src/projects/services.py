@@ -48,3 +48,13 @@ def get_applied_for_slot(slot):
                                              'profile__executor_offer')
     profiles = [apply.profile for apply in applies]
     return profiles
+
+
+def delete_apply(slot, profile):
+    if slot in profile.get_applied_slots():
+        apply = ProfileProjectStatus.objects.get(
+            worker_slot=slot,
+            profile=profile,
+            status=Status.objects.get(
+                value='Ожидает'))
+        apply.delete()
