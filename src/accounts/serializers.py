@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Profile, ExecutorOffer
+from ..projects.models import WorkerSlot
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -93,4 +94,10 @@ class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
 class ExecutorOfferListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExecutorOffer
+        fields = '__all__'
+
+
+class WorkerSlotListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkerSlot
         fields = '__all__'

@@ -40,4 +40,8 @@ urlpatterns += [
          views.ChangePasswordView.as_view()),
     path('get-executor-offers/',
          views.ExecutorOfferListAPIView.as_view()),
+    path('get_invited_slots/',
+         views.InvitedWorkerSlotListAPIView.as_view()),
+    path('accept_invite/<int:slot_id>/',
+         views.AcceptInviteAPIView.as_view()),
 ]
