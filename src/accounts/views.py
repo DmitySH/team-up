@@ -294,8 +294,19 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileUpdateSerializer
 
-    def get_object(self):
+    def get_queryset(self):
         return self.request.user.profile
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        services.object_update(user, serializer.validated_data.pop('user'))
+
+        services.object_update(user.profile, serializer.validated_data)
+
+        return Response('Profile updated')
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -309,10 +320,10 @@ class ChangePasswordView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
 
         if not user.check_password(
-                serializer.data.get('old_password')):
+                serializer.validated_data.get('old_password')):
             return Response('Wrong old password', status.HTTP_400_BAD_REQUEST)
 
-        new_pw = serializer.data.get('new_password')
+        new_pw = serializer.validated_data.get('new_password')
         try:
             validators.validate_password(password=new_pw, user=user)
         except ValidationError as ex:
@@ -323,9 +334,21 @@ class ChangePasswordView(generics.UpdateAPIView):
         return Response('Password changed')
 
 
-class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
+class ExecutorOfferUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ExecutorOfferUpdateSerializer
+
+    def post(self, request):
+        profile = request.user.profile
+        serializer = ExecutorOfferUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        created = services.update_or_create_offer(profile,
+                                                  serializer.validated_data)
+
+        if created:
+            return Response('Executor offer was created')
+        else:
+            return Response('Executor offer was updated')
 
 
 class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
