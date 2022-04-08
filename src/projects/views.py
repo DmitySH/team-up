@@ -13,8 +13,9 @@ from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .permissions import *
-from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer
+from .serializers import WorkerSlotUpdateSerializer, \
+    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer, \
+    ProjectUpdateSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.serializers import ProfileDetailSerializer
 from ..accounts.views import SpecializationsBelbin
@@ -270,9 +271,20 @@ class ProjectDetailAPIView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'slug'
 
 
-class ProjectUpdateAPIView(generics.CreateAPIView):
+class ProjectUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProjectUpdateSerializer
+
+    def post(self, request):
+        profile = request.user.profile
+        serializer = ProjectUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        created = services.update_or_create_project(profile,
+                                                    serializer.validated_data)
+        if created:
+            return Response('Project was created')
+        else:
+            return Response('Project was updated')
 
 
 class ProjectDeleteAPIView(generics.DestroyAPIView):
@@ -287,30 +299,29 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
             raise NotFound(detail="Error 404", code=404)
 
 
-class WorkerSlotUpdateAPIView(generics.CreateAPIView):
+class WorkerSlotUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
-    serializer_class = WorkerSlotUpdateSerializer
 
-    def create(self, request, *args, **kwargs):
-        project = self.request.user.profile.project()
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request):
+        project = request.user.profile.project()
+        serializer = WorkerSlotUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if serializer.is_valid():
-            if not project:
-                return Response('User does not have project',
-                                status=status.HTTP_400_BAD_REQUEST)
-            if 'id' in serializer.validated_data and \
-                    not get_object_or_none(project.team,
-                                           id=serializer.validated_data.get(
-                                               'id', None)
-                                           ):
-                return Response('No such slot in this project',
-                                status=status.HTTP_400_BAD_REQUEST)
+        if 'id' in serializer.validated_data and \
+                not get_object_or_none(project.team,
+                                       id=serializer.validated_data.get(
+                                           'id', None)
+                                       ):
+            return Response('No such slot in this project',
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        created = services.update_or_create_worker_slot(
+            project, serializer.validated_data)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if created:
+            return Response('Worker slot was created')
+        else:
+            return Response('Worker slot was updated')
 
 
 class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
@@ -321,20 +332,18 @@ class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
         project = self.request.user.profile.project()
         serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid():
-            slot = get_object_or_none(project.team,
-                                      id=serializer.validated_data.get(
-                                          'id', None)
-                                      )
-            if 'id' in serializer.validated_data and \
-                    not slot:
-                return Response('No such slot in this project',
-                                status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        slot = get_object_or_none(project.team,
+                                  id=serializer.validated_data.get(
+                                      'id', None)
+                                  )
+        if 'id' in serializer.validated_data and \
+                not slot:
+            return Response('No such slot in this project',
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            slot.delete()
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        slot.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 class ProjectListAPIView(generics.ListAPIView):
