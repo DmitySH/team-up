@@ -1,5 +1,6 @@
 import django.contrib.auth.password_validation as validators
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.views import PasswordChangeView, \
@@ -97,9 +98,8 @@ class MyPasswordChangeDoneView(PasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
 
 
-class UserEditView(View):
+class UserEditView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
         form = UserEditForm(instance=request.user)
         form_profile = ProfileEditForm(instance=request.user.profile)
 
@@ -110,8 +110,6 @@ class UserEditView(View):
         return render(request, 'accounts/edit_profile.html', args)
 
     def post(self, request):
-        check_auth(request)
-
         form = UserEditForm(request.POST, instance=request.user)
         form_profile = ProfileEditForm(request.POST, request.FILES,
                                        instance=request.user.profile)
@@ -131,9 +129,8 @@ class UserEditView(View):
         return render(request, 'accounts/edit_profile.html', args)
 
 
-class InvitationsView(View):
+class InvitationsView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
         invited_slots = request.user.profile.get_invited_slots()
         applied_slots = request.user.profile.get_applied_slots()
         return render(request, 'accounts/invitation_list.html',
@@ -191,17 +188,14 @@ class SpecializationsBelbin:
         return BelbinTest.objects.all()
 
 
-class ExecutorOfferFormView(View):
+class ExecutorOfferFormView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
-
         form = ExecutorOfferForm(instance=request.user.profile.offer())
         return render(request,
                       'accounts/executor_offer_form.html',
                       context={'form': form})
 
     def post(self, request):
-        check_auth(request)
         form = ExecutorOfferForm(request.POST,
                                  instance=request.user.profile.offer())
 

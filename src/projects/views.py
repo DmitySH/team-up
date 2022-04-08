@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.http import Http404
@@ -47,16 +48,13 @@ def delete_slot(request, pk):
         return redirect('main_page')
 
 
-class ProjectFormView(View):
+class ProjectFormView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
-
         form = ProjectForm(instance=request.user.profile.project())
         return render(request, 'projects/project_form.html',
                       context={'form': form})
 
     def post(self, request):
-        check_auth(request)
         project = request.user.profile.project()
 
         form = ProjectForm(request.POST, instance=project)
@@ -133,10 +131,13 @@ class ProjectDetailView(DetailView):
     template_name = 'projects/project_detail.html'
 
 
-class WorkerSlotFormView(View):
+class WorkerSlotFormView(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, slug, pk):
-        check_auth(request)
-        check_own_project(request, slug)
         slot = get_object_or_none(Project.objects.get(title=slug).team,
                                   id=pk)
         form = WorkerSlotForm(instance=slot)
@@ -144,8 +145,6 @@ class WorkerSlotFormView(View):
                       context={'form': form})
 
     def post(self, request, slug, pk):
-        check_auth(request)
-        check_own_project(request, slug)
         project = Project.objects.get(title=slug)
         slot = get_object_or_none(project.team, id=pk)
 
@@ -165,20 +164,26 @@ class WorkerSlotFormView(View):
                       context={'form': form})
 
 
-class ProjectInvitesView(View):
+class ProjectInvitesView(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, title, profile):
-        check_auth(request)
-        check_own_project(request, title)
         project = get_object_or_404(Project.objects, title=title)
 
         return render(request, 'projects/project_invite.html',
                       context={'project': project, 'username': profile})
 
 
-class AppliedProfiles(View):
+class AppliedProfiles(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, title, slot_pk):
-        check_auth(request)
-        check_own_project(request, title)
         try:
             slot = WorkerSlot.objects.get(id=slot_pk)
             check_own_slot(request, slot)
