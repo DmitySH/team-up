@@ -14,7 +14,7 @@ from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .permissions import *
 from .serializers import WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer, \
+    ProjectListSerializer, ProjectDetailSerializer, \
     ProjectUpdateSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.serializers import ProfileDetailSerializer
@@ -324,26 +324,20 @@ class WorkerSlotUpdateAPIView(APIView):
             return Response('Worker slot was updated')
 
 
-class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
-    serializer_class = DeleteWorkerSlotSerializer
+class WorkerSlotDeleteAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsProjectOwner,
+                          IsSlotOwner]
 
-    def delete(self, request, *args, **kwargs):
-        project = self.request.user.profile.project()
-        serializer = self.get_serializer(data=request.data)
+    def delete(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='No such slot')
 
-        serializer.is_valid(raise_exception=True)
-        slot = get_object_or_none(project.team,
-                                  id=serializer.validated_data.get(
-                                      'id', None)
-                                  )
-        if 'id' in serializer.validated_data and \
-                not slot:
-            return Response('No such slot in this project',
-                            status=status.HTTP_400_BAD_REQUEST)
+        self.check_object_permissions(request, slot)
 
         slot.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK, data='Slot deleted')
 
 
 class ProjectListAPIView(generics.ListAPIView):
