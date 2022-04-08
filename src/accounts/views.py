@@ -1,5 +1,6 @@
 import django.contrib.auth.password_validation as validators
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.views import PasswordChangeView, \
@@ -10,7 +11,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
 from rest_framework import generics, permissions, status
-from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -98,9 +98,8 @@ class MyPasswordChangeDoneView(PasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
 
 
-class UserEditView(View):
+class UserEditView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
         form = UserEditForm(instance=request.user)
         form_profile = ProfileEditForm(instance=request.user.profile)
 
@@ -111,8 +110,6 @@ class UserEditView(View):
         return render(request, 'accounts/edit_profile.html', args)
 
     def post(self, request):
-        check_auth(request)
-
         form = UserEditForm(request.POST, instance=request.user)
         form_profile = ProfileEditForm(request.POST, request.FILES,
                                        instance=request.user.profile)
@@ -132,9 +129,8 @@ class UserEditView(View):
         return render(request, 'accounts/edit_profile.html', args)
 
 
-class InvitationsView(View):
+class InvitationsView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
         invited_slots = request.user.profile.get_invited_slots()
         applied_slots = request.user.profile.get_applied_slots()
         return render(request, 'accounts/invitation_list.html',
@@ -192,17 +188,14 @@ class SpecializationsBelbin:
         return BelbinTest.objects.all()
 
 
-class ExecutorOfferFormView(View):
+class ExecutorOfferFormView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
-
         form = ExecutorOfferForm(instance=request.user.profile.offer())
         return render(request,
                       'accounts/executor_offer_form.html',
                       context={'form': form})
 
     def post(self, request):
-        check_auth(request)
         form = ExecutorOfferForm(request.POST,
                                  instance=request.user.profile.offer())
 
@@ -295,8 +288,19 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileUpdateSerializer
 
-    def get_object(self):
+    def get_queryset(self):
         return self.request.user.profile
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        services.object_update(user, serializer.validated_data.pop('user'))
+
+        services.object_update(user.profile, serializer.validated_data)
+
+        return Response('Profile updated')
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -304,38 +308,41 @@ class ChangePasswordView(generics.UpdateAPIView):
     model = User
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
-
     def update(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = request.user
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if serializer.is_valid():
-            if not user.check_password(
-                    serializer.data.get('old_password')):
-                return Response({'old_password': ['Wrong password']},
-                                status=status.HTTP_400_BAD_REQUEST)
+        if not user.check_password(
+                serializer.validated_data.get('old_password')):
+            return Response('Wrong old password', status.HTTP_400_BAD_REQUEST)
 
-            new_pw = serializer.data.get('new_password')
-            try:
-                validators.validate_password(password=new_pw, user=user)
-            except ValidationError as ex:
-                return Response({'new_password': list(ex.messages)},
-                                status=status.HTTP_400_BAD_REQUEST)
+        new_pw = serializer.validated_data.get('new_password')
+        try:
+            validators.validate_password(password=new_pw, user=user)
+        except ValidationError as ex:
+            return Response(list(ex.messages),
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            user.set_password(new_pw)
-            user.save()
-
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        services.update_password(user, new_pw)
+        return Response('Password changed')
 
 
-class ExecutorOfferUpdateAPIView(generics.CreateAPIView):
+class ExecutorOfferUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ExecutorOfferUpdateSerializer
+
+    def post(self, request):
+        profile = request.user.profile
+        serializer = ExecutorOfferUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        created = services.update_or_create_offer(profile,
+                                                  serializer.validated_data)
+
+        if created:
+            return Response('Executor offer was created')
+        else:
+            return Response('Executor offer was updated')
 
 
 class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
@@ -345,9 +352,9 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
         offer = request.user.profile.offer()
         if offer:
             offer.delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response('Offer deleted', status.HTTP_200_OK)
         else:
-            raise NotFound(detail="Error 404", code=404)
+            return Response('No such offer', status.HTTP_400_BAD_REQUEST)
 
 
 class ExecutorOfferListAPIView(generics.ListAPIView):
@@ -359,8 +366,8 @@ class AcceptInviteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):
-        slot = get_object_or_404(WorkerSlot.objects,
-                                 id=slot_id)
+        slot = get_object_or_none(WorkerSlot.objects,
+                                  id=slot_id)
 
         if slot and services.accept_slot_invite(slot, request.user.profile):
             return Response('Invitation accepted', status=status.HTTP_200_OK)

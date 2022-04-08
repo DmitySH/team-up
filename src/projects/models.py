@@ -32,7 +32,7 @@ class Project(models.Model):
         null=True
     )
 
-    title = models.CharField('Название', max_length=200)
+    title = models.CharField('Название', max_length=200, unique=True)
     description = models.TextField('Описание')
     vacant = models.PositiveSmallIntegerField('Вакантных мест',
                                               validators=[

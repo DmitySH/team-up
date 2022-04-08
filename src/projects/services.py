@@ -1,4 +1,42 @@
 from src.accounts.models import ProfileProjectStatus, Status
+from src.projects.models import Project, WorkerSlot
+
+
+def update_or_create_project(profile, data):
+    project, created = Project.objects.update_or_create(
+        owner=profile,
+        defaults={'description': data.get('description'),
+                  'title': data.get('title'),
+                  'vacant': data.get('vacant'),
+                  'owner': profile,
+                  'city': data.get('city') or '',
+                  'online': data.get('online'),
+                  }
+    )
+
+    project.required_specialization.set(data.get(
+        'required_specialization'))
+    project.required_belbin.set(data.get('required_belbin'))
+
+    return created
+
+
+def update_or_create_worker_slot(project, data):
+    slot, created = WorkerSlot.objects.update_or_create(
+        project=project,
+        id=data.get('id'),
+
+        defaults={'description': data.get('description'),
+                  'salary': data.get('salary'),
+                  'work_hours': data.get('work_hours') or 40,
+                  }
+    )
+
+    slot.specialization.set(data.get(
+        'specialization'))
+    slot.role.set(data.get('role'))
+
+    return created
 
 
 def check_same_applies(invited_profile, slot):

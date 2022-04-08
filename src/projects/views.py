@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
 from django.http import Http404
@@ -13,8 +14,9 @@ from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
 from .permissions import *
-from .serializers import ProjectUpdateSerializer, WorkerSlotUpdateSerializer, \
-    DeleteWorkerSlotSerializer, ProjectListSerializer, ProjectDetailSerializer
+from .serializers import WorkerSlotUpdateSerializer, \
+    ProjectListSerializer, ProjectDetailSerializer, \
+    ProjectUpdateSerializer
 from ..accounts.models import Status, ProfileProjectStatus, Profile
 from ..accounts.serializers import ProfileDetailSerializer
 from ..accounts.views import SpecializationsBelbin
@@ -46,16 +48,13 @@ def delete_slot(request, pk):
         return redirect('main_page')
 
 
-class ProjectFormView(View):
+class ProjectFormView(LoginRequiredMixin, View):
     def get(self, request):
-        check_auth(request)
-
         form = ProjectForm(instance=request.user.profile.project())
         return render(request, 'projects/project_form.html',
                       context={'form': form})
 
     def post(self, request):
-        check_auth(request)
         project = request.user.profile.project()
 
         form = ProjectForm(request.POST, instance=project)
@@ -132,10 +131,13 @@ class ProjectDetailView(DetailView):
     template_name = 'projects/project_detail.html'
 
 
-class WorkerSlotFormView(View):
+class WorkerSlotFormView(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, slug, pk):
-        check_auth(request)
-        check_own_project(request, slug)
         slot = get_object_or_none(Project.objects.get(title=slug).team,
                                   id=pk)
         form = WorkerSlotForm(instance=slot)
@@ -143,8 +145,6 @@ class WorkerSlotFormView(View):
                       context={'form': form})
 
     def post(self, request, slug, pk):
-        check_auth(request)
-        check_own_project(request, slug)
         project = Project.objects.get(title=slug)
         slot = get_object_or_none(project.team, id=pk)
 
@@ -164,20 +164,26 @@ class WorkerSlotFormView(View):
                       context={'form': form})
 
 
-class ProjectInvitesView(View):
+class ProjectInvitesView(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, title, profile):
-        check_auth(request)
-        check_own_project(request, title)
         project = get_object_or_404(Project.objects, title=title)
 
         return render(request, 'projects/project_invite.html',
                       context={'project': project, 'username': profile})
 
 
-class AppliedProfiles(View):
+class AppliedProfiles(UserPassesTestMixin, View):
+    def test_func(self):
+        check_auth(self.request)
+        check_own_project(self.request, self.kwargs['title'])
+        return True
+
     def get(self, request, title, slot_pk):
-        check_auth(request)
-        check_own_project(request, title)
         try:
             slot = WorkerSlot.objects.get(id=slot_pk)
             check_own_slot(request, slot)
@@ -270,9 +276,20 @@ class ProjectDetailAPIView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'slug'
 
 
-class ProjectUpdateAPIView(generics.CreateAPIView):
+class ProjectUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProjectUpdateSerializer
+
+    def post(self, request):
+        profile = request.user.profile
+        serializer = ProjectUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        created = services.update_or_create_project(profile,
+                                                    serializer.validated_data)
+        if created:
+            return Response('Project was created')
+        else:
+            return Response('Project was updated')
 
 
 class ProjectDeleteAPIView(generics.DestroyAPIView):
@@ -287,54 +304,45 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
             raise NotFound(detail="Error 404", code=404)
 
 
-class WorkerSlotUpdateAPIView(generics.CreateAPIView):
+class WorkerSlotUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
-    serializer_class = WorkerSlotUpdateSerializer
 
-    def create(self, request, *args, **kwargs):
-        project = self.request.user.profile.project()
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request):
+        project = request.user.profile.project()
+        serializer = WorkerSlotUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if serializer.is_valid():
-            if not project:
-                return Response('User does not have project',
-                                status=status.HTTP_400_BAD_REQUEST)
-            if 'id' in serializer.validated_data and \
-                    not get_object_or_none(project.team,
-                                           id=serializer.validated_data.get(
-                                               'id', None)
-                                           ):
-                return Response('No such slot in this project',
-                                status=status.HTTP_400_BAD_REQUEST)
+        if 'id' in serializer.validated_data and \
+                not get_object_or_none(project.team,
+                                       id=serializer.validated_data.get(
+                                           'id', None)
+                                       ):
+            return Response('No such slot in this project',
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        created = services.update_or_create_worker_slot(
+            project, serializer.validated_data)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if created:
+            return Response('Worker slot was created')
+        else:
+            return Response('Worker slot was updated')
 
 
-class WorkerSlotDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
-    serializer_class = DeleteWorkerSlotSerializer
+class WorkerSlotDeleteAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsProjectOwner,
+                          IsSlotOwner]
 
-    def delete(self, request, *args, **kwargs):
-        project = self.request.user.profile.project()
-        serializer = self.get_serializer(data=request.data)
+    def delete(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='No such slot')
 
-        if serializer.is_valid():
-            slot = get_object_or_none(project.team,
-                                      id=serializer.validated_data.get(
-                                          'id', None)
-                                      )
-            if 'id' in serializer.validated_data and \
-                    not slot:
-                return Response('No such slot in this project',
-                                status=status.HTTP_400_BAD_REQUEST)
+        self.check_object_permissions(request, slot)
 
-            slot.delete()
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        slot.delete()
+        return Response(status=status.HTTP_200_OK, data='Slot deleted')
 
 
 class ProjectListAPIView(generics.ListAPIView):

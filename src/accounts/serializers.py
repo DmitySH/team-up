@@ -6,6 +6,8 @@ from ..projects.models import WorkerSlot
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name')
@@ -40,7 +42,6 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     user = UserDetailSerializer()
-
     photo = serializers.CharField()
     cv = serializers.CharField()
 
@@ -50,18 +51,6 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             'remote', 'is_male', 'specialization', 'patronymic', 'city',
             'age', 'description', 'user', 'photo', 'cv'
         )
-
-    def update(self, instance, validated_data):
-        user = instance.user
-
-        for attr, value in validated_data.pop('user').items():
-            setattr(user, attr, value)
-
-        user.save()
-        super(ProfileUpdateSerializer, self).update(instance, validated_data)
-        instance.save()
-
-        return instance
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
@@ -77,18 +66,6 @@ class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExecutorOffer
         exclude = ('profile', 'id')
-
-    def create(self, validated_data):
-        profile = self.context['request'].user.profile
-        offer, _ = ExecutorOffer.objects.update_or_create(
-            profile=profile,
-            defaults={'description': validated_data.get('description'),
-                      'salary': validated_data.get('salary'),
-                      'work_hours': validated_data.get('work_hours') or 40,
-                      'profile': profile}
-        )
-
-        return offer
 
 
 class ExecutorOfferListSerializer(serializers.ModelSerializer):

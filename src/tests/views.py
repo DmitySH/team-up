@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from src.base.constants import *
 from src.base.services import *
+from . import services
 from .forms import BelbinPartForm, MBTIPartForm, LSQPartForm
 from .models import LSQTest, BelbinTest, MBTITest
+from .permissions import *
 
 
 class BelbinTestFormView(View):
@@ -125,18 +128,53 @@ class LSQTestFormView(View):
 # API views.
 
 class BelbinProcessAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasNoBelbinResult]
+
     def post(self, request):
-        return Response(status=status.HTTP_200_OK,
-                        data=analyze_belbin(request.data['value']))
+        correct = all(
+            [services.validate_block_sum(block.values())
+             for block in request.data['value']])
+        if correct:
+            try:
+                roles = analyze_belbin(request.data['value'])
+            except KeyError:
+                return Response(status=status.HTTP_400_BAD_REQUEST,
+                                data='Incorrect test data')
+
+            services.update_belbin(roles, request.user.profile)
+            return Response(status=status.HTTP_200_OK,
+                            data=analyze_belbin(request.data['value']))
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        data='Incorrect test data')
 
 
 class MBTIProcessAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasNoMBTIResult]
+
     def post(self, request):
+        try:
+            roles = analyze_mbti(request.data['value'])
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='Incorrect test data')
+
+        services.update_mbti(roles, request.user.profile)
+
         return Response(status=status.HTTP_200_OK,
                         data=analyze_mbti(request.data['value']))
 
 
 class LSQProcessAPIView(APIView):
+    permission_classes = [IsAuthenticated, HasNoLSQResult]
+
     def post(self, request):
+        try:
+            roles = analyze_lsq(request.data['value'])
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data='Incorrect test data')
+
+        services.update_lsq(roles, request.user.profile)
+
         return Response(status=status.HTTP_200_OK,
                         data=analyze_lsq(request.data['value']))
