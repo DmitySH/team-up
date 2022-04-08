@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('projects', '0001_initial'),
     ]
@@ -13,6 +12,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='project',
             name='title',
-            field=models.CharField(max_length=200, unique=True, verbose_name='Название'),
+            field=models.CharField(max_length=200, unique=True,
+                                   verbose_name='Название'),
         ),
     ]

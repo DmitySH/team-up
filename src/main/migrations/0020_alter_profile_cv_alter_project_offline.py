@@ -24,8 +24,9 @@ class Migration(migrations.Migration):
             name='offline',
             field=models.BooleanField(blank=True,
                                       choices=[(None, 'Не указывать'), (
-                                      False, 'Требуется присутствие'), (True,
-                                                                        'Присутствие не требуется')],
+                                          False, 'Требуется присутствие'),
+                                               (True,
+                                                'Присутствие не требуется')],
                                       default=None, null=True,
                                       verbose_name='Возможность работы онлайн'),
         ),
