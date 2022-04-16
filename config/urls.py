@@ -5,7 +5,6 @@ from django.urls import path, include
 from config import settings
 from .yasg import urlpatterns as doc_urls
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
