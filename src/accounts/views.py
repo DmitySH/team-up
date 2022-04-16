@@ -440,11 +440,20 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
 
 
 class ExecutorOfferListAPIView(generics.ListAPIView):
+    """
+    Gets list of all executor offers.
+    """
+
     serializer_class = ExecutorOfferListSerializer
     queryset = ExecutorOffer.objects.all()
 
 
 class AcceptInviteAPIView(APIView):
+    """
+    Accepts invite of logged user to slot.
+    slot_id -- id of slot where invite will be accepted.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):
