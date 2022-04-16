@@ -2,6 +2,10 @@ from django.contrib import admin
 
 from .models import *
 
+"""
+Registration of models in admin panel
+"""
+
 
 @admin.register(Status)
 class StatusAdmin(admin.ModelAdmin):

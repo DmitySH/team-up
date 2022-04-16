@@ -1,5 +1,6 @@
 import django.contrib.auth.password_validation as validators
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
@@ -29,6 +30,10 @@ from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
 
 
 class LoginView(View):
+    """
+    Authorizes user.
+    """
+
     def get(self, request):
         form = AuthForm()
         return render(request, 'accounts/login.html',
@@ -52,11 +57,19 @@ class LoginView(View):
                       context={'form': form})
 
 
-class MyLogoutView(LogoutView):
+class CustomLogoutView(LogoutView):
+    """
+    Logouts user.
+    """
+
     template_name = 'accounts/logged_out.html'
 
 
 class RegisterView(View):
+    """
+    View of user's registration.
+    """
+
     def get(self, request):
         user_form = RegisterForm()
         return render(request, 'accounts/register.html',
@@ -79,6 +92,10 @@ class RegisterView(View):
 
 
 class UserDetailView(DetailView):
+    """
+    View of detail information about user's profile.
+    """
+
     model = User
     slug_field = 'username'
     template_name = 'accounts/user_detail.html'
@@ -90,15 +107,27 @@ class UserDetailView(DetailView):
         return context
 
 
-class MyPasswordChangeView(PasswordChangeView):
+class CustomPasswordChangeView(PasswordChangeView):
+    """
+    Changes password.
+    """
+
     template_name = 'accounts/password_change.html'
 
 
-class MyPasswordChangeDoneView(PasswordChangeDoneView):
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    """
+    View after password change.
+    """
+
     template_name = 'accounts/password_change_done.html'
 
 
 class UserEditView(LoginRequiredMixin, View):
+    """
+    View of profile editing.
+    """
+
     def get(self, request):
         form = UserEditForm(instance=request.user)
         form_profile = ProfileEditForm(instance=request.user.profile)
@@ -130,6 +159,10 @@ class UserEditView(LoginRequiredMixin, View):
 
 
 class InvitationsView(LoginRequiredMixin, View):
+    """
+    View of invited and applied slots of logged user.
+    """
+
     def get(self, request):
         invited_slots = request.user.profile.get_invited_slots()
         applied_slots = request.user.profile.get_applied_slots()
@@ -139,8 +172,12 @@ class InvitationsView(LoginRequiredMixin, View):
                                })
 
 
+@login_required(login_url='/login/')
 def accept_invite(request, slot):
-    check_auth(request)
+    """
+    Accepts invite with slot id = slot of user that is logged in.
+    """
+
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=slot)
         services.accept_slot_invite(slot, request.user.profile)
@@ -148,8 +185,12 @@ def accept_invite(request, slot):
     return redirect('invitations')
 
 
+@login_required(login_url='/login/')
 def decline_invite(request, slot):
-    check_auth(request)
+    """
+    Declines invite with slot id = slot of user that is logged in.
+    """
+
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=slot)
 
@@ -164,8 +205,12 @@ def decline_invite(request, slot):
     return redirect('invitations')
 
 
+@login_required(login_url='/login/')
 def retract_invite(request, slot):
-    check_auth(request)
+    """
+    Retracts invite with slot id = slot of user that is logged in.
+    """
+
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=slot)
 
@@ -181,6 +226,10 @@ def retract_invite(request, slot):
 
 
 class SpecializationsBelbin:
+    """
+    Provides extra queries for specializations and belbin test objects.
+    """
+
     def get_specializations(self):
         return Specialization.objects.all()
 
@@ -189,6 +238,10 @@ class SpecializationsBelbin:
 
 
 class ExecutorOfferFormView(LoginRequiredMixin, View):
+    """
+    View of form to create and update executor's offer.
+    """
+
     def get(self, request):
         form = ExecutorOfferForm(instance=request.user.profile.offer())
         return render(request,
@@ -221,7 +274,11 @@ def delete_offer(request):
     return redirect(request.user.profile.get_absolute_url())
 
 
-class ExecutorFilterExtention(SpecializationsBelbin):
+class ExecutorFilterExtension(SpecializationsBelbin):
+    """
+    Filer for executor's offers.
+    """
+
     def get_cities(self):
         return sorted([x for x in set(map(lambda x: x[0],
                                           Profile.objects.all().values_list(
@@ -233,7 +290,11 @@ class ExecutorFilterExtention(SpecializationsBelbin):
              if x != 'Не указывать'])
 
 
-class ExecutorOfferListView(ListView, ExecutorFilterExtention):
+class ExecutorOfferListView(ListView, ExecutorFilterExtension):
+    """
+    Gets all executor's offers and provides filter for them.
+    """
+
     model = ExecutorOffer
     template_name = 'accounts/executor_offer_list.html'
 
@@ -277,14 +338,23 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtention):
 
 # API views.
 class ProfileDetailAPIView(generics.RetrieveAPIView):
+    """
+    Returns all information about user's profile.
+    username -- profile's username.
+    """
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Profile.objects.all()
     serializer_class = ProfileDetailSerializer
     lookup_field = 'user__username'
-    lookup_url_kwarg = 'slug'
+    lookup_url_kwarg = 'username'
 
 
 class ProfileUpdateAPIView(generics.UpdateAPIView):
+    """
+    Updates profile of user that was logged in.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileUpdateSerializer
 
@@ -304,6 +374,10 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
 
 
 class ChangePasswordView(generics.UpdateAPIView):
+    """
+    Changes password of user that was logged in.
+    """
+
     serializer_class = ChangePasswordSerializer
     model = User
     permission_classes = [IsAuthenticated]
@@ -329,6 +403,10 @@ class ChangePasswordView(generics.UpdateAPIView):
 
 
 class ExecutorOfferUpdateAPIView(APIView):
+    """
+    Updates executor's offer of user that was logged in.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -346,6 +424,10 @@ class ExecutorOfferUpdateAPIView(APIView):
 
 
 class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
+    """
+    Deletes executor's offer of user that was logged in.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -377,6 +459,10 @@ class AcceptInviteAPIView(APIView):
 
 
 class InvitedWorkerSlotListAPIView(generics.ListAPIView):
+    """
+    Gets list of all worker slots, where logged user was invited in.
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = WorkerSlotListSerializer
 
@@ -385,6 +471,10 @@ class InvitedWorkerSlotListAPIView(generics.ListAPIView):
 
 
 class AppliedWorkerSlotListAPIView(generics.ListAPIView):
+    """
+    Gets list of all worker slots, where user has applies.
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = WorkerSlotListSerializer
 
@@ -393,6 +483,11 @@ class AppliedWorkerSlotListAPIView(generics.ListAPIView):
 
 
 class DeclineInviteAPIView(APIView):
+    """
+    Declines invitation to worker slot of user that was logged in.
+    slot_id -- id of slot where invite will be declined.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):
@@ -404,6 +499,11 @@ class DeclineInviteAPIView(APIView):
 
 
 class RetractInviteAPIView(APIView):
+    """
+    Retracts invitation to worker slot of user that was logged in.
+    slot_id -- id of slot which will be retracted.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):

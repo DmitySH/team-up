@@ -12,7 +12,7 @@ from src.tests.models import BelbinTest, MBTITest, LSQTest
 
 class Specialization(models.Model):
     """
-    Специализация.
+    Specialization db model.
     """
 
     name = models.CharField('Специализация', max_length=50)
@@ -27,7 +27,7 @@ class Specialization(models.Model):
 
 class Status(models.Model):
     """
-    Статусы пользователей в проекте.
+    Profile status in project db model.
     """
 
     value = models.CharField('Статус в проекте', max_length=20)
@@ -42,7 +42,7 @@ class Status(models.Model):
 
 class Profile(models.Model):
     """
-    Пользователь сайта (расширение модели user).
+    User's extension db model.
     """
 
     class RemoteChoices(models.IntegerChoices):
@@ -184,7 +184,7 @@ class Profile(models.Model):
 
 class ProfileProjectStatus(models.Model):
     """
-    Статусы для вовлеченных в проект пользователей.
+    Status in project db model.
     """
 
     worker_slot = models.ForeignKey(WorkerSlot,
@@ -223,7 +223,7 @@ class ProfileProjectStatus(models.Model):
 
 class ExecutorOffer(models.Model):
     """
-    Предложение работника.
+    Executor offer db model.
     """
 
     profile = models.OneToOneField(Profile,

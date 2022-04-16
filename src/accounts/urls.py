@@ -4,11 +4,11 @@ from . import views
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.MyLogoutView.as_view(), name='logout'),
+    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
     path('register/', views.RegisterView.as_view(), name='register'),
-    path('password-change/', views.MyPasswordChangeView.as_view(),
+    path('password-change/', views.CustomPasswordChangeView.as_view(),
          name='password_change'),
-    path('password-change/done/', views.MyPasswordChangeDoneView.as_view(),
+    path('password-change/done/', views.CustomPasswordChangeDoneView.as_view(),
          name='password_change_done'),
     path('profiles/<str:slug>/', views.UserDetailView.as_view(),
          name='profile_detail'),
@@ -30,7 +30,7 @@ urlpatterns = [
 
 # API urls.
 urlpatterns += [
-    path('get-profile/<str:slug>/', views.ProfileDetailAPIView.as_view()),
+    path('get-profile/<str:username>/', views.ProfileDetailAPIView.as_view()),
     path('edit-profile/', views.ProfileUpdateAPIView.as_view()),
     path('update-executor-offer/',
          views.ExecutorOfferUpdateAPIView.as_view()),

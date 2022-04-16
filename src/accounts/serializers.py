@@ -6,6 +6,10 @@ from ..projects.models import WorkerSlot
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializes user model.
+    """
+
     username = serializers.CharField(read_only=True)
 
     class Meta:
@@ -14,12 +18,20 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class ExecutorOfferDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializes executor's offer model.
+    """
+
     class Meta:
         model = ExecutorOffer
         exclude = ('profile', 'id')
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializes profile model.
+    """
+
     user = UserDetailSerializer()
     remote = serializers.CharField(source='get_remote_value')
     sex = serializers.CharField(source='get_sex_value')
@@ -41,6 +53,10 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializes data to update profile model.
+    """
+
     user = UserDetailSerializer()
     photo = serializers.CharField()
     cv = serializers.CharField()
@@ -54,6 +70,10 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
+    """
+    Serializes changed password.
+    """
+
     class Meta:
         model = User
         fields = ['old_password', 'new_password']
@@ -63,18 +83,30 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
 
 class ExecutorOfferUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializes executor offer model.
+    """
+
     class Meta:
         model = ExecutorOffer
         exclude = ('profile', 'id')
 
 
 class ExecutorOfferListSerializer(serializers.ModelSerializer):
+    """
+    Serializes list of all executor offers.
+    """
+
     class Meta:
         model = ExecutorOffer
         fields = '__all__'
 
 
 class WorkerSlotListSerializer(serializers.ModelSerializer):
+    """
+    Serializes list of all worker slots.
+    """
+
     class Meta:
         model = WorkerSlot
         fields = '__all__'

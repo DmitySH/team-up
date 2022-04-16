@@ -7,7 +7,7 @@ from src.accounts.models import ExecutorOffer, Profile
 
 class AuthForm(forms.Form):
     """
-    Форма входа в аккаунт.
+    Form to log in.
     """
 
     username = forms.CharField(max_length=30, label='Имя пользователя')
@@ -16,7 +16,7 @@ class AuthForm(forms.Form):
 
 class RegisterForm(UserCreationForm):
     """
-    Форма регистрации пользователя.
+    Registration form.
     """
 
     username = forms.CharField(max_length=30, required=True,
@@ -32,7 +32,7 @@ class RegisterForm(UserCreationForm):
 
 class UserEditForm(forms.ModelForm):
     """
-    Форма изменения пользователя.
+    Form which changes user's information.
     """
 
     class Meta:
@@ -42,7 +42,7 @@ class UserEditForm(forms.ModelForm):
 
 class ProfileEditForm(forms.ModelForm):
     """
-    Форма изменения профиля.
+    Form which changes profile's information.
     """
 
     class Meta:
@@ -53,7 +53,7 @@ class ProfileEditForm(forms.ModelForm):
 
 class ExecutorOfferForm(forms.ModelForm):
     """
-    Форма создания и изменения предложения работника.
+    Form of creation and changing executor offers.
     """
 
     salary = forms.IntegerField(label='Ожидаемая зарплата', required=False)
