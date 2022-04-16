@@ -3,11 +3,19 @@ from django.shortcuts import _get_queryset
 
 
 def check_auth(request):
+    """
+    Check if user is authenticated.
+    """
+
     if not request.user.is_authenticated:
         raise PermissionDenied
 
 
 def check_own_project(request, slug):
+    """
+    Checks if user has project.
+    """
+
     if request.user.profile.project():
         if request.user.profile.project().title != slug:
             raise PermissionDenied
@@ -16,6 +24,9 @@ def check_own_project(request, slug):
 
 
 def check_own_slot(request, slot):
+    """
+    Check if user owns slot with slot id = slot.
+    """
     if request.user.profile.project():
         if slot not in request.user.profile.project().team.all():
             raise PermissionDenied
@@ -24,17 +35,38 @@ def check_own_slot(request, slot):
 
 
 def check_slug_auth(request, slug):
+    """
+    Check if user has same username as in request.
+    """
+
     check_auth(request)
     if not request.user.username == slug:
         raise PermissionDenied
 
 
 def change_labels(form, labels):
+    """
+    Changes labels in form.
+    """
+
     for i, field in enumerate(form.fields):
         form[field].label = labels[i]
 
 
+def change_choices(form, choices):
+    """
+    Changes choices of form.
+    """
+
+    for i, field in enumerate(form.fields):
+        form.fields[field].choices = choices[i]
+
+
 def analyze_belbin(data):
+    """
+    Gets results of belbin test.
+    """
+
     result = {
         'Исполнитель': data[0]['answer6'] + data[1]['answer0'] \
                        + data[2]['answer7'] + data[3]['answer3'] \
@@ -81,12 +113,11 @@ def analyze_belbin(data):
         return [keys[i] for i in range(2)]
 
 
-def change_choices(form, choices):
-    for i, field in enumerate(form.fields):
-        form.fields[field].choices = choices[i]
-
-
 def analyze_mbti(data):
+    """
+    Gets results of mbti test.
+    """
+
     result = [
         (
             ['Экстраверт', 0],
@@ -149,6 +180,10 @@ def analyze_mbti(data):
 
 
 def analyze_lsq(data):
+    """
+    Gets results of lsq tests.
+    """
+
     result = [
         (
             ['Деятель', 0],
@@ -173,6 +208,10 @@ def analyze_lsq(data):
 
 
 def get_object_or_none(klass, *args, **kwargs):
+    """
+    Gets object with kwargs or None if no such object.
+    """
+
     queryset = _get_queryset(klass)
     if not hasattr(queryset, 'get'):
         klass__name = klass.__name__ if isinstance(klass,
