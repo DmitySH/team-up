@@ -3,7 +3,7 @@ from django.db import models
 
 class BelbinTest(models.Model):
     """
-    Роль по Белбину.
+    Belbin role db model.
     """
 
     role = models.CharField('Роль по Белбину', max_length=30)
@@ -18,7 +18,7 @@ class BelbinTest(models.Model):
 
 class MBTITest(models.Model):
     """
-    Роль по Майерсу-Бриггсу.
+    MBTI role db model.
     """
 
     role = models.CharField('Роль по Майерсу-Бриггсу', max_length=30)
@@ -33,7 +33,7 @@ class MBTITest(models.Model):
 
 class LSQTest(models.Model):
     """
-    Роль по Хони-Мамфорду.
+    LSQ role db model.
     """
 
     role = models.CharField('Роль по Хони-Мамфорду', max_length=30)

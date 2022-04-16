@@ -3,6 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class BelbinPartForm(forms.Form):
+    """
+    Form with belbin test questions.
+    """
+
     answer0 = forms.IntegerField(max_value=10, min_value=0, required=True,
                                  initial=0)
     answer1 = forms.IntegerField(max_value=10, min_value=0, required=True,
@@ -32,6 +36,10 @@ class BelbinPartForm(forms.Form):
 
 
 class MBTIPartForm(forms.Form):
+    """
+    Form with mbti test questions.
+    """
+
     answer1 = forms.TypedChoiceField(required=True, initial=1,
                                      coerce=lambda x: int(x))
     answer2 = forms.TypedChoiceField(required=True, initial=1,
@@ -49,6 +57,10 @@ class MBTIPartForm(forms.Form):
 
 
 class LSQPartForm(forms.Form):
+    """
+    Form with lsq test questions.
+    """
+
     NO_YES_CHOICES = (
         (None, '-----'),
         (0, _('Нет')),
