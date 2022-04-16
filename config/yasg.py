@@ -3,10 +3,12 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from config.settings import API_VERSION
+
 schema_view = get_schema_view(
     openapi.Info(
         title="TeamUp API",
-        default_version='v1.0.1',
+        default_version=API_VERSION,
         description="Full api to contribute with TeamUp services",
         contact=openapi.Contact(email="dashagarov@edu.hse.ru"),
         license=openapi.License(name="BSD License"),

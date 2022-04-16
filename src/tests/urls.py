@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from ..base.services import add_prefix_to_urls
 
 urlpatterns = [
     path('profile/belbintest/', views.BelbinTestFormView.as_view(),
@@ -12,8 +13,12 @@ urlpatterns = [
 ]
 
 # API urls.
-urlpatterns += [
+api_urlpatterns = [
     path('process-belbin/', views.BelbinProcessAPIView.as_view()),
     path('process-mbti/', views.MBTIProcessAPIView.as_view()),
     path('process-lsq/', views.LSQProcessAPIView.as_view()),
 ]
+
+api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
+
+urlpatterns += api_urlpatterns

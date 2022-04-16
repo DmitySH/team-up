@@ -1,5 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import _get_queryset
+from django.urls import path, include
+
+from config.settings import API_VERSION
 
 
 def check_auth(request):
@@ -225,3 +228,12 @@ def get_object_or_none(klass, *args, **kwargs):
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
         return None
+
+
+def add_prefix_to_urls(api_urls, prefix='api/' + API_VERSION):
+    """
+    Adds prefix to urlpatterns list.
+    """
+
+    api_urls = [path(f'{prefix}/', include(api_urls))]
+    return api_urls

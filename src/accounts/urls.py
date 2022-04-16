@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from ..base.services import add_prefix_to_urls
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
@@ -29,7 +30,7 @@ urlpatterns = [
 ]
 
 # API urls.
-urlpatterns += [
+api_urlpatterns = [
     path('get-profile/<str:username>/', views.ProfileDetailAPIView.as_view()),
     path('edit-profile/', views.ProfileUpdateAPIView.as_view()),
     path('update-executor-offer/',
@@ -51,3 +52,7 @@ urlpatterns += [
     path('retract-apply/<int:slot_id>/',
          views.RetractInviteAPIView.as_view()),
 ]
+
+api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
+
+urlpatterns += api_urlpatterns

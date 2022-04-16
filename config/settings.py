@@ -180,3 +180,5 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+API_VERSION = 'v1'
