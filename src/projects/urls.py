@@ -34,7 +34,7 @@ urlpatterns = [
 
 # API urls.
 urlpatterns += [
-    path('get-project/<str:slug>/', ProjectDetailAPIView.as_view()),
+    path('get-project/<str:title>/', ProjectDetailAPIView.as_view()),
     path('update-project/',
          views.ProjectUpdateAPIView.as_view()),
     path('delete-project/',

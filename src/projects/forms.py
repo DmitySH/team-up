@@ -5,7 +5,7 @@ from src.projects.models import Project, WorkerSlot
 
 class ProjectForm(forms.ModelForm):
     """
-    Форма создания и изменения проекта.
+    Form of creation and update of project.
     """
 
     class Meta:
@@ -15,7 +15,7 @@ class ProjectForm(forms.ModelForm):
 
 class WorkerSlotForm(forms.ModelForm):
     """
-    Форма создания и изменения слота работника.
+    Form of creation and update of worker slot.
     """
 
     class Meta:

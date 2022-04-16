@@ -7,7 +7,7 @@ from src.tests.models import BelbinTest
 
 class Project(models.Model):
     """
-    Проект.
+    Project.
     """
 
     # Remote choices codes:
@@ -71,7 +71,7 @@ class Project(models.Model):
 
 class WorkerSlot(models.Model):
     """
-    Карточка работника в проекте.
+    Card of worker in project.
     """
 
     profile = models.ForeignKey('accounts.Profile',
