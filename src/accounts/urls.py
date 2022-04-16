@@ -1,14 +1,15 @@
 from django.urls import path
 
 from . import views
+from ..base.services import add_prefix_to_urls
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.MyLogoutView.as_view(), name='logout'),
+    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
     path('register/', views.RegisterView.as_view(), name='register'),
-    path('password-change/', views.MyPasswordChangeView.as_view(),
+    path('password-change/', views.CustomPasswordChangeView.as_view(),
          name='password_change'),
-    path('password-change/done/', views.MyPasswordChangeDoneView.as_view(),
+    path('password-change/done/', views.CustomPasswordChangeDoneView.as_view(),
          name='password_change_done'),
     path('profiles/<str:slug>/', views.UserDetailView.as_view(),
          name='profile_detail'),
@@ -29,8 +30,8 @@ urlpatterns = [
 ]
 
 # API urls.
-urlpatterns += [
-    path('get-profile/<str:slug>/', views.ProfileDetailAPIView.as_view()),
+api_urlpatterns = [
+    path('get-profile/<str:username>/', views.ProfileDetailAPIView.as_view()),
     path('edit-profile/', views.ProfileUpdateAPIView.as_view()),
     path('update-executor-offer/',
          views.ExecutorOfferUpdateAPIView.as_view()),
@@ -51,3 +52,7 @@ urlpatterns += [
     path('retract-apply/<int:slot_id>/',
          views.RetractInviteAPIView.as_view()),
 ]
+
+api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
+
+urlpatterns += api_urlpatterns

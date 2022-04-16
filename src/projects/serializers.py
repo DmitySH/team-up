@@ -6,6 +6,9 @@ from src.projects.models import Project, WorkerSlot
 class ProjectDetailSerializer(serializers.ModelSerializer):
     team = serializers.SlugRelatedField(slug_field='id', many=True,
                                         read_only=True)
+    """
+    Serializes projcet model.
+    """
 
     class Meta:
         model = Project
@@ -13,12 +16,20 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
 
 class ProjectUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializes fields to update in project model.
+    """
+
     class Meta:
         model = Project
         exclude = ('owner', 'verified', 'id',)
 
 
 class WorkerSlotUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializes fields to update in worker slot.
+    """
+
     id = serializers.IntegerField(required=False)
 
     class Meta:
@@ -26,15 +37,11 @@ class WorkerSlotUpdateSerializer(serializers.ModelSerializer):
         exclude = ('project', 'profile')
 
 
-class DeleteWorkerSlotSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(required=True)
-
-    class Meta:
-        model = WorkerSlot
-        fields = ['id']
-
-
 class ProjectListSerializer(serializers.ModelSerializer):
+    """
+    Serializes list of all projects.
+    """
+
     required_belbin = serializers.SlugRelatedField(
         slug_field='role',
         many=True,

@@ -5,6 +5,10 @@ from django.db import connection, reset_queries
 
 
 def query_debugger(func):
+    """
+    Counts number of db queries.
+    """
+
     @functools.wraps(func)
     def inner_func(*args, **kwargs):
         reset_queries()

@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from .views import ProjectDetailAPIView
+from ..base.services import add_prefix_to_urls
 
 urlpatterns = [
     path('profile/delete-project', views.delete_project,
@@ -33,8 +34,8 @@ urlpatterns = [
 ]
 
 # API urls.
-urlpatterns += [
-    path('get-project/<str:slug>/', ProjectDetailAPIView.as_view()),
+api_urlpatterns = [
+    path('get-project/<str:title>/', ProjectDetailAPIView.as_view()),
     path('update-project/',
          views.ProjectUpdateAPIView.as_view()),
     path('delete-project/',
@@ -54,3 +55,7 @@ urlpatterns += [
     path('decline-apply-slot/<str:username>/<int:slot_id>/',
          views.DeclineApplyAPIView.as_view()),
 ]
+
+api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
+
+urlpatterns += api_urlpatterns

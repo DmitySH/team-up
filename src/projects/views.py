@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Q
@@ -24,8 +25,12 @@ from ..base.services import check_own_slot, check_own_project, check_auth, \
     get_object_or_none
 
 
+@login_required(login_url='/login/')
 def delete_project(request):
-    check_auth(request)
+    """
+    Deletes project of user that was logged in.
+    """
+
     if request.POST:
         project = request.user.profile.project()
         if project:
@@ -33,8 +38,12 @@ def delete_project(request):
     return redirect(request.user.profile.get_absolute_url())
 
 
+@login_required(login_url='/login/')
 def delete_slot(request, pk):
-    check_auth(request)
+    """
+    Deletes slot with slot id = pk of user that was logged in.
+    """
+
     project = request.user.profile.project()
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=pk)
@@ -49,6 +58,10 @@ def delete_slot(request, pk):
 
 
 class ProjectFormView(LoginRequiredMixin, View):
+    """
+    View of form to create and update project of user that was logged in.
+    """
+
     def get(self, request):
         form = ProjectForm(instance=request.user.profile.project())
         return render(request, 'projects/project_form.html',
@@ -71,7 +84,11 @@ class ProjectFormView(LoginRequiredMixin, View):
                       context={'form': form})
 
 
-class ProjectFilterExtention(SpecializationsBelbin):
+class ProjectFilterExtension(SpecializationsBelbin):
+    """
+    Provides filtration for projects.
+    """
+
     def get_cities(self):
         return sorted(list(set(map(lambda x: x[0],
                                    Project.objects.all().values_list(
@@ -81,7 +98,11 @@ class ProjectFilterExtention(SpecializationsBelbin):
         return sorted(list(map(lambda x: x[1], Project.REMOTE_CHOICES)))
 
 
-class ProjectListView(ListView, ProjectFilterExtention):
+class ProjectListView(ListView, ProjectFilterExtension):
+    """
+    View of list of all projects.
+    """
+
     model = Project
     queryset = Project.objects.all()
     template_name = 'projects/project_list.html'
@@ -126,12 +147,20 @@ class ProjectListView(ListView, ProjectFilterExtention):
 
 
 class ProjectDetailView(DetailView):
+    """
+    View of detail project's information.
+    """
+
     model = Project
     slug_field = 'title'
     template_name = 'projects/project_detail.html'
 
 
 class WorkerSlotFormView(UserPassesTestMixin, View):
+    """
+    View of form to create and update of worker slot.
+    """
+
     def test_func(self):
         check_auth(self.request)
         check_own_project(self.request, self.kwargs['title'])
@@ -165,6 +194,10 @@ class WorkerSlotFormView(UserPassesTestMixin, View):
 
 
 class ProjectInvitesView(UserPassesTestMixin, View):
+    """
+    View of invites for project of user that was logged in.
+    """
+
     def test_func(self):
         check_auth(self.request)
         check_own_project(self.request, self.kwargs['title'])
@@ -178,6 +211,10 @@ class ProjectInvitesView(UserPassesTestMixin, View):
 
 
 class AppliedProfiles(UserPassesTestMixin, View):
+    """
+    View of applies for projects of user that was logged in.
+    """
+
     def test_func(self):
         check_auth(self.request)
         check_own_project(self.request, self.kwargs['title'])
@@ -203,8 +240,12 @@ class AppliedProfiles(UserPassesTestMixin, View):
                                'slot': slot})
 
 
+@login_required(login_url='/login/')
 def invite_profile(request, title, profile, slot_pk):
-    check_auth(request)
+    """
+    Invites profile to slot with slot id = slot pk.
+    """
+
     check_own_project(request, title)
 
     if request.POST:
@@ -219,9 +260,11 @@ def invite_profile(request, title, profile, slot_pk):
     return redirect('offer_list')
 
 
+@login_required(login_url='/login/')
 def apply_for_slot(request, title, profile, slot_pk):
-    check_auth(request)
-
+    """
+    Applies profile for slot with slo id = slot_pk.
+    """
     if request.POST:
         try:
             slot = WorkerSlot.objects.get(id=slot_pk)
@@ -244,8 +287,12 @@ def apply_for_slot(request, title, profile, slot_pk):
     return redirect('project_detail', slug=title)
 
 
+@login_required(login_url='/login/')
 def decline_apply(request, title, profile, slot_pk):
-    check_auth(request)
+    """
+    Decline apply of profile to slot with slot id = slot_pk.
+    """
+
     check_own_project(request, title)
 
     if request.POST:
@@ -269,14 +316,23 @@ def decline_apply(request, title, profile, slot_pk):
 
 # API views
 class ProjectDetailAPIView(generics.RetrieveAPIView):
+    """
+    Gets detailed information about project.
+    title -- title of project to get.
+    """
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Project.objects.all()
     serializer_class = ProjectDetailSerializer
     lookup_field = 'title'
-    lookup_url_kwarg = 'slug'
+    lookup_url_kwarg = 'title'
 
 
 class ProjectUpdateAPIView(APIView):
+    """
+    Updates project of logged user.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -293,6 +349,10 @@ class ProjectUpdateAPIView(APIView):
 
 
 class ProjectDeleteAPIView(generics.DestroyAPIView):
+    """
+    Deletes project of logged user.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -305,6 +365,10 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
 
 
 class WorkerSlotUpdateAPIView(APIView):
+    """
+    Updates worker slot of logged user.
+    """
+
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
 
     def post(self, request):
@@ -330,6 +394,11 @@ class WorkerSlotUpdateAPIView(APIView):
 
 
 class WorkerSlotDeleteAPIView(APIView):
+    """
+    Deletes worker slot of logged user.
+    slot_id -- id of slot which will be deleted.
+    """
+
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner,
                           IsSlotOwner]
 
@@ -346,11 +415,21 @@ class WorkerSlotDeleteAPIView(APIView):
 
 
 class ProjectListAPIView(generics.ListAPIView):
+    """
+    Gets list of all projects.
+    """
+
     serializer_class = ProjectListSerializer
     queryset = Project.objects.all()
 
 
 class InviteAPIView(APIView):
+    """
+    Invites user to slot.
+    username -- username of user to invite.
+    slot_id -- id of slot where user will be invited.
+    """
+
     permission_classes = [permissions.IsAuthenticated,
                           IsProjectOwner, IsSlotOwner]
 
@@ -374,6 +453,11 @@ class InviteAPIView(APIView):
 
 
 class ApplyAPIView(APIView):
+    """
+    Applies logged user to slot.
+    slot_id -- id of slot which will be applied to.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, slot_id):
@@ -396,6 +480,11 @@ class ApplyAPIView(APIView):
 
 
 class SlotAppliesAPIView(APIView):
+    """
+    Gets all applies for that slot.
+    slot_id -- id of slot which applies will be returned.
+    """
+
     permission_classes = [permissions.IsAuthenticated,
                           IsProjectOwner, IsSlotOwner]
 
@@ -413,6 +502,11 @@ class SlotAppliesAPIView(APIView):
 
 
 class DeclineApplyAPIView(APIView):
+    """
+    Declines apply for slot of logged user.
+    username -- username of user which apply will be declined.
+    """
+
     permission_classes = [permissions.IsAuthenticated,
                           IsProjectOwner, IsSlotOwner]
 

@@ -14,6 +14,10 @@ from .permissions import *
 
 
 class BelbinTestFormView(View):
+    """
+    View of form wit belbin test.
+    """
+
     def get(self, request):
         check_auth(request)
 
@@ -51,6 +55,10 @@ class BelbinTestFormView(View):
 
 
 class MBTITestFormView(View):
+    """
+    View of form with mbti test.
+    """
+
     def get(self, request):
         check_auth(request)
 
@@ -89,6 +97,10 @@ class MBTITestFormView(View):
 
 
 class LSQTestFormView(View):
+    """
+    View of form with lsq test.
+    """
+
     def get(self, request):
         check_auth(request)
 
@@ -128,6 +140,10 @@ class LSQTestFormView(View):
 # API views.
 
 class BelbinProcessAPIView(APIView):
+    """
+    Processes belbin data to get test result.
+    """
+
     permission_classes = [IsAuthenticated, HasNoBelbinResult]
 
     def post(self, request):
@@ -149,6 +165,10 @@ class BelbinProcessAPIView(APIView):
 
 
 class MBTIProcessAPIView(APIView):
+    """
+    Processes mbti data to get test result.
+    """
+
     permission_classes = [IsAuthenticated, HasNoMBTIResult]
 
     def post(self, request):
@@ -165,6 +185,10 @@ class MBTIProcessAPIView(APIView):
 
 
 class LSQProcessAPIView(APIView):
+    """
+    Processes lsq data to get test result.
+    """
+
     permission_classes = [IsAuthenticated, HasNoLSQResult]
 
     def post(self, request):

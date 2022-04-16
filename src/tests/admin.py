@@ -2,6 +2,10 @@ from django.contrib import admin
 
 from .models import BelbinTest, MBTITest, LSQTest
 
+"""
+Register all models to admin panel.
+"""
+
 
 @admin.register(BelbinTest)
 class BelbinAdmin(admin.ModelAdmin):

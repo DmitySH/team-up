@@ -2,6 +2,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TestQuestions:
+    """
+    Questions for all tests.
+    """
+
     belbin = [
         [
             'Я думаю, что в состоянии быстро воспринимать и использовать новые возможности',
