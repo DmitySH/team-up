@@ -1,8 +1,17 @@
 from django.contrib.auth.models import User
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
 from .models import Profile, ExecutorOffer
 from ..projects.models import WorkerSlot
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    email = serializers.EmailField(write_only=True, required=True)
+
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = UserCreateSerializer.Meta.fields + ('email',)
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

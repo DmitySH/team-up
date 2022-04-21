@@ -141,7 +141,12 @@ REST_FRAMEWORK = {
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user_create': 'src.accounts.serializers.CustomUserCreateSerializer',
+        'user': 'djoser.serializers.UserSerializer',
+        'current_user': 'djoser.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserSerializer',
+    },
 }
 
 SIMPLE_JWT = {
