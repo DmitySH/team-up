@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import src.base.services
 from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
@@ -258,7 +259,7 @@ def invite_profile(request, title, profile, slot_pk):
             raise Http404
         services.check_same_applies(profile, slot)
 
-    return redirect('offer_list')
+    return redirect(request.user.profile.project.get_absolute_url())
 
 
 @login_required(login_url='/login/')
@@ -312,7 +313,7 @@ def decline_apply(request, title, profile, slot_pk):
                     value='Ожидает'))
             apply.delete()
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.user.profile.project.get_absolute_url())
 
 
 # API views
@@ -374,7 +375,22 @@ def clear_worker_slot(request, slot_id):
     if request.POST:
         slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
         if slot:
+            src.base.services.check_own_slot(request, slot)
             services.clear_slot(slot)
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url='/login/')
+def leave_worker_slot(request, slot_id):
+    """
+    Leaves worker slot with id = slot_id.
+    """
+
+    if request.POST:
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot:
+            if slot.profile == request.user.profile:
+                services.clear_slot(slot)
     return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -508,7 +524,7 @@ class ApplyAPIView(APIView):
 class ClearSlotAPIView(APIView):
     """
     Cleans worker slot with id = slot_id.
-    slot_id -- id of slot which will be applied to.
+    slot_id -- id of slot which will be cleared.
     """
 
     permission_classes = [permissions.IsAuthenticated,
@@ -522,6 +538,24 @@ class ClearSlotAPIView(APIView):
         services.clear_slot(slot)
 
         return Response('Slot is empty now', status.HTTP_200_OK)
+
+
+class LeaveSlotAPIView(APIView):
+    """
+    User leaves worker slot with id = slot_id.
+    slot_id -- id of slot which will be left.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST)
+        if request.user.profile == slot.profile:
+            services.clear_slot(slot)
+            return Response('Slot was left', status.HTTP_200_OK)
+        return Response('Profile not in that slot', status.HTTP_400_BAD_REQUEST)
 
 
 class SlotAppliesAPIView(APIView):

@@ -31,15 +31,27 @@
         {% endif %}
     {% else %}
         {% if user.is_authenticated %}
-            <li class="list-group-item">
-                <form method="post"
-                      action="{% url 'slot_apply' title=project.title profile=user.username slot_pk=slot.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-dark btn-block">
-                        <b>Оставить заявку</b>
-                    </button>
-                </form>
-            </li>
+            {% if slot.profile == user.profile %}
+                <li class="list-group-item">
+                    <form method="post"
+                          action="{% url 'worker_slot_leave' slot_id=slot.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-block">
+                            <b>Покинуть место</b>
+                        </button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="list-group-item">
+                    <form method="post"
+                          action="{% url 'slot_apply' title=project.title profile=user.username slot_pk=slot.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-dark btn-block">
+                            <b>Оставить заявку</b>
+                        </button>
+                    </form>
+                </li>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endblock %}
