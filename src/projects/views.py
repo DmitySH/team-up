@@ -163,7 +163,7 @@ class WorkerSlotFormView(UserPassesTestMixin, View):
 
     def test_func(self):
         check_auth(self.request)
-        check_own_project(self.request, self.kwargs['title'])
+        check_own_project(self.request, self.kwargs['slug'])
         return True
 
     def get(self, request, slug, pk):

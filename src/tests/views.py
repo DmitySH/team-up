@@ -5,9 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import services
 from src.base.constants import *
 from src.base.services import *
+from src.tests import services
 from .forms import BelbinPartForm, MBTIPartForm, LSQPartForm
 from .models import LSQTest, BelbinTest, MBTITest
 from .permissions import *
