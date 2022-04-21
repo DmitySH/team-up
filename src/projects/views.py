@@ -8,6 +8,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -450,6 +451,18 @@ class InviteAPIView(APIView):
 
         services.check_same_applies(invited_profile, slot)
         return Response('User was invited')
+
+
+class CurrentProjectsListAPIView(generics.ListAPIView):
+    """
+    Gets list of all projects where user is in team.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectDetailSerializer
+
+    def get_queryset(self):
+        return set(self.request.user.profile.get_current_projects())
 
 
 class ApplyAPIView(APIView):

@@ -54,6 +54,8 @@ api_urlpatterns = [
          views.SlotAppliesAPIView.as_view()),
     path('decline-apply-slot/<str:username>/<int:slot_id>/',
          views.DeclineApplyAPIView.as_view()),
+    path('get_current_projects/',
+         views.CurrentProjectsListAPIView.as_view()),
 ]
 
 api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
