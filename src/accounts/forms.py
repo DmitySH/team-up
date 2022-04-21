@@ -19,6 +19,10 @@ class RegisterForm(UserCreationForm):
     Registration form.
     """
 
+    email = forms.EmailField(label='Электронный адрес', required=True,
+                             widget=forms.EmailInput,
+                             help_text='Без него с вами будет невозможно связаться')
+
     username = forms.CharField(max_length=30, required=True,
                                label='Имя пользователя')
     password1 = forms.CharField(widget=forms.PasswordInput(), label='Пароль')
@@ -27,14 +31,15 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2')
 
 
 class UserEditForm(forms.ModelForm):
     """
     Form which changes user's information.
     """
-    email = forms.EmailField(label='Электронный адрес', required=False,
+
+    email = forms.EmailField(label='Электронный адрес', required=True,
                              widget=forms.EmailInput,
                              help_text='Без него с вами будет невозможно связаться')
 

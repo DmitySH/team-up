@@ -17,6 +17,7 @@ __pycache__/
 *.py[cod]
 .pyc
 *.pyc
+**/secrets.py
 
 media/*
 !*media/.gitkeep

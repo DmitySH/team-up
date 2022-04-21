@@ -2,9 +2,11 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import config.secrets as secret
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-_ud2*c!iq40qbd430m=p5(gr635q-&3f0eqa%%(c97f^0+^d^3'
+SECRET_KEY = secret.KEY
 
 DEBUG = True
 
@@ -21,7 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # DRF
-
     'rest_framework',
     'drf_yasg',
     'djoser',
@@ -73,19 +74,12 @@ DATABASES = {
     # postgresql
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'team_up_db',
-        'USER': 'team_up_user',
-        'PASSWORD': '231102',
+        'NAME': secret.DB_NAME,
+        'USER': secret.DB_USER_NAME,
+        'PASSWORD': secret.DB_USER_PASSWORD,
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
-
-    # sqlite3
-
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
 }
 
 # Password validation
