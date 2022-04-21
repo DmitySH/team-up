@@ -14,7 +14,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name')
+        fields = ('username', 'first_name', 'last_name', 'email')
 
 
 class ExecutorOfferDetailSerializer(serializers.ModelSerializer):
@@ -33,8 +33,8 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     """
 
     user = UserDetailSerializer()
-    remote = serializers.CharField(source='get_remote_value')
-    sex = serializers.CharField(source='get_sex_value')
+    remote = serializers.CharField(source='remote_value')
+    sex = serializers.CharField(source='sex_value')
     executor_offer = ExecutorOfferDetailSerializer()
 
     belbin = serializers.SlugRelatedField(slug_field='role', many=True,

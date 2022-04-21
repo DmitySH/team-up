@@ -34,10 +34,12 @@ class UserEditForm(forms.ModelForm):
     """
     Form which changes user's information.
     """
+    email = forms.EmailField(label='Электронный адрес', required=True,
+                             widget=forms.EmailInput)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'email')
 
 
 class ProfileEditForm(forms.ModelForm):
