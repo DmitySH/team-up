@@ -98,7 +98,7 @@ def get_team(profile):
     Gets team of user's project.
     """
 
-    return profile.project().team.all()
+    return profile.project.team.all()
 
 
 def get_applied_for_slot(slot):
@@ -127,3 +127,7 @@ def delete_apply(slot, profile):
             status=Status.objects.get(
                 value='Ожидает'))
         apply.delete()
+
+def clear_slot(slot):
+    slot.profile = None
+    slot.save()

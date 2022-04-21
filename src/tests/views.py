@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from src.base.constants import *
 from src.base.services import *
-from . import services
+from src.tests import services
 from .forms import BelbinPartForm, MBTIPartForm, LSQPartForm
 from .models import LSQTest, BelbinTest, MBTITest
 from .permissions import *
@@ -41,7 +41,7 @@ class BelbinTestFormView(View):
             [form.is_valid() and form.validate_sum() for form in belbin_forms])
 
         if correct:
-            roles = analyze_belbin(
+            roles = services.analyze_belbin(
                 [form.cleaned_data for form in belbin_forms])
 
             for role in roles:
@@ -83,7 +83,7 @@ class MBTITestFormView(View):
         correct = all([form.is_valid() for form in mbti_forms])
 
         if correct:
-            roles = analyze_mbti(
+            roles = services.analyze_mbti(
                 [form.cleaned_data for form in mbti_forms])
 
             for role in roles:
@@ -123,7 +123,7 @@ class LSQTestFormView(View):
         correct = all([form.is_valid() for form in lsq_forms])
 
         if correct:
-            roles = analyze_lsq(
+            roles = services.analyze_lsq(
                 [form.cleaned_data for form in lsq_forms])
 
             for role in roles:
@@ -152,14 +152,15 @@ class BelbinProcessAPIView(APIView):
              for block in request.data['value']])
         if correct:
             try:
-                roles = analyze_belbin(request.data['value'])
+                roles = services.analyze_belbin(request.data['value'])
             except KeyError:
                 return Response(status=status.HTTP_400_BAD_REQUEST,
                                 data='Incorrect test data')
 
             services.update_belbin(roles, request.user.profile)
             return Response(status=status.HTTP_200_OK,
-                            data=analyze_belbin(request.data['value']))
+                            data=services.analyze_belbin(
+                                request.data['value']))
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         data='Incorrect test data')
 
@@ -173,7 +174,7 @@ class MBTIProcessAPIView(APIView):
 
     def post(self, request):
         try:
-            roles = analyze_mbti(request.data['value'])
+            roles = services.analyze_mbti(request.data['value'])
         except KeyError:
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data='Incorrect test data')
@@ -181,7 +182,7 @@ class MBTIProcessAPIView(APIView):
         services.update_mbti(roles, request.user.profile)
 
         return Response(status=status.HTTP_200_OK,
-                        data=analyze_mbti(request.data['value']))
+                        data=services.analyze_mbti(request.data['value']))
 
 
 class LSQProcessAPIView(APIView):
@@ -193,7 +194,7 @@ class LSQProcessAPIView(APIView):
 
     def post(self, request):
         try:
-            roles = analyze_lsq(request.data['value'])
+            roles = services.analyze_lsq(request.data['value'])
         except KeyError:
             return Response(status=status.HTTP_400_BAD_REQUEST,
                             data='Incorrect test data')
@@ -201,4 +202,4 @@ class LSQProcessAPIView(APIView):
         services.update_lsq(roles, request.user.profile)
 
         return Response(status=status.HTTP_200_OK,
-                        data=analyze_lsq(request.data['value']))
+                        data=services.analyze_lsq(request.data['value']))

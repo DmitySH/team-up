@@ -8,9 +8,11 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import src.base.services
 from . import services
 from .forms import ProjectForm, WorkerSlotForm
 from .models import *
@@ -32,7 +34,7 @@ def delete_project(request):
     """
 
     if request.POST:
-        project = request.user.profile.project()
+        project = request.user.profile.project
         if project:
             project.delete()
     return redirect(request.user.profile.get_absolute_url())
@@ -44,7 +46,7 @@ def delete_slot(request, pk):
     Deletes slot with slot id = pk of user that was logged in.
     """
 
-    project = request.user.profile.project()
+    project = request.user.profile.project
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=pk)
         if slot.project == project:
@@ -63,12 +65,12 @@ class ProjectFormView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        form = ProjectForm(instance=request.user.profile.project())
+        form = ProjectForm(instance=request.user.profile.project)
         return render(request, 'projects/project_form.html',
                       context={'form': form})
 
     def post(self, request):
-        project = request.user.profile.project()
+        project = request.user.profile.project
 
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -163,7 +165,7 @@ class WorkerSlotFormView(UserPassesTestMixin, View):
 
     def test_func(self):
         check_auth(self.request)
-        check_own_project(self.request, self.kwargs['title'])
+        check_own_project(self.request, self.kwargs['slug'])
         return True
 
     def get(self, request, slug, pk):
@@ -257,7 +259,7 @@ def invite_profile(request, title, profile, slot_pk):
             raise Http404
         services.check_same_applies(profile, slot)
 
-    return redirect('offer_list')
+    return redirect(request.user.profile.project.get_absolute_url())
 
 
 @login_required(login_url='/login/')
@@ -311,7 +313,7 @@ def decline_apply(request, title, profile, slot_pk):
                     value='Ожидает'))
             apply.delete()
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.user.profile.project.get_absolute_url())
 
 
 # API views
@@ -356,12 +358,40 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        project = request.user.profile.project()
+        project = request.user.profile.project
         if project:
             project.delete()
             return Response(status=status.HTTP_200_OK)
         else:
             raise NotFound(detail="Error 404", code=404)
+
+
+@login_required(login_url='/login/')
+def clear_worker_slot(request, slot_id):
+    """
+    Deletes profile of worker slot with id = slot id.
+    """
+
+    if request.POST:
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot:
+            src.base.services.check_own_slot(request, slot)
+            services.clear_slot(slot)
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url='/login/')
+def leave_worker_slot(request, slot_id):
+    """
+    Leaves worker slot with id = slot_id.
+    """
+
+    if request.POST:
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot:
+            if slot.profile == request.user.profile:
+                services.clear_slot(slot)
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 class WorkerSlotUpdateAPIView(APIView):
@@ -372,7 +402,7 @@ class WorkerSlotUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
 
     def post(self, request):
-        project = request.user.profile.project()
+        project = request.user.profile.project
         serializer = WorkerSlotUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -452,6 +482,18 @@ class InviteAPIView(APIView):
         return Response('User was invited')
 
 
+class CurrentProjectsListAPIView(generics.ListAPIView):
+    """
+    Gets list of all projects where user is in team.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectDetailSerializer
+
+    def get_queryset(self):
+        return set(self.request.user.profile.get_current_projects())
+
+
 class ApplyAPIView(APIView):
     """
     Applies logged user to slot.
@@ -477,6 +519,43 @@ class ApplyAPIView(APIView):
 
         services.create_waiting_status(request.user.profile, slot)
         return Response(status=status.HTTP_200_OK, data='Applied for slot')
+
+
+class ClearSlotAPIView(APIView):
+    """
+    Cleans worker slot with id = slot_id.
+    slot_id -- id of slot which will be cleared.
+    """
+
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST)
+        self.check_object_permissions(request, slot)
+        services.clear_slot(slot)
+
+        return Response('Slot is empty now', status.HTTP_200_OK)
+
+
+class LeaveSlotAPIView(APIView):
+    """
+    User leaves worker slot with id = slot_id.
+    slot_id -- id of slot which will be left.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST)
+        if request.user.profile == slot.profile:
+            services.clear_slot(slot)
+            return Response('Slot was left', status.HTTP_200_OK)
+        return Response('Profile not in that slot', status.HTTP_400_BAD_REQUEST)
 
 
 class SlotAppliesAPIView(APIView):

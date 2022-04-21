@@ -7,7 +7,7 @@ class IsSlotOwner(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        return obj in request.user.profile.project().team.all()
+        return obj in request.user.profile.project.team.all()
 
 
 class IsProjectOwner(permissions.BasePermission):
@@ -16,4 +16,4 @@ class IsProjectOwner(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.profile.project()
+        return request.user.profile.project

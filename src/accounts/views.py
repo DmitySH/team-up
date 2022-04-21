@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from src.base.services import check_auth, get_object_or_none
+from src.base.services import get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
 from . import services
@@ -166,9 +166,11 @@ class InvitationsView(LoginRequiredMixin, View):
     def get(self, request):
         invited_slots = request.user.profile.get_invited_slots()
         applied_slots = request.user.profile.get_applied_slots()
+        projects = set(request.user.profile.get_current_projects())
         return render(request, 'accounts/invitation_list.html',
                       context={'invited_slots': invited_slots,
-                               'applied_slots': applied_slots
+                               'applied_slots': applied_slots,
+                               'projects': projects
                                })
 
 
@@ -243,14 +245,14 @@ class ExecutorOfferFormView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        form = ExecutorOfferForm(instance=request.user.profile.offer())
+        form = ExecutorOfferForm(instance=request.user.profile.offer)
         return render(request,
                       'accounts/executor_offer_form.html',
                       context={'form': form})
 
     def post(self, request):
         form = ExecutorOfferForm(request.POST,
-                                 instance=request.user.profile.offer())
+                                 instance=request.user.profile.offer)
 
         if form.is_valid():
             form.cleaned_data['profile'] = request.user.profile
@@ -265,10 +267,14 @@ class ExecutorOfferFormView(LoginRequiredMixin, View):
                       context={'form': form})
 
 
+@login_required(login_url='/login/')
 def delete_offer(request):
-    check_auth(request)
+    """
+    Deletes user's offer.
+    """
+
     if request.POST:
-        offer = request.user.profile.offer()
+        offer = request.user.profile.offer
         if offer:
             offer.delete()
     return redirect(request.user.profile.get_absolute_url())
@@ -431,7 +437,7 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        offer = request.user.profile.offer()
+        offer = request.user.profile.offer
         if offer:
             offer.delete()
             return Response('Offer deleted', status.HTTP_200_OK)
@@ -440,11 +446,20 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
 
 
 class ExecutorOfferListAPIView(generics.ListAPIView):
+    """
+    Gets list of all executor offers.
+    """
+
     serializer_class = ExecutorOfferListSerializer
     queryset = ExecutorOffer.objects.all()
 
 
 class AcceptInviteAPIView(APIView):
+    """
+    Accepts invite of logged user to slot.
+    slot_id -- id of slot where invite will be accepted.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slot_id):

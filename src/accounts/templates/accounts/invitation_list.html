@@ -160,5 +160,33 @@
         {% else %}
             <h1>Пока заявок нет</h1>
         {% endif %}
+        <hr>
+        {% if projects %}<h1 class="page-header text-center">
+            <b>Ваши проекты</b></h1>
+            <div class="row justify-content-md-center">
+                <ul class="list-group text-center">
+                    {% for project in projects %}
+                        <li class="list-group-item">
+                            <a href="{{ project.get_absolute_url }}">
+                                <button type="button"
+                                        class="btn">
+                                    {{ project.title }}
+                                    <br/>
+                                    Электронный адрес владельца:
+                                    <br/>
+                                    {% if project.owner.user.email %}
+                                        {{ project.owner.user.email }}
+                                    {% else %}
+                                        Не указан
+                                    {% endif %}
+                                </button>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <h1>Пока проектов нет</h1>
+        {% endif %}
     </div>
 {% endblock %}

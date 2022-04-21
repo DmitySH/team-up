@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from src.projects.models import WorkerSlot
+from src.projects.models import WorkerSlot, Project
 from src.tests.models import BelbinTest, MBTITest, LSQTest
 
 
@@ -51,7 +51,8 @@ class Profile(models.Model):
         ONLINE_AND_OFFLINE = 2, _('И онлайн, и оффлайн')
         OFFLINE = 3, _('Оффлайн')
 
-    def get_remote_value(self):
+    @property
+    def remote_value(self):
         if self.remote is None:
             return None
         return self.RemoteChoices.choices[self.remote][1]
@@ -140,7 +141,8 @@ class Profile(models.Model):
                     username=self.user.username
                     )
 
-    def get_sex_value(self):
+    @property
+    def sex_value(self):
         if self.is_male is None:
             return None
         if self.is_male:
@@ -148,12 +150,14 @@ class Profile(models.Model):
         else:
             return 'Женский'
 
+    @property
     def offer(self):
         try:
             return self.executor_offer
         except ObjectDoesNotExist:
             return None
 
+    @property
     def project(self):
         try:
             return self.projects.first()
@@ -176,6 +180,10 @@ class Profile(models.Model):
             'worker_slot')
         slots = [relation.worker_slot for relation in applies]
         return slots
+
+    def get_current_projects(self):
+        projects = Project.objects.filter(team__profile_id=self.id)
+        return projects
 
     class Meta:
         verbose_name = 'Профиль'

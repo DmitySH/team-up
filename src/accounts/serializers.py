@@ -1,8 +1,17 @@
 from django.contrib.auth.models import User
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
 from .models import Profile, ExecutorOffer
 from ..projects.models import WorkerSlot
+
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    email = serializers.EmailField(write_only=True, required=True)
+
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = UserCreateSerializer.Meta.fields + ('email',)
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -14,7 +23,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name')
+        fields = ('username', 'first_name', 'last_name', 'email')
 
 
 class ExecutorOfferDetailSerializer(serializers.ModelSerializer):
@@ -33,8 +42,8 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     """
 
     user = UserDetailSerializer()
-    remote = serializers.CharField(source='get_remote_value')
-    sex = serializers.CharField(source='get_sex_value')
+    remote = serializers.CharField(source='remote_value')
+    sex = serializers.CharField(source='sex_value')
     executor_offer = ExecutorOfferDetailSerializer()
 
     belbin = serializers.SlugRelatedField(slug_field='role', many=True,
