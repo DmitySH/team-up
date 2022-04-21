@@ -19,8 +19,8 @@ def check_own_project(request, slug):
     Checks if user has project.
     """
 
-    if request.user.profile.project():
-        if request.user.profile.project().title != slug:
+    if request.user.profile.project:
+        if request.user.profile.project.title != slug:
             raise PermissionDenied
     else:
         raise PermissionDenied
@@ -30,8 +30,8 @@ def check_own_slot(request, slot):
     """
     Check if user owns slot with slot id = slot.
     """
-    if request.user.profile.project():
-        if slot not in request.user.profile.project().team.all():
+    if request.user.profile.project:
+        if slot not in request.user.profile.project.team.all():
             raise PermissionDenied
     else:
         raise PermissionDenied

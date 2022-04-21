@@ -98,7 +98,7 @@ def get_team(profile):
     Gets team of user's project.
     """
 
-    return profile.project().team.all()
+    return profile.project.team.all()
 
 
 def get_applied_for_slot(slot):

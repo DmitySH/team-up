@@ -20,7 +20,8 @@ class Project(models.Model):
         (ONLINE, 'Присутствие не требуется'),
     )
 
-    def get_remote_value(self):
+    @property
+    def remote_value(self):
         return self.REMOTE_CHOICES[2][1] if self.online else \
             self.REMOTE_CHOICES[1][1]
 

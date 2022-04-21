@@ -243,14 +243,14 @@ class ExecutorOfferFormView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        form = ExecutorOfferForm(instance=request.user.profile.offer())
+        form = ExecutorOfferForm(instance=request.user.profile.offer)
         return render(request,
                       'accounts/executor_offer_form.html',
                       context={'form': form})
 
     def post(self, request):
         form = ExecutorOfferForm(request.POST,
-                                 instance=request.user.profile.offer())
+                                 instance=request.user.profile.offer)
 
         if form.is_valid():
             form.cleaned_data['profile'] = request.user.profile
@@ -268,7 +268,7 @@ class ExecutorOfferFormView(LoginRequiredMixin, View):
 def delete_offer(request):
     check_auth(request)
     if request.POST:
-        offer = request.user.profile.offer()
+        offer = request.user.profile.offer
         if offer:
             offer.delete()
     return redirect(request.user.profile.get_absolute_url())
@@ -431,7 +431,7 @@ class ExecutorOfferDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        offer = request.user.profile.offer()
+        offer = request.user.profile.offer
         if offer:
             offer.delete()
             return Response('Offer deleted', status.HTTP_200_OK)

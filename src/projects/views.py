@@ -32,7 +32,7 @@ def delete_project(request):
     """
 
     if request.POST:
-        project = request.user.profile.project()
+        project = request.user.profile.project
         if project:
             project.delete()
     return redirect(request.user.profile.get_absolute_url())
@@ -44,7 +44,7 @@ def delete_slot(request, pk):
     Deletes slot with slot id = pk of user that was logged in.
     """
 
-    project = request.user.profile.project()
+    project = request.user.profile.project
     if request.POST:
         slot = get_object_or_404(WorkerSlot.objects, id=pk)
         if slot.project == project:
@@ -63,12 +63,12 @@ class ProjectFormView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        form = ProjectForm(instance=request.user.profile.project())
+        form = ProjectForm(instance=request.user.profile.project)
         return render(request, 'projects/project_form.html',
                       context={'form': form})
 
     def post(self, request):
-        project = request.user.profile.project()
+        project = request.user.profile.project
 
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -356,7 +356,7 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        project = request.user.profile.project()
+        project = request.user.profile.project
         if project:
             project.delete()
             return Response(status=status.HTTP_200_OK)
@@ -372,7 +372,7 @@ class WorkerSlotUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProjectOwner]
 
     def post(self, request):
-        project = request.user.profile.project()
+        project = request.user.profile.project
         serializer = WorkerSlotUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

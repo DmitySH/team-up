@@ -140,7 +140,8 @@ class Profile(models.Model):
                     username=self.user.username
                     )
 
-    def get_sex_value(self):
+    @property
+    def sex_value(self):
         if self.is_male is None:
             return None
         if self.is_male:
@@ -148,12 +149,14 @@ class Profile(models.Model):
         else:
             return 'Женский'
 
+    @property
     def offer(self):
         try:
             return self.executor_offer
         except ObjectDoesNotExist:
             return None
 
+    @property
     def project(self):
         try:
             return self.projects.first()
