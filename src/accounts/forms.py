@@ -34,8 +34,9 @@ class UserEditForm(forms.ModelForm):
     """
     Form which changes user's information.
     """
-    email = forms.EmailField(label='Электронный адрес', required=True,
-                             widget=forms.EmailInput)
+    email = forms.EmailField(label='Электронный адрес', required=False,
+                             widget=forms.EmailInput,
+                             help_text='Без него с вами будет невозможно связаться')
 
     class Meta:
         model = User

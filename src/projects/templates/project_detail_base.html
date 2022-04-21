@@ -63,6 +63,17 @@
                                     Место свободно
                                 {% endif %}
                             </li>
+                            {% if user.profile.project.title == project.title %}
+                                <li class="list-group-item">
+                                Электронный адрес:
+                                <br>
+                                {% if slot.profile.user.email %}
+                                    {{ slot.profile.user.email }}
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            {% endif %}
+                            </li>
                             <li class="list-group-item">
                                 Описание:
                                 <br>

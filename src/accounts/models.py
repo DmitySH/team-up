@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from src.projects.models import WorkerSlot
+from src.projects.models import WorkerSlot, Project
 from src.tests.models import BelbinTest, MBTITest, LSQTest
 
 
@@ -180,6 +180,10 @@ class Profile(models.Model):
             'worker_slot')
         slots = [relation.worker_slot for relation in applies]
         return slots
+
+    def get_current_projects(self):
+        projects = Project.objects.filter(team__profile_id=self.id)
+        return projects
 
     class Meta:
         verbose_name = 'Профиль'

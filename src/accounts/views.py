@@ -166,9 +166,11 @@ class InvitationsView(LoginRequiredMixin, View):
     def get(self, request):
         invited_slots = request.user.profile.get_invited_slots()
         applied_slots = request.user.profile.get_applied_slots()
+        projects = set(request.user.profile.get_current_projects())
         return render(request, 'accounts/invitation_list.html',
                       context={'invited_slots': invited_slots,
-                               'applied_slots': applied_slots
+                               'applied_slots': applied_slots,
+                               'projects': projects
                                })
 
 
