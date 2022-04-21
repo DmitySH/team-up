@@ -127,3 +127,7 @@ def delete_apply(slot, profile):
             status=Status.objects.get(
                 value='Ожидает'))
         apply.delete()
+
+def clear_slot(slot):
+    slot.profile = None
+    slot.save()

@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from src.base.services import check_auth, get_object_or_none
+from src.base.services import get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
 from . import services
@@ -267,8 +267,12 @@ class ExecutorOfferFormView(LoginRequiredMixin, View):
                       context={'form': form})
 
 
+@login_required(login_url='/login/')
 def delete_offer(request):
-    check_auth(request)
+    """
+    Deletes user's offer.
+    """
+
     if request.POST:
         offer = request.user.profile.offer
         if offer:

@@ -365,6 +365,19 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
             raise NotFound(detail="Error 404", code=404)
 
 
+@login_required(login_url='/login/')
+def clear_worker_slot(request, slot_id):
+    """
+    Deletes profile of worker slot with id = slot id.
+    """
+
+    if request.POST:
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if slot:
+            services.clear_slot(slot)
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
 class WorkerSlotUpdateAPIView(APIView):
     """
     Updates worker slot of logged user.
@@ -490,6 +503,25 @@ class ApplyAPIView(APIView):
 
         services.create_waiting_status(request.user.profile, slot)
         return Response(status=status.HTTP_200_OK, data='Applied for slot')
+
+
+class ClearSlotAPIView(APIView):
+    """
+    Cleans worker slot with id = slot_id.
+    slot_id -- id of slot which will be applied to.
+    """
+
+    permission_classes = [permissions.IsAuthenticated,
+                          IsProjectOwner, IsSlotOwner]
+
+    def get(self, request, slot_id):
+        slot = get_object_or_none(WorkerSlot.objects, id=slot_id)
+        if not slot:
+            return Response('No such slot', status.HTTP_400_BAD_REQUEST)
+        self.check_object_permissions(request, slot)
+        services.clear_slot(slot)
+
+        return Response('Slot is empty now', status.HTTP_200_OK)
 
 
 class SlotAppliesAPIView(APIView):

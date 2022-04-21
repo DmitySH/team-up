@@ -17,6 +17,18 @@
                 </button>
             </a>
         </li>
+        {% if slot.profile %}
+            <li class="list-group-item">
+                <form method="post"
+                      action="{% url 'worker_slot_clear' slot_id=slot.pk %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Освободить место
+                    </button>
+                </form>
+            </li>
+        {% endif %}
     {% else %}
         {% if user.is_authenticated %}
             <li class="list-group-item">

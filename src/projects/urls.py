@@ -31,6 +31,8 @@ urlpatterns = [
          name='project_detail'),
     path('projects/<str:slug>/<int:pk>', views.WorkerSlotFormView.as_view(),
          name='worker_slot_form'),
+    path('projects/<int:slot_id>', views.clear_worker_slot,
+         name='worker_slot_clear'),
 ]
 
 # API urls.
@@ -54,8 +56,10 @@ api_urlpatterns = [
          views.SlotAppliesAPIView.as_view()),
     path('decline-apply-slot/<str:username>/<int:slot_id>/',
          views.DeclineApplyAPIView.as_view()),
-    path('get_current_projects/',
+    path('get-current_projects/',
          views.CurrentProjectsListAPIView.as_view()),
+    path('clear-slot/<int:slot_id>/',
+         views.ClearSlotAPIView.as_view()),
 ]
 
 api_urlpatterns = add_prefix_to_urls(api_urlpatterns)
