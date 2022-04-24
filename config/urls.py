@@ -8,9 +8,8 @@ from .yasg import urlpatterns as doc_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
-    path('auth/', include('djoser.urls.jwt')),
+    path('auth/', include('src.accounts.djoser_token_urls')),
+
     path('', include('src.accounts.urls')),
     path('', include('src.projects.urls')),
     path('', include('src.main.urls')),

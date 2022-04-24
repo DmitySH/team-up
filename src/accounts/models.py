@@ -45,6 +45,10 @@ class Profile(models.Model):
     User's extension db model.
     """
 
+    User._meta.get_field('email')._unique = True
+    User._meta.get_field('email').blank = False
+    User._meta.get_field('email').null = False
+
     class RemoteChoices(models.IntegerChoices):
         __empty__ = _('Не указывать')
         ONLINE = 1, _('Онлайн')
