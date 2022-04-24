@@ -58,8 +58,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     """
 
     user = UserDetailSerializer()
-    photo = serializers.CharField()
-    cv = serializers.CharField()
+    photo = serializers.CharField(required=False)
+    cv = serializers.CharField(required=False)
 
     class Meta:
         model = Profile
