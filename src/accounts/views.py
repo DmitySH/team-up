@@ -303,6 +303,7 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtension):
 
     model = ExecutorOffer
     template_name = 'accounts/executor_offer_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         if self.request.GET:

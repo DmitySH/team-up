@@ -256,5 +256,6 @@ class ExecutorOffer(models.Model):
         return 'Карточка {profile}'.format(profile=self.profile.user.username)
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Карточка работника'
         verbose_name_plural = 'Карточки работника'
