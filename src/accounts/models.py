@@ -15,7 +15,7 @@ class Specialization(models.Model):
     Specialization db model.
     """
 
-    name = models.CharField('Специализация', max_length=50)
+    name = models.CharField('Специализация', max_length=100)
 
     def __str__(self):
         return self.name
