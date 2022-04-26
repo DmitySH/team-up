@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from drf_base64.fields import Base64FileField, Base64ImageField
+
 from rest_framework import serializers
 
 from .models import Profile, ExecutorOffer, Specialization
@@ -11,6 +13,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
 
     username = serializers.CharField(read_only=True)
+    email = serializers.EmailField(required=False)
 
     class Meta:
         model = User
@@ -56,10 +59,9 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     """
     Serializes data to update profile model.
     """
-
+    cv = Base64FileField(required=False)
+    photo = Base64ImageField(required=False)
     user = UserDetailSerializer()
-    photo = serializers.CharField(required=False)
-    cv = serializers.CharField(required=False)
 
     class Meta:
         model = Profile

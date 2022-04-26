@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
-from rest_framework import generics, permissions, status, parsers
+from rest_framework import generics, permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -372,10 +372,9 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
 
         services.object_update(user, serializer.validated_data.pop('user'))
-
         services.object_update(user.profile, serializer.validated_data)
 
-        return Response(serializer.data)
+        return Response("Profile was updated")
 
 
 class ChangePasswordView(generics.UpdateAPIView):
