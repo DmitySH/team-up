@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, parsers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,14 +19,12 @@ from rest_framework.views import APIView
 from src.base.services import get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
+from . import serializers
 from . import services
 from .forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm, ExecutorOfferForm
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
-from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
-    ExecutorOfferUpdateSerializer, ChangePasswordSerializer, \
-    ExecutorOfferListSerializer, WorkerSlotListSerializer
 
 
 class LoginView(View):
@@ -352,7 +350,7 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
+    serializer_class = serializers.ProfileDetailSerializer
     lookup_field = 'user__username'
     lookup_url_kwarg = 'username'
 
@@ -363,7 +361,7 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
     """
 
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProfileUpdateSerializer
+    serializer_class = serializers.ProfileUpdateSerializer
 
     def get_queryset(self):
         return self.request.user.profile
@@ -377,7 +375,7 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
 
         services.object_update(user.profile, serializer.validated_data)
 
-        return Response('Profile updated')
+        return Response(serializer.data)
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -385,7 +383,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     Changes password of user that was logged in.
     """
 
-    serializer_class = ChangePasswordSerializer
+    serializer_class = serializers.ChangePasswordSerializer
     model = User
     permission_classes = [IsAuthenticated]
 
@@ -418,7 +416,8 @@ class ExecutorOfferUpdateAPIView(APIView):
 
     def post(self, request):
         profile = request.user.profile
-        serializer = ExecutorOfferUpdateSerializer(data=request.data)
+        serializer = serializers.ExecutorOfferUpdateSerializer(
+            data=request.data)
         serializer.is_valid(raise_exception=True)
 
         created = services.update_or_create_offer(profile,
@@ -451,7 +450,7 @@ class ExecutorOfferListAPIView(generics.ListAPIView):
     Gets list of all executor offers.
     """
 
-    serializer_class = ExecutorOfferListSerializer
+    serializer_class = serializers.ExecutorOfferListSerializer
     queryset = ExecutorOffer.objects.all()
 
 
@@ -480,7 +479,7 @@ class InvitedWorkerSlotListAPIView(generics.ListAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotListSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_invited_slots()
@@ -492,7 +491,7 @@ class AppliedWorkerSlotListAPIView(generics.ListAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotListSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_applied_slots()
@@ -529,3 +528,12 @@ class RetractInviteAPIView(APIView):
             return Response('Apply retracted')
 
         return Response('Incorrect data')
+
+
+class SpecializationListAPIView(generics.ListAPIView):
+    """
+    Gets list of all specializations.
+    """
+
+    serializer_class = serializers.SpecializationListSerializer
+    queryset = Specialization.objects.all()

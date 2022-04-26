@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Profile, ExecutorOffer
+from .models import Profile, ExecutorOffer, Specialization
 from ..projects.models import WorkerSlot
 
 
@@ -109,4 +109,14 @@ class WorkerSlotListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkerSlot
+        fields = '__all__'
+
+
+class SpecializationListSerializer(serializers.ModelSerializer):
+    """
+    Serializes list of all specializations.
+    """
+
+    class Meta:
+        model = Specialization
         fields = '__all__'
