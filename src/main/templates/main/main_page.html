@@ -1,7 +1,8 @@
 {% extends 'main_base.html' %}
+{% load static %}
 {% block title %}Главная{% endblock %}
 {% block banner %}<img style="filter: brightness(60%); width: 100%;"
-                       src="/static/img/banner.jpg"
+                       src="{% static 'img/banner.jpg' %}"
                        alt="Команда мечты">{% endblock %}
 {% block content %}
     <div>
