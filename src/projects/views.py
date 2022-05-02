@@ -108,6 +108,7 @@ class ProjectListView(ListView, ProjectFilterExtension):
     model = Project
     queryset = Project.objects.all()
     template_name = 'projects/project_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         if self.request.GET.get('search'):

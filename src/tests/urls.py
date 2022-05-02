@@ -17,6 +17,9 @@ api_urlpatterns = [
     path('process-belbin/', views.BelbinProcessAPIView.as_view()),
     path('process-mbti/', views.MBTIProcessAPIView.as_view()),
     path('process-lsq/', views.LSQProcessAPIView.as_view()),
+    path('get-belbin-roles/', views.BelbinTestListAPIView.as_view()),
+    path('get-mbti-roles/', views.MBTITestListAPIView.as_view()),
+    path('get-lsq-roles/', views.LSQTestListAPIView.as_view()),
 ]
 
 api_urlpatterns = add_prefix_to_urls(api_urlpatterns)

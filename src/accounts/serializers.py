@@ -1,17 +1,10 @@
 from django.contrib.auth.models import User
-from djoser.serializers import UserCreateSerializer
+from drf_base64.fields import Base64FileField, Base64ImageField
+
 from rest_framework import serializers
 
-from .models import Profile, ExecutorOffer
+from .models import Profile, ExecutorOffer, Specialization
 from ..projects.models import WorkerSlot
-
-
-class CustomUserCreateSerializer(UserCreateSerializer):
-    email = serializers.EmailField(write_only=True, required=True)
-
-    class Meta(UserCreateSerializer.Meta):
-        model = User
-        fields = UserCreateSerializer.Meta.fields + ('email',)
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -20,6 +13,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
 
     username = serializers.CharField(read_only=True)
+    email = serializers.EmailField(required=False)
 
     class Meta:
         model = User
@@ -65,10 +59,9 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     """
     Serializes data to update profile model.
     """
-
+    cv = Base64FileField(required=False)
+    photo = Base64ImageField(required=False)
     user = UserDetailSerializer()
-    photo = serializers.CharField()
-    cv = serializers.CharField()
 
     class Meta:
         model = Profile
@@ -118,4 +111,14 @@ class WorkerSlotListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkerSlot
+        fields = '__all__'
+
+
+class SpecializationListSerializer(serializers.ModelSerializer):
+    """
+    Serializes list of all specializations.
+    """
+
+    class Meta:
+        model = Specialization
         fields = '__all__'

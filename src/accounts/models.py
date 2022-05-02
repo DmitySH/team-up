@@ -15,7 +15,7 @@ class Specialization(models.Model):
     Specialization db model.
     """
 
-    name = models.CharField('Специализация', max_length=50)
+    name = models.CharField('Специализация', max_length=100)
 
     def __str__(self):
         return self.name
@@ -44,6 +44,10 @@ class Profile(models.Model):
     """
     User's extension db model.
     """
+
+    User._meta.get_field('email')._unique = True
+    User._meta.get_field('email').blank = False
+    User._meta.get_field('email').null = False
 
     class RemoteChoices(models.IntegerChoices):
         __empty__ = _('Не указывать')
@@ -80,7 +84,7 @@ class Profile(models.Model):
     patronymic = models.CharField('Отчество', max_length=30, blank=True,
                                   default='', null=True)
     photo = models.ImageField('Фотография', upload_to='profile_photos/',
-                              default='profile_photos/empty.png',
+                              null=True,
                               blank=True)
     description = models.TextField('Описание',
                                    default='Пользователь не рассказывает о себе',
@@ -252,5 +256,6 @@ class ExecutorOffer(models.Model):
         return 'Карточка {profile}'.format(profile=self.profile.user.username)
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Карточка работника'
         verbose_name_plural = 'Карточки работника'

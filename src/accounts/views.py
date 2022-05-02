@@ -19,14 +19,12 @@ from rest_framework.views import APIView
 from src.base.services import get_object_or_none
 from src.projects.models import WorkerSlot
 from src.tests.models import BelbinTest
+from . import serializers
 from . import services
 from .forms import AuthForm, RegisterForm, UserEditForm, \
     ProfileEditForm, ExecutorOfferForm
 from .models import Status, Profile, ExecutorOffer, \
     ProfileProjectStatus, Specialization
-from .serializers import ProfileDetailSerializer, ProfileUpdateSerializer, \
-    ExecutorOfferUpdateSerializer, ChangePasswordSerializer, \
-    ExecutorOfferListSerializer, WorkerSlotListSerializer
 
 
 class LoginView(View):
@@ -144,17 +142,15 @@ class UserEditView(LoginRequiredMixin, View):
                                        instance=request.user.profile)
 
         if form.is_valid() and form_profile.is_valid():
-            if not form_profile.cleaned_data['photo']:
-                request.user.profile.photo = 'profile_photos/empty.png'
-                request.user.profile.save()
             form.save()
             form_profile.save()
-            return redirect('profile_detail', slug=request.user.username)
 
+            return redirect('profile_detail', slug=request.user.username)
         args = {
             'form_user': form,
             'form_profile': form_profile,
         }
+
         return render(request, 'accounts/edit_profile.html', args)
 
 
@@ -303,6 +299,7 @@ class ExecutorOfferListView(ListView, ExecutorFilterExtension):
 
     model = ExecutorOffer
     template_name = 'accounts/executor_offer_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         if self.request.GET:
@@ -351,7 +348,7 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
+    serializer_class = serializers.ProfileDetailSerializer
     lookup_field = 'user__username'
     lookup_url_kwarg = 'username'
 
@@ -362,7 +359,7 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
     """
 
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProfileUpdateSerializer
+    serializer_class = serializers.ProfileUpdateSerializer
 
     def get_queryset(self):
         return self.request.user.profile
@@ -373,10 +370,9 @@ class ProfileUpdateAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
 
         services.object_update(user, serializer.validated_data.pop('user'))
-
         services.object_update(user.profile, serializer.validated_data)
 
-        return Response('Profile updated')
+        return Response("Profile was updated")
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -384,7 +380,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     Changes password of user that was logged in.
     """
 
-    serializer_class = ChangePasswordSerializer
+    serializer_class = serializers.ChangePasswordSerializer
     model = User
     permission_classes = [IsAuthenticated]
 
@@ -417,7 +413,8 @@ class ExecutorOfferUpdateAPIView(APIView):
 
     def post(self, request):
         profile = request.user.profile
-        serializer = ExecutorOfferUpdateSerializer(data=request.data)
+        serializer = serializers.ExecutorOfferUpdateSerializer(
+            data=request.data)
         serializer.is_valid(raise_exception=True)
 
         created = services.update_or_create_offer(profile,
@@ -450,7 +447,7 @@ class ExecutorOfferListAPIView(generics.ListAPIView):
     Gets list of all executor offers.
     """
 
-    serializer_class = ExecutorOfferListSerializer
+    serializer_class = serializers.ExecutorOfferListSerializer
     queryset = ExecutorOffer.objects.all()
 
 
@@ -479,7 +476,7 @@ class InvitedWorkerSlotListAPIView(generics.ListAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotListSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_invited_slots()
@@ -491,7 +488,7 @@ class AppliedWorkerSlotListAPIView(generics.ListAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotListSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_applied_slots()
@@ -528,3 +525,12 @@ class RetractInviteAPIView(APIView):
             return Response('Apply retracted')
 
         return Response('Incorrect data')
+
+
+class SpecializationListAPIView(generics.ListAPIView):
+    """
+    Gets list of all specializations.
+    """
+
+    serializer_class = serializers.SpecializationListSerializer
+    queryset = Specialization.objects.all()

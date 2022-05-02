@@ -6,7 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/header_style.css' %}"
           type="text/css"
           media="all">
@@ -34,6 +33,7 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 </head>
 <body>
 <div id="page" class="page">
@@ -44,7 +44,8 @@
     <div class="row">
         {% block sidebar %}
         {% endblock sidebar %}
-
+        {% block banner %}
+        {% endblock %}
         <div class="container">
             <section class="ab-info-main py-md-5 py-4 editContent"
                      style="padding-left: 3rem; padding-right: 3rem;">

@@ -41,16 +41,18 @@ api_urlpatterns = [
          views.ChangePasswordView.as_view()),
     path('get-executor-offers/',
          views.ExecutorOfferListAPIView.as_view()),
-    path('get_invited_slots/',
+    path('get-invited-slots/',
          views.InvitedWorkerSlotListAPIView.as_view()),
-    path('get_applied_slots/',
+    path('get-applied-slots/',
          views.AppliedWorkerSlotListAPIView.as_view()),
-    path('accept_invite/<int:slot_id>/',
+    path('accept-invite/<int:slot_id>/',
          views.AcceptInviteAPIView.as_view()),
-    path('decline_invite/<int:slot_id>/',
+    path('decline-invite/<int:slot_id>/',
          views.DeclineInviteAPIView.as_view()),
     path('retract-apply/<int:slot_id>/',
          views.RetractInviteAPIView.as_view()),
+    path('get-specialiazations/',
+         views.SpecializationListAPIView.as_view()),
 ]
 
 api_urlpatterns = add_prefix_to_urls(api_urlpatterns)

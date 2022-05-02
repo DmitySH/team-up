@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from src.base.constants import *
 from src.base.services import *
 from src.tests import services
+from . import serializers
 from .forms import BelbinPartForm, MBTIPartForm, LSQPartForm
 from .models import LSQTest, BelbinTest, MBTITest
 from .permissions import *
@@ -203,3 +204,30 @@ class LSQProcessAPIView(APIView):
 
         return Response(status=status.HTTP_200_OK,
                         data=services.analyze_lsq(request.data['value']))
+
+
+class BelbinTestListAPIView(generics.ListAPIView):
+    """
+    Gets list of all belbin test roles.
+    """
+
+    serializer_class = serializers.BelbinTestListSerializer
+    queryset = BelbinTest.objects.all()
+
+
+class MBTITestListAPIView(generics.ListAPIView):
+    """
+    Gets list of all mbti test roles.
+    """
+
+    serializer_class = serializers.MBTITestListSerializer
+    queryset = MBTITest.objects.all()
+
+
+class LSQTestListAPIView(generics.ListAPIView):
+    """
+    Gets list of all lsq test roles.
+    """
+
+    serializer_class = serializers.LSQTestListSerializer
+    queryset = LSQTest.objects.all()
