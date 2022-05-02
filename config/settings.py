@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
     # Oher apps
     'crispy_forms',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

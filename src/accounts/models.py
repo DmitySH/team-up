@@ -84,7 +84,7 @@ class Profile(models.Model):
     patronymic = models.CharField('Отчество', max_length=30, blank=True,
                                   default='', null=True)
     photo = models.ImageField('Фотография', upload_to='profile_photos/',
-                              default='profile_photos/empty.png',
+                              null=True,
                               blank=True)
     description = models.TextField('Описание',
                                    default='Пользователь не рассказывает о себе',

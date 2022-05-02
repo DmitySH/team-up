@@ -5,7 +5,12 @@
         <ul style="margin-top: 20px" class="list-group">
             <li class="list-group-item">
                 <img style="height: 250px; max-width: 500px"
-                     src="{{ profile.photo.url }}"
+                     src="
+                    {% if profile.photo %}
+                    {{ profile.photo.url }}
+                     {% else %}
+                     /media/profile_photos/empty.png
+                     {% endif %}"
                      alt="Фото профиля">
             </li>
             <li class="list-group-item">Фамилия: {{ user_.last_name }}</li>

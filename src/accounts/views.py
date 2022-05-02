@@ -142,17 +142,15 @@ class UserEditView(LoginRequiredMixin, View):
                                        instance=request.user.profile)
 
         if form.is_valid() and form_profile.is_valid():
-            if not form_profile.cleaned_data['photo']:
-                request.user.profile.photo = 'profile_photos/empty.png'
-                request.user.profile.save()
             form.save()
             form_profile.save()
-            return redirect('profile_detail', slug=request.user.username)
 
+            return redirect('profile_detail', slug=request.user.username)
         args = {
             'form_user': form,
             'form_profile': form_profile,
         }
+
         return render(request, 'accounts/edit_profile.html', args)
 
 
