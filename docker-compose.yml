@@ -2,14 +2,12 @@ version: "3.9"
 
 services:
   web:
+    container_name: team-up-web
     build: ./
-    container_name: team_up_web
     restart: always
-    command: bash entrypoint.sh
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/usr/src/app
-      - ./static:/usr/src/app/static
-      - ./media:/usr/stc/app/media
+      - ./:/usr/src/app/
     ports:
       - "8000:8000"
     env_file:
@@ -18,26 +16,14 @@ services:
       - db
 
   db:
-    image: postgres:14
-    container_name: team_up_db
-    volumes:
-      - team_up_postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.env.dev
-    ports:
-      - "5434:5432"
-
-  nginx:
-    build: ./nginx
-    container_name: team_up_nginx
+    image: postgres:14.0-alpine
     restart: on-failure
     ports:
-      - "80:80"
+      - "5432:5432"
+    env_file:
+      - ./.env.dev
     volumes:
-      - ./static:/static
-      - ./media:/media
-    depends_on:
-      - web
+      - postgres_data:/var/lib/postgresql/data/
 
 volumes:
-  team_up_postgres_data:
+  postgres_data:
