@@ -1,4 +1,5 @@
 {% extends 'main_base.html' %}
+{% load static %}
 {% block title %}Аккаунт{% endblock %}
 {% block content %}
     <div class="container">
@@ -9,7 +10,7 @@
                     {% if profile.photo %}
                     {{ profile.photo.url }}
                      {% else %}
-                     /media/profile_photos/empty.png
+                     {% static 'img/empty.png' %}
                      {% endif %}"
                      alt="Фото профиля">
             </li>

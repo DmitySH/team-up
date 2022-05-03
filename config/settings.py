@@ -121,10 +121,10 @@ STATIC_URL = '/static/'
 # STATIC_DIR = os.path.join(BASE_DIR, 'static')
 # STATICFILES_DIRS = [STATIC_DIR]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -181,11 +181,15 @@ SWAGGER_SETTINGS = {
     },
 }
 
+CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1:1337', 'http://127.0.0.1:1337']
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost',
-    'http://localhost:8080',
-    'http://127.0.0.1:8000',
     'http://127.0.0.1',
+    'http://localhost:8080',
+    'http://localhost:1337',
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:1337',
 ]
 
 API_VERSION = 'v1'
