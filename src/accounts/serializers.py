@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from drf_base64.fields import Base64FileField, Base64ImageField
-
 from rest_framework import serializers
 
 from .models import Profile, ExecutorOffer, Specialization
@@ -49,6 +48,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     specialization = serializers.SlugRelatedField(slug_field='name',
                                                   many=True,
                                                   read_only=True)
+    project = serializers.CharField(source='project.title', read_only=True)
 
     class Meta:
         model = Profile
@@ -98,6 +98,8 @@ class ExecutorOfferListSerializer(serializers.ModelSerializer):
     """
     Serializes list of all executor offers.
     """
+
+    profile = serializers.CharField(source='profile.user.username')
 
     class Meta:
         model = ExecutorOffer

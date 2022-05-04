@@ -362,9 +362,9 @@ class ProjectDeleteAPIView(generics.DestroyAPIView):
         project = request.user.profile.project
         if project:
             project.delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response('Project deleted', status.HTTP_200_OK)
         else:
-            raise NotFound(detail="Error 404", code=404)
+            raise NotFound(detail='User has no project', code=404)
 
 
 @login_required(login_url='/login/')

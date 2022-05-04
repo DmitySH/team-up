@@ -7,7 +7,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     team = serializers.SlugRelatedField(slug_field='id', many=True,
                                         read_only=True)
     """
-    Serializes projcet model.
+    Serializes project model.
     """
 
     class Meta:
@@ -19,6 +19,8 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
     """
     Serializes fields to update in project model.
     """
+
+    title = serializers.CharField()
 
     class Meta:
         model = Project
@@ -51,7 +53,9 @@ class ProjectListSerializer(serializers.ModelSerializer):
         slug_field='name',
         many=True,
         read_only=True)
-    online = serializers.CharField(source='get_remote_value')
+
+    online = serializers.CharField(source='remote_value')
+    owner = serializers.CharField(source='owner.user.username')
 
     class Meta:
         model = Project
