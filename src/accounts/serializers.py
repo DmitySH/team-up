@@ -99,6 +99,8 @@ class ExecutorOfferListSerializer(serializers.ModelSerializer):
     Serializes list of all executor offers.
     """
 
+    profile = serializers.CharField(source='profile.user.username')
+
     class Meta:
         model = ExecutorOffer
         fields = '__all__'
