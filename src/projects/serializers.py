@@ -4,11 +4,12 @@ from src.projects.models import Project, WorkerSlot
 
 
 class ProjectDetailSerializer(serializers.ModelSerializer):
-    team = serializers.SlugRelatedField(slug_field='id', many=True,
-                                        read_only=True)
     """
     Serializes project model.
     """
+
+    team = serializers.SlugRelatedField(slug_field='id', many=True,
+                                        read_only=True)
 
     class Meta:
         model = Project
