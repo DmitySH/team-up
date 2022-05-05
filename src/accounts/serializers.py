@@ -106,9 +106,9 @@ class ExecutorOfferListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class WorkerSlotListSerializer(serializers.ModelSerializer):
+class WorkerSlotDetailSerializer(serializers.ModelSerializer):
     """
-    Serializes list of all worker slots.
+    Serializes detail info about worker slot.
     """
 
     class Meta:
