@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from src.accounts.serializers import WorkerSlotDetailSerializer
 from src.projects.models import Project, WorkerSlot
 
 
@@ -9,8 +10,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     """
 
     online = serializers.CharField(source='remote_value')
-    team = serializers.SlugRelatedField(slug_field='id', many=True,
-                                        read_only=True)
+    team = WorkerSlotDetailSerializer(read_only=True, many=True)
     owner = serializers.CharField(source='owner.user.username')
 
     class Meta:

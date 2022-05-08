@@ -99,7 +99,8 @@ class ExecutorOfferListSerializer(serializers.ModelSerializer):
     Serializes list of all executor offers.
     """
 
-    profile = serializers.CharField(source='profile.user.username')
+    profile = serializers.CharField(source='profile.user.username',
+                                    read_only=True)
 
     class Meta:
         model = ExecutorOffer
@@ -108,8 +109,11 @@ class ExecutorOfferListSerializer(serializers.ModelSerializer):
 
 class WorkerSlotDetailSerializer(serializers.ModelSerializer):
     """
-    Serializes detail info about worker slot.
+    Serializes detailed info about worker slot.
     """
+
+    profile = serializers.CharField(source='profile.user.username',
+                                    read_only=False, allow_null=True)
 
     class Meta:
         model = WorkerSlot
