@@ -105,6 +105,8 @@ def get_team(profile):
     Gets team of user's project.
     """
 
+    if not profile.project:
+        return set()
     return profile.project.team.all()
 
 

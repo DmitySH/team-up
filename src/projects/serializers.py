@@ -47,8 +47,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
     Serializes list of all projects.
     """
 
-    team = serializers.SlugRelatedField(slug_field='id', many=True,
-                                        read_only=True)
+    team = WorkerSlotDetailSerializer(read_only=True, many=True)
 
     online = serializers.CharField(source='remote_value')
     owner = serializers.CharField(source='owner.user.username')
