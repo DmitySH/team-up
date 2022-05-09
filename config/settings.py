@@ -3,14 +3,16 @@ from datetime import timedelta
 from pathlib import Path
 
 import config.secrets as secret
+import config.secrets_azure as az_secret
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = secret.KEY
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = secret.ALLOWED_HOSTS.split()
+CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS.split()
 
 # Application definition
 
@@ -37,10 +39,12 @@ INSTALLED_APPS = [
     # Oher apps
     'crispy_forms',
     'django_cleanup.apps.CleanupConfig',
+    'storages',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,17 +75,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 
-DATABASES = {
-    # postgresql
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': secret.DB_NAME,
-        'USER': secret.DB_USER_NAME,
-        'PASSWORD': secret.DB_USER_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+DATABASES = az_secret.POSTGRES_DB
 
 # Password validation
 
@@ -112,12 +106,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = 'static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [STATIC_DIR]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [STATIC_DIR]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -176,3 +171,12 @@ SWAGGER_SETTINGS = {
 }
 
 API_VERSION = 'v1'
+
+
+DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
+
+MEDIA_LOCATION = "media"
+
+AZURE_ACCOUNT_NAME = "teamupblob"
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
