@@ -15,7 +15,7 @@
                     <h5 class="text-center">{{ project.city }}
                         {% if project.online is not None %}
                             (
-                            {{ project.get_remote_value }}
+                            {{ project.remote_value }}
                             )
                         {% endif %}
 
