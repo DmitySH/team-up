@@ -8,7 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
-DEBUG = bool(int(os.environ.get('DEBUG', True)))
+AZURE = False
+DOCKER = False
+DEBUG = bool(int(os.environ.get('DEBUG', True))) and not AZURE
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS',
                                secret.ALLOWED_HOSTS).split()
@@ -118,10 +120,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = '/static/'
-# STATIC_DIR = os.path.join(BASE_DIR, 'static')
-# STATICFILES_DIRS = [STATIC_DIR]
 
-STATIC_ROOT = BASE_DIR / 'static'
+if DOCKER:
+    STATIC_ROOT = BASE_DIR / 'static'
+else:
+    STATIC_DIR = os.path.join(BASE_DIR, 'static')
+    STATICFILES_DIRS = [STATIC_DIR]
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -181,15 +186,8 @@ SWAGGER_SETTINGS = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1:1337', 'http://127.0.0.1:1337']
+CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost',
-    'http://127.0.0.1',
-    'http://localhost:8080',
-    'http://localhost:1337',
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:1337',
-]
+CORS_ALLOWED_ORIGINS = secret.CORS_ALLOWED_ORIGINS
 
 API_VERSION = 'v1'
