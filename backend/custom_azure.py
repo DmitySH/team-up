@@ -1,8 +1,10 @@
 from storages.backends.azure_storage import AzureStorage
 
+import config.secrets_azure as az_secret
+
 
 class AzureMediaStorage(AzureStorage):
     account_name = 'teamupblob'
-    account_key = '9982y1m3zjih8wy70f+ErWDKGGMLWC37E20aHcQfgUj0yfTp8Fkwz8V+vTgC7+4eFNzCL+0I90Jvc8GTo+IPfg=='  # Must be replaced by your <storage_account_key>
+    account_key = az_secret.AZURE_KEY
     azure_container = 'media'
     expiration_secs = None

@@ -11,10 +11,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
 AZURE = False
 DOCKER = False
+
 DEBUG = bool(int(os.environ.get('DEBUG', True))) and not AZURE
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS',
                                secret.ALLOWED_HOSTS).split()
+
+CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS
+
+CORS_ALLOWED_ORIGINS = secret.CORS_ALLOWED_ORIGINS
 
 # Application definition
 
@@ -42,8 +47,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_cleanup.apps.CleanupConfig',
     'corsheaders',
-    'storages',
 ]
+
+if AZURE:
+    INSTALLED_APPS.append('storages')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,19 +86,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 
-DATABASES = {
-    # postgresql
-    'default': {
-        'ENGINE': os.environ.get('POSTGRES_ENGINE',
-                                 'django.db.backends.postgresql_psycopg2'),
-        'NAME': os.environ.get('POSTGRES_DB', secret.DB_NAME),
-        'USER': os.environ.get('POSTGRES_USER', secret.DB_USER_NAME),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD',
-                                   secret.DB_USER_PASSWORD),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+if AZURE:
+    DATABASES = az_secret.POSTGRES_DB
+else:
+    DATABASES = {
+        # postgresql
+        'default': {
+            'ENGINE': os.environ.get('POSTGRES_ENGINE',
+                                     'django.db.backends.postgresql_psycopg2'),
+            'NAME': os.environ.get('POSTGRES_DB', secret.DB_NAME),
+            'USER': os.environ.get('POSTGRES_USER', secret.DB_USER_NAME),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD',
+                                       secret.DB_USER_PASSWORD),
+            'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
 
 # Password validation
 
@@ -126,12 +136,21 @@ STATIC_URL = '/static/'
 
 if DOCKER:
     STATIC_ROOT = BASE_DIR / 'static'
+elif AZURE:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    STATIC_ROOT = BASE_DIR / 'static'
 else:
     STATIC_DIR = os.path.join(BASE_DIR, 'static')
     STATICFILES_DIRS = [STATIC_DIR]
 
 
-MEDIA_URL = '/media/'
+if AZURE:
+    DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
+    MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{az_secret.AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
+else:
+    MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -189,17 +208,4 @@ SWAGGER_SETTINGS = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS
-
-CORS_ALLOWED_ORIGINS = secret.CORS_ALLOWED_ORIGINS
-
 API_VERSION = 'v1'
-
-
-DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
-
-MEDIA_LOCATION = "media"
-
-AZURE_ACCOUNT_NAME = "teamupblob"
-AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
-MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
