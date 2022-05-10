@@ -19,6 +19,7 @@ __pycache__/
 .pyc
 *.pyc
 **/secrets.py
+**/secrets_azure.py
 
 media/*
 !*media/.gitkeep

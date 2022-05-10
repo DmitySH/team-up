@@ -3,6 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import config.secrets as secret
+import config.secrets_azure as az_secret
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,10 +42,12 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_cleanup.apps.CleanupConfig',
     'corsheaders',
+    'storages',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -191,3 +194,12 @@ CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS
 CORS_ALLOWED_ORIGINS = secret.CORS_ALLOWED_ORIGINS
 
 API_VERSION = 'v1'
+
+
+DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
+
+MEDIA_LOCATION = "media"
+
+AZURE_ACCOUNT_NAME = "teamupblob"
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
