@@ -6,11 +6,12 @@ import config.secrets as secret
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = secret.KEY
+SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
-DEBUG = True
+DEBUG = bool(int(os.environ.get('DEBUG', True)))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS',
+                               secret.ALLOWED_HOSTS).split()
 
 # Application definition
 
@@ -37,11 +38,13 @@ INSTALLED_APPS = [
     # Oher apps
     'crispy_forms',
     'django_cleanup.apps.CleanupConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -74,12 +77,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     # postgresql
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': secret.DB_NAME,
-        'USER': secret.DB_USER_NAME,
-        'PASSWORD': secret.DB_USER_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': os.environ.get('POSTGRES_ENGINE',
+                                 'django.db.backends.postgresql_psycopg2'),
+        'NAME': os.environ.get('POSTGRES_DB', secret.DB_NAME),
+        'USER': os.environ.get('POSTGRES_USER', secret.DB_USER_NAME),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD',
+                                   secret.DB_USER_PASSWORD),
+        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -112,13 +117,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = 'static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [STATIC_DIR]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [STATIC_DIR]
+
+STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -174,5 +180,16 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1:1337', 'http://127.0.0.1:1337']
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://localhost:8080',
+    'http://localhost:1337',
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:1337',
+]
 
 API_VERSION = 'v1'

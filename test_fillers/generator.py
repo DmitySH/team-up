@@ -22,10 +22,9 @@ person = Person(Locale.RU)
 
 def generate_users(n=1):
     for i in range(n):
-        user = User.objects.create(**{'username': person.username(drange=(1,
-                                                                          2100)),
-                                      'email': person.email()}
-                                   )
+        user = User.objects.create(**{'username': person.username(
+            drange=(1, 2100)),
+            'email': person.email()})
         user.set_password('worldhello')
         user.profile.belbin.set(list(random.sample(list(range(1, 8)),
                                                    random.randint(0, 2))))
