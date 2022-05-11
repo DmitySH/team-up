@@ -3,6 +3,7 @@ idea
 .DS_Store
 .env.dev
 .env.prod
+.vscode
 
 *.egg-info/
 .installed.cfg
