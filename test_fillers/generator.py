@@ -312,3 +312,11 @@ def generate_all():
     generate_users(100)
     generate_projects()
     generate_executor_offers()
+
+
+def init_base():
+    generate_specializations()
+    generate_mbti_roles()
+    generate_lsq_roles()
+    generate_belbin_roles()
+    generate_statuses()
