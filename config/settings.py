@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
 AZURE = False
-DOCKER = False
+DOCKER = True
 
 DEBUG = bool(int(os.environ.get('DEBUG', True))) and not AZURE
 
@@ -142,7 +142,6 @@ elif AZURE:
 else:
     STATIC_DIR = os.path.join(BASE_DIR, 'static')
     STATICFILES_DIRS = [STATIC_DIR]
-
 
 if AZURE:
     DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'

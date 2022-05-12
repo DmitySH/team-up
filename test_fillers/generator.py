@@ -94,6 +94,9 @@ def generate_executor_offers():
 
 
 def generate_belbin_roles():
+    if BelbinTest.objects.all().exists():
+        return
+
     roles = [
         'Педант',
         'Душа команды',
@@ -110,6 +113,9 @@ def generate_belbin_roles():
 
 
 def generate_mbti_roles():
+    if MBTITest.objects.all().exists():
+        return
+
     roles = [
         'Иррационал',
         'Рационал',
@@ -126,6 +132,9 @@ def generate_mbti_roles():
 
 
 def generate_lsq_roles():
+    if LSQTest.objects.all().exists():
+        return
+
     roles = [
         'Рефлексирующий',
         'Прагматик',
@@ -138,6 +147,9 @@ def generate_lsq_roles():
 
 
 def generate_specializations():
+    if Specialization.objects.all().exists():
+        return
+
     spec_list = {'Диспетчер', 'Контроль качества', 'Корректор, ретушер',
                  'Администрирование', 'Закупки, Снабжение',
                  'Кассовое обслуживание, инкассация', 'Автомобильный бизнес',
@@ -297,6 +309,9 @@ def generate_specializations():
 
 
 def generate_statuses():
+    if Status.objects.all().exists():
+        return
+
     statuses = ['Приглашен', 'Ожидает']
 
     for status in statuses:
@@ -320,3 +335,7 @@ def init_base():
     generate_lsq_roles()
     generate_belbin_roles()
     generate_statuses()
+    print('Everything created')
+
+
+init_base()
