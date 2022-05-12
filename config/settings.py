@@ -3,14 +3,23 @@ from datetime import timedelta
 from pathlib import Path
 
 import config.secrets as secret
+import config.secrets_azure as az_secret
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = secret.KEY
+SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
-DEBUG = True
+AZURE = False
+DOCKER = True
 
-ALLOWED_HOSTS = []
+DEBUG = bool(int(os.environ.get('DEBUG', True))) and not AZURE
+
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS',
+                               secret.ALLOWED_HOSTS).split()
+
+CSRF_TRUSTED_ORIGINS = secret.CSRF_TRUSTED_ORIGINS
+
+CORS_ALLOWED_ORIGINS = secret.CORS_ALLOWED_ORIGINS
 
 # Application definition
 
@@ -37,11 +46,17 @@ INSTALLED_APPS = [
     # Oher apps
     'crispy_forms',
     'django_cleanup.apps.CleanupConfig',
+    'corsheaders',
 ]
+
+if AZURE:
+    INSTALLED_APPS.append('storages')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -71,17 +86,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 
-DATABASES = {
-    # postgresql
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': secret.DB_NAME,
-        'USER': secret.DB_USER_NAME,
-        'PASSWORD': secret.DB_USER_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+if AZURE:
+    DATABASES = az_secret.POSTGRES_DB
+else:
+    DATABASES = {
+        # postgresql
+        'default': {
+            'ENGINE': os.environ.get('POSTGRES_ENGINE',
+                                     'django.db.backends.postgresql_psycopg2'),
+            'NAME': os.environ.get('POSTGRES_DB', secret.DB_NAME),
+            'USER': os.environ.get('POSTGRES_USER', secret.DB_USER_NAME),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD',
+                                       secret.DB_USER_PASSWORD),
+            'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
 
 # Password validation
 
@@ -112,13 +132,25 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = 'static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [STATIC_DIR]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if DOCKER:
+    STATIC_ROOT = BASE_DIR / 'static'
+elif AZURE:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    STATIC_ROOT = BASE_DIR / 'static'
+else:
+    STATIC_DIR = os.path.join(BASE_DIR, 'static')
+    STATICFILES_DIRS = [STATIC_DIR]
+
+if AZURE:
+    DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
+    MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{az_secret.AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
+else:
+    MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

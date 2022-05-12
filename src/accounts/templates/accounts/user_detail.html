@@ -107,61 +107,58 @@
             {% endif %}
         </ul>
 
-        {% if user_.username == user.username %}
-            <div class="row justify-content-md-start">
-                <div class="col-6 card">
+        <ul style="margin-top: 20px" class="list-group text-center">
+            {% if user_.username == user.username %}
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'edit_profile' %}">
                         <b>Редактировать профиль</b>
                     </a>
-                </div>
-                <div class="col-6 card">
+                </li>
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'password_change' %}">
                         <b>Сменить пароль</b>
                     </a>
-                </div>
-                <br>
-                <div class="col-6 card text-wrap align-middle">
+                </li>
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'executor_offer' %}">
                         <b>{% if not profile.executor_offer %}Создать
                         {% else %}Редактировать
-                        {% endif %}<br>предложение работника</b>
+                        {% endif %}предложение работника</b>
                     </a>
-                </div>
-                <div class="col-6 card align-middle">
+                </li>
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'project_form' %}">
                         <b>{% if not profile.project %}Создать
                         {% else %}Редактировать
                         {% endif %}проект</b>
                     </a>
-                </div>
+                </li>
                 {% if profile.project %}
-                    <div class="col-6 card align-middle">
+                    <li style="list-style-type: none; margin: 20px 0 0 20px">
                         <a class="btn btn-light action-button" role="button"
                            href="{% url 'project_detail' slug=profile.project.title %}">
                             <b>Перейти к проекту</b>
                         </a>
-                    </div>
+                    </li>
                 {% endif %}
-                <div class="col-6 card align-middle">
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'invitations' %}">
                         <b>Посмотреть приглашения, заявки, проекты</b>
                     </a>
-                </div>
-            </div>
-        {% elif user.profile.project %}
-            <div class="row justify-content-md-start">
-                <div class="col-6 card align-middle">
+                </li>
+            {% elif user.profile.project %}
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
                        href="{% url 'project_invite' title=user.profile.project.title profile=profile.user.username %}">
                         <b>Пригласить в проект</b>
                     </a>
-                </div>
-            </div>
-        {% endif %}
+                </li>
+            {% endif %}
+        </ul>
     </div>
 {% endblock %}

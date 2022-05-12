@@ -470,13 +470,26 @@ class AcceptInviteAPIView(APIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
+class WorkerSlotDetailAPIView(generics.RetrieveAPIView):
+    """
+    Gets worker slot.
+    slot_id -- id of getting slot.
+    """
+
+    serializer_class = serializers.WorkerSlotDetailSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = WorkerSlot.objects.all()
+    lookup_field = 'id'
+    lookup_url_kwarg = 'slot_id'
+
+
 class InvitedWorkerSlotListAPIView(generics.ListAPIView):
     """
     Gets list of all worker slots, where logged user was invited in.
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotDetailSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_invited_slots()
@@ -488,7 +501,7 @@ class AppliedWorkerSlotListAPIView(generics.ListAPIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.WorkerSlotListSerializer
+    serializer_class = serializers.WorkerSlotDetailSerializer
 
     def get_queryset(self):
         return self.request.user.profile.get_applied_slots()

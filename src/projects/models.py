@@ -66,7 +66,7 @@ class Project(models.Model):
         return reverse('project_detail', kwargs={'slug': self.title})
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
 

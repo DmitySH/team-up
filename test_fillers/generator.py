@@ -22,10 +22,9 @@ person = Person(Locale.RU)
 
 def generate_users(n=1):
     for i in range(n):
-        user = User.objects.create(**{'username': person.username(drange=(1,
-                                                                          2100)),
-                                      'email': person.email()}
-                                   )
+        user = User.objects.create(**{'username': person.username(
+            drange=(1, 2100)),
+            'email': person.email()})
         user.set_password('worldhello')
         user.profile.belbin.set(list(random.sample(list(range(1, 8)),
                                                    random.randint(0, 2))))
@@ -95,6 +94,9 @@ def generate_executor_offers():
 
 
 def generate_belbin_roles():
+    if BelbinTest.objects.all().exists():
+        return
+
     roles = [
         'Педант',
         'Душа команды',
@@ -111,6 +113,9 @@ def generate_belbin_roles():
 
 
 def generate_mbti_roles():
+    if MBTITest.objects.all().exists():
+        return
+
     roles = [
         'Иррационал',
         'Рационал',
@@ -127,6 +132,9 @@ def generate_mbti_roles():
 
 
 def generate_lsq_roles():
+    if LSQTest.objects.all().exists():
+        return
+
     roles = [
         'Рефлексирующий',
         'Прагматик',
@@ -139,6 +147,9 @@ def generate_lsq_roles():
 
 
 def generate_specializations():
+    if Specialization.objects.all().exists():
+        return
+
     spec_list = {'Диспетчер', 'Контроль качества', 'Корректор, ретушер',
                  'Администрирование', 'Закупки, Снабжение',
                  'Кассовое обслуживание, инкассация', 'Автомобильный бизнес',
@@ -298,6 +309,9 @@ def generate_specializations():
 
 
 def generate_statuses():
+    if Status.objects.all().exists():
+        return
+
     statuses = ['Приглашен', 'Ожидает']
 
     for status in statuses:
@@ -313,3 +327,15 @@ def generate_all():
     generate_users(100)
     generate_projects()
     generate_executor_offers()
+
+
+def init_base():
+    generate_specializations()
+    generate_mbti_roles()
+    generate_lsq_roles()
+    generate_belbin_roles()
+    generate_statuses()
+    print('Everything created')
+
+
+init_base()

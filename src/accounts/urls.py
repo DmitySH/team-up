@@ -53,6 +53,8 @@ api_urlpatterns = [
          views.RetractInviteAPIView.as_view()),
     path('get-specialiazations/',
          views.SpecializationListAPIView.as_view()),
+    path('get-worker-slot/<int:slot_id>/',
+         views.WorkerSlotDetailAPIView.as_view()),
 ]
 
 api_urlpatterns = add_prefix_to_urls(api_urlpatterns)

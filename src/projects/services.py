@@ -1,3 +1,5 @@
+from rest_framework.exceptions import ValidationError
+
 from src.accounts.models import ProfileProjectStatus, Status
 from src.projects.models import Project, WorkerSlot
 
@@ -6,6 +8,11 @@ def update_or_create_project(profile, data):
     """
     Updates project if exists, else creates it.
     """
+
+    qs = Project.objects.filter(title=data.get('title'))
+
+    if qs.exists() and profile.project != qs.first():
+        raise ValidationError('Project title must be unique.', code='unique')
 
     project, created = Project.objects.update_or_create(
         owner=profile,
@@ -98,6 +105,8 @@ def get_team(profile):
     Gets team of user's project.
     """
 
+    if not profile.project:
+        return set()
     return profile.project.team.all()
 
 
