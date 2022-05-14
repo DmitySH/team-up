@@ -11,32 +11,32 @@
                     <div class="card-body">
                         <ul class="list-group text-center">
                             <li class="list-group-item">
-                                <b>{{ project.title }}</b>
+                                <h5>Проект {{ project.title }}</h5>
                             </li>
                             <li class="list-group-item">
-                                Описание:
+                                <b>Описание:</b>
                                 <br>
                                 {{ project.description }}
                             </li>
                             {% if project.city %}
                                 <li class="list-group-item">
-                                    Город:
+                                    <b>Город:</b>
                                     <br>
                                     {{ project.city }}
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
-                                Вакантных мест:
+                                <b>Вакантных мест:</b>
                                 <br>
                                 {{ project.vacant }}
                             </li>
                             {% if project.online is not None %}
                                 <li class="list-group-item">
-                                    {{ project.remote_value }}
+                                    <b>{{ project.remote_value }}</b>
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
-                                Требуются специализации:
+                                <b>Требуются специализации:</b>
                                 <br>
                                 <ol class="text-center list-group">
                                     {% for spec in project.required_specialization.all %}
@@ -45,7 +45,7 @@
                                 </ol>
                             </li>
                             <li class="list-group-item">
-                                Требуются роли по Белбину:
+                                <b>Требуются роли по Белбину:</b>
                                 <br>
                                 <ol class="text-center list-group">
                                     {% for role in  project.required_belbin.all %}

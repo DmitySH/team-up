@@ -11,28 +11,28 @@
                     <div class="card-body">
                         <ul class="list-group text-center">
                             <li class="list-group-item">
-                                {{ offer.profile }}
+                                <h5>Работник {{ offer.profile }}</h5>
                             </li>
                             <li class="list-group-item">
-                                Описание:
+                                <b>Описание:</b>
                                 <br>
                                 {{ offer.description }}
                             </li>
                             {% if offer.salary %}
                                 <li class="list-group-item">
-                                    Рассчитывает получать:
+                                    <b>Рассчитывает получать:</b>
                                     <br>
-                                    {{ offer.salary }}
+                                    {{ offer.salary }} рублей
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
-                                Хочет работать
+                                <b>Хочет работать</b>
                                 {{ offer.work_hours }}
                                 часов в неделю
                             </li>
                             {% if offer.profile.specialization.exists %}
                                 <li class="list-group-item">
-                                    Специализации:
+                                    <b>Специализации:</b>
                                     <br>
                                     <ul class="text-center list-group">
                                         {% for spec in offer.profile.specialization.all %}
@@ -44,7 +44,7 @@
                             {% if offer.profile.belbin.exists %}
                                 <li class="list-group-item">
                                     <br>
-                                    Роли по Белбину:
+                                    <b>Роли по Белбину:</b>
                                     <ul class="text-center list-group">
                                         {% for role in offer.profile.belbin.all %}
                                             <li class="list-group-item">{{ role }}</li>

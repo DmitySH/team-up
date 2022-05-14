@@ -64,7 +64,7 @@ class ExecutorOfferForm(forms.ModelForm):
     Form of creation and changing executor offers.
     """
 
-    salary = forms.IntegerField(label='Ожидаемая зарплата', required=False)
+    salary = forms.IntegerField(label='Ожидаемая зарплата (в рублях)', required=False)
 
     class Meta:
         model = ExecutorOffer

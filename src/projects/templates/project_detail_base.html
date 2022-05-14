@@ -10,21 +10,19 @@
                 {{ project.description }}
             </li>
             {% if project.city %}
-                <li class="list-group-item">
+                <li class="list-group-item text-center">
                     <h4 class="text-center">Город:</h4>
-                    <h5 class="text-center">{{ project.city }}
-                        {% if project.online is not None %}
-                            (
-                            {{ project.remote_value }}
-                            )
-                        {% endif %}
-
-                    </h5>
+                    {{ project.city }}
+                    {% if project.online is not None %}
+                        (
+                        {{ project.remote_value }}
+                        )
+                    {% endif %}
                 </li>
             {% endif %}
-            <li class="list-group-item">
+            <li class="list-group-item text-center">
                 <h4 class="text-center">Вакантных мест:</h4>
-                <h5 class="text-center">{{ project.vacant }}</h5>
+                {{ project.vacant }}
             </li>
             <li class="list-group-item">
                 <h4 class="text-center">Требуются специализации:</h4>
