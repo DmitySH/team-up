@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', secret.KEY)
 
 AZURE = False
-DOCKER = False
+DOCKER = True
 
 DEBUG = bool(int(os.environ.get('DEBUG', True))) and not AZURE
 
