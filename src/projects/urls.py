@@ -35,6 +35,8 @@ urlpatterns = [
          name='worker_slot_clear'),
     path('projects/<int:slot_id>/leave/', views.leave_worker_slot,
          name='worker_slot_leave'),
+    path('projects/<str:title>/analyze/', views.AnalyzeTeam.as_view(),
+         name='analyze_team'),
 ]
 
 # API urls.

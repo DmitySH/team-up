@@ -213,6 +213,20 @@ class ProjectInvitesView(UserPassesTestMixin, View):
                       context={'project': project, 'username': profile})
 
 
+class AnalyzeTeam(IsAuthenticated, View):
+    """
+    View provides team analyze.
+    """
+
+    def get(self, request, title):
+        project = get_object_or_404(Project.objects, title=title)
+        result = services.analyzer(project)
+
+        return render(request, 'projects/analyze.html',
+                      context={'project': project, 'analyze': result[0],
+                               'final_res': result[1]})
+
+
 class AppliedProfiles(UserPassesTestMixin, View):
     """
     View of applies for projects of user that was logged in.
@@ -551,7 +565,8 @@ class LeaveSlotAPIView(APIView):
         if request.user.profile == slot.profile:
             services.clear_slot(slot)
             return Response('Slot was left', status.HTTP_200_OK)
-        return Response('Profile not in that slot', status.HTTP_400_BAD_REQUEST)
+        return Response('Profile not in that slot',
+                        status.HTTP_400_BAD_REQUEST)
 
 
 class SlotAppliesAPIView(APIView):

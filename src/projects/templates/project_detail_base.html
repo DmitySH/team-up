@@ -5,6 +5,14 @@
         <h1 class="page-header text-center">
             <b>Проект {{ project.title }}</b></h1>
         <ul class="list-group">
+            <li class="text-center"
+                style="list-style: none; margin-bottom: 10px">
+                <a href="{% url 'analyze_team' title=project.title %}">
+                    <button type="button" onclick=""
+                            class="btn btn-success">Анализ эффективности
+                    </button>
+                </a>
+            </li>
             <li class="list-group-item text-center">
                 <h4 class="text-center">Описание:</h4>
                 {{ project.description }}
@@ -81,8 +89,7 @@
                             {% if slot.salary %}
                                 <li class="list-group-item">
                                     <h6>Получает:</h6>
-                                    <br>
-                                    {{ slot.salary }}
+                                    {{ slot.salary }} рублей
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
