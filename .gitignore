@@ -9,6 +9,7 @@ idea
 .installed.cfg
 *.egg
 
+docs
 dist
 db.sqlite3
 sqlite.db
@@ -19,6 +20,7 @@ __pycache__/
 *.py[cod]
 .pyc
 *.pyc
+
 **/secrets.py
 **/secrets_azure.py
 
