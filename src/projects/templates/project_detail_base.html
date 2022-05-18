@@ -54,7 +54,10 @@
                                     <a href="{{ slot.profile.get_absolute_url }}">
                                         <button type="button"
                                                 class="btn">
-                                            {{ slot.profile }}
+                                            ({{ slot.profile.user.username }})
+                                            <br/>
+                                            {{ slot.profile.user.first_name }}
+                                            {{ slot.profile.user.last_name }}
                                         </button>
                                     </a>
                                 {% else %}
