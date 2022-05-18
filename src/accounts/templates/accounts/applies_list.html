@@ -1,12 +1,11 @@
 {% extends 'main_base.html' %}
-{% block title %}Приглашения{% endblock %}
+{% block title %}Заявки{% endblock %}
 {% block content %}
     <div class="justify-content-center">
-        {% if invited_slots %}
-            <h1 class="page-header text-center">
-                <b>Ваши приглашения</b></h1>
+        {% if applied_slots %}<h1 class="page-header text-center">
+            <b>Ваши заявки</b></h1>
             <div class="row justify-content-md-start">
-                {% for slot in invited_slots %}
+                {% for slot in applied_slots %}
                     <div class="col-6 card">
                         <div class="card-body">
                             <ul class="list-group text-center">
@@ -59,21 +58,11 @@
                                 {% endif %}
                                 <li class="list-group-item">
                                     <form method="post"
-                                          action="{% url 'accept_invite' slot=slot.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit"
-                                                class="btn btn-success">
-                                            Принять
-                                        </button>
-                                    </form>
-                                </li>
-                                <li class="list-group-item">
-                                    <form method="post"
-                                          action="{% url 'decline_invite' slot=slot.id %}">
+                                          action="{% url 'retract_invite' slot=slot.id %}">
                                         {% csrf_token %}
                                         <button type="submit"
                                                 class="btn btn-danger">
-                                            Отказаться
+                                            Отозвать
                                         </button>
                                     </form>
                                 </li>
@@ -83,7 +72,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <h1>Пока приглашений нет</h1>
+            <h1>Пока заявок нет</h1>
         {% endif %}
     </div>
 {% endblock %}

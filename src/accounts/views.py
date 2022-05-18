@@ -156,18 +156,35 @@ class UserEditView(LoginRequiredMixin, View):
 
 class InvitationsView(LoginRequiredMixin, View):
     """
-    View of invited and applied slots of logged user.
+    View of invites of logged user.
     """
 
     def get(self, request):
         invited_slots = request.user.profile.get_invited_slots()
-        applied_slots = request.user.profile.get_applied_slots()
-        projects = set(request.user.profile.get_current_projects())
         return render(request, 'accounts/invitation_list.html',
-                      context={'invited_slots': invited_slots,
-                               'applied_slots': applied_slots,
-                               'projects': projects
-                               })
+                      context={'invited_slots': invited_slots})
+
+
+class AppliesView(LoginRequiredMixin, View):
+    """
+    View of applied slots of logged user.
+    """
+
+    def get(self, request):
+        applied_slots = request.user.profile.get_applied_slots()
+        return render(request, 'accounts/applies_list.html',
+                      context={'applied_slots': applied_slots})
+
+
+class ProjectsView(LoginRequiredMixin, View):
+    """
+    View of current projects of logged user.
+    """
+
+    def get(self, request):
+        projects = set(request.user.profile.get_current_projects())
+        return render(request, 'accounts/current_projects_list.html',
+                      context={'projects': projects})
 
 
 @login_required(login_url='/login/')

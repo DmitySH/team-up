@@ -107,3 +107,14 @@ html, body {
     color: #bfc0f1
 }
 
+.border {
+    outline: 2px solid #b9fc95;
+}
+
+.small_font {
+    font-size: 10pt;
+}
+
+.border-big {
+    outline: 4px solid #b9fc95;
+}

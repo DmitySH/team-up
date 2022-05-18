@@ -228,12 +228,7 @@ class AppliedProfiles(UserPassesTestMixin, View):
             slot = WorkerSlot.objects.get(id=slot_pk)
             check_own_slot(request, slot)
 
-            applies = ProfileProjectStatus.objects.filter(
-                worker_slot=slot,
-                status=Status.objects.get(
-                    value='Ожидает')).select_related('profile',
-                                                     'profile__executor_offer')
-            profiles = [apply.profile for apply in applies]
+            profiles = slot.applied_profiles
 
         except ObjectDoesNotExist:
             raise Http404

@@ -61,13 +61,12 @@
                                         </button>
                                     </a>
                                 {% else %}
-                                    Место свободно
+                                    <u>Место свободно</u>
                                 {% endif %}
                             </li>
                             {% if user.profile.project.title == project.title %}
                                 <li class="list-group-item">
-                                Электронный адрес:
-                                <br>
+                                <h6>Электронный адрес:</h6>
                                 {% if slot.profile.user.email %}
                                     {{ slot.profile.user.email }}
                                 {% else %}
@@ -76,26 +75,24 @@
                             {% endif %}
                             </li>
                             <li class="list-group-item">
-                                Описание:
-                                <br>
+                                <h6>Описание:</h6>
                                 {{ slot.description }}
                             </li>
                             {% if slot.salary %}
                                 <li class="list-group-item">
-                                    Получает:
+                                    <h6>Получает:</h6>
                                     <br>
                                     {{ slot.salary }}
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
-                                Работает
+                                <h6>Работает</h6>
                                 {{ slot.work_hours }}
                                 часов в неделю
                             </li>
                             {% if slot.specialization.exists %}
                                 <li class="list-group-item">
-                                    Специализации:
-                                    <br>
+                                    <h6>Специализации:</h6>
                                     <ul class="text-center list-group">
                                         {% for spec in slot.specialization.all %}
                                             <li class="list-group-item">{{ spec }}</li>
@@ -105,8 +102,7 @@
                             {% endif %}
                             {% if slot.role.exists %}
                                 <li class="list-group-item">
-                                    <br>
-                                    Роли по Белбину:
+                                    <h6>Роли по Белбину:</h6>
                                     <ul class="text-center list-group">
                                         {% for role in slot.role.all %}
                                             <li class="list-group-item">{{ role }}</li>

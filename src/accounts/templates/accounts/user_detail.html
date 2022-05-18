@@ -10,7 +10,7 @@
                        href="{% url 'executor_offer' %}">
                         <b>{% if not profile.executor_offer %}Создать
                         {% else %}Редактировать
-                        {% endif %}предложение работника</b>
+                        {% endif %} резюме</b>
                     </a>
                 </li>
                 <li style="list-style-type: none; margin: 20px 0 0 20px">
@@ -18,21 +18,37 @@
                        href="{% url 'project_form' %}">
                         <b>{% if not profile.project %}Создать
                         {% else %}Редактировать
-                        {% endif %}проект</b>
+                        {% endif %}мой проект</b>
                     </a>
                 </li>
                 {% if profile.project %}
                     <li style="list-style-type: none; margin: 20px 0 0 20px">
                         <a class="btn btn-light action-button" role="button"
                            href="{% url 'project_detail' slug=profile.project.title %}">
-                            <b>Перейти к проекту</b>
+                            <b>Мой проект</b>
                         </a>
                     </li>
                 {% endif %}
                 <li style="list-style-type: none; margin: 20px 0 0 20px">
-                    <a class="btn btn-light action-button" role="button"
+                    <a class="
+                    {% if profile.get_invited_slots %}
+                    border
+                     {% endif %}
+                    btn btn-light action-button" role="button"
                        href="{% url 'invitations' %}">
-                        <b>Посмотреть приглашения, заявки, проекты</b>
+                        <b>Куда меня пригласили</b>
+                    </a>
+                </li>
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
+                    <a class="btn btn-light action-button" role="button"
+                       href="{% url 'applies' %}">
+                        <b>Мои заявки</b>
+                    </a>
+                </li>
+                <li style="list-style-type: none; margin: 20px 0 0 20px">
+                    <a class="btn btn-light action-button" role="button"
+                       href="{% url 'projects' %}">
+                        <b>Проекты, в которых я работаю</b>
                     </a>
                 </li>
             {% elif user.profile.project %}
@@ -89,6 +105,10 @@
                         <a href="{% url 'belbin_test' %}">Пройти тест</a>
                     {% endif %}
                 {% endif %}
+                <br/>
+                <a class="small_font"
+                   href="https://habr.com/ru/company/oleg-bunin/blog/522586/">
+                    Что это такое?</a>
             </li>
             <li class="list-group-item">
                 {% if profile.mbti.exists %}
@@ -104,6 +124,10 @@
                         <a href="{% url 'mbti_test' %}">Пройти тест</a>
                     {% endif %}
                 {% endif %}
+                <br/>
+                <a class="small_font"
+                   href="https://happypeople.blog/test-na-tip-lichnosti-po-tipologii-majers-briggs-mvti/">
+                    Что это такое?</a>
             </li>
             <li class="list-group-item">
                 {% if profile.lsq.exists %}
@@ -119,6 +143,10 @@
                         <a href="{% url 'lsq_test' %}">Пройти тест</a>
                     {% endif %}
                 {% endif %}
+                <br/>
+                <a class="small_font"
+                   href="http://profitest.devicecollection.com/tests-list/test-xoni-mamforda">
+                    Что это такое?</a>
             </li>
             {% if profile.remote %}
                 <li class="list-group-item">
