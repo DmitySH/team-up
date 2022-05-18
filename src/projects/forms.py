@@ -17,6 +17,7 @@ class WorkerSlotForm(forms.ModelForm):
     """
     Form of creation and update of worker slot.
     """
+    salary = forms.IntegerField(label='Зарплата (в рублях)', required=False)
 
     class Meta:
         model = WorkerSlot

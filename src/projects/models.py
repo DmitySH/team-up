@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
 
+import src.accounts.models
 from src.tests.models import BelbinTest
 
 
@@ -107,6 +108,15 @@ class WorkerSlot(models.Model):
                                 related_name='team',
                                 null=True
                                 )
+
+    @property
+    def applied_profiles(self):
+        applies = src.accounts.models.ProfileProjectStatus.objects.filter(
+            worker_slot=self,
+            status=src.accounts.models.Status.objects.get(
+                value='Ожидает')).select_related('profile',
+                                                 'profile__executor_offer')
+        return [apply.profile for apply in applies]
 
     def __str__(self):
         return 'Слот в проекте {project}' \

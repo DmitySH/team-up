@@ -12,7 +12,11 @@
         <li class="list-group-item">
             <a href="{% url 'applied_profiles' title=project.title slot_pk=slot.pk %}">
                 <button type="button"
-                        class="btn btn-dark">
+                        class="
+                        btn btn-dark
+                        {% if slot.applied_profiles|length > 0 %}
+                         border-big
+                        {% endif %}">
                     Заявки
                 </button>
             </a>

@@ -21,6 +21,7 @@ class Specialization(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Специализация'
         verbose_name_plural = 'Специализации'
 

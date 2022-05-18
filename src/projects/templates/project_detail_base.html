@@ -5,26 +5,32 @@
         <h1 class="page-header text-center">
             <b>Проект {{ project.title }}</b></h1>
         <ul class="list-group">
+            <li class="text-center"
+                style="list-style: none; margin-bottom: 10px">
+                <a href="{% url 'analyze_team' title=project.title %}">
+                    <button type="button" onclick=""
+                            class="btn btn-success">Анализ эффективности
+                    </button>
+                </a>
+            </li>
             <li class="list-group-item text-center">
                 <h4 class="text-center">Описание:</h4>
                 {{ project.description }}
             </li>
             {% if project.city %}
-                <li class="list-group-item">
+                <li class="list-group-item text-center">
                     <h4 class="text-center">Город:</h4>
-                    <h5 class="text-center">{{ project.city }}
-                        {% if project.online is not None %}
-                            (
-                            {{ project.remote_value }}
-                            )
-                        {% endif %}
-
-                    </h5>
+                    {{ project.city }}
+                    {% if project.online is not None %}
+                        (
+                        {{ project.remote_value }}
+                        )
+                    {% endif %}
                 </li>
             {% endif %}
-            <li class="list-group-item">
+            <li class="list-group-item text-center">
                 <h4 class="text-center">Вакантных мест:</h4>
-                <h5 class="text-center">{{ project.vacant }}</h5>
+                {{ project.vacant }}
             </li>
             <li class="list-group-item">
                 <h4 class="text-center">Требуются специализации:</h4>
@@ -56,17 +62,19 @@
                                     <a href="{{ slot.profile.get_absolute_url }}">
                                         <button type="button"
                                                 class="btn">
-                                            {{ slot.profile }}
+                                            ({{ slot.profile.user.username }})
+                                            <br/>
+                                            {{ slot.profile.user.first_name }}
+                                            {{ slot.profile.user.last_name }}
                                         </button>
                                     </a>
                                 {% else %}
-                                    Место свободно
+                                    <u>Место свободно</u>
                                 {% endif %}
                             </li>
                             {% if user.profile.project.title == project.title %}
                                 <li class="list-group-item">
-                                Электронный адрес:
-                                <br>
+                                <h6>Электронный адрес:</h6>
                                 {% if slot.profile.user.email %}
                                     {{ slot.profile.user.email }}
                                 {% else %}
@@ -75,26 +83,23 @@
                             {% endif %}
                             </li>
                             <li class="list-group-item">
-                                Описание:
-                                <br>
+                                <h6>Описание:</h6>
                                 {{ slot.description }}
                             </li>
                             {% if slot.salary %}
                                 <li class="list-group-item">
-                                    Получает:
-                                    <br>
-                                    {{ slot.salary }}
+                                    <h6>Получает:</h6>
+                                    {{ slot.salary }} рублей
                                 </li>
                             {% endif %}
                             <li class="list-group-item">
-                                Работает
+                                <h6>Работает</h6>
                                 {{ slot.work_hours }}
                                 часов в неделю
                             </li>
                             {% if slot.specialization.exists %}
                                 <li class="list-group-item">
-                                    Специализации:
-                                    <br>
+                                    <h6>Специализации:</h6>
                                     <ul class="text-center list-group">
                                         {% for spec in slot.specialization.all %}
                                             <li class="list-group-item">{{ spec }}</li>
@@ -104,8 +109,7 @@
                             {% endif %}
                             {% if slot.role.exists %}
                                 <li class="list-group-item">
-                                    <br>
-                                    Роли по Белбину:
+                                    <h6>Роли по Белбину:</h6>
                                     <ul class="text-center list-group">
                                         {% for role in slot.role.all %}
                                             <li class="list-group-item">{{ role }}</li>
