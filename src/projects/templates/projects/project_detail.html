@@ -1,4 +1,5 @@
 {% extends 'project_detail_base.html' %}
+{% load static %}
 {% block downcard %}
     {% if user.profile.project.title == project.title %}
         <li class="list-group-item">
@@ -10,12 +11,18 @@
             </a>
         </li>
         <li class="list-group-item">
+            {% if slot.applied_profiles|length > 0 %}
+                <img src="{% static 'img/alert.png' %}"
+                     style="width: 35px; margin-bottom: 5px"
+                     alt="Alert!">
+                <br/>
+            {% endif %}
             <a href="{% url 'applied_profiles' title=project.title slot_pk=slot.pk %}">
                 <button type="button"
                         class="
                         btn btn-dark
                         {% if slot.applied_profiles|length > 0 %}
-                         border-big
+                        border-big
                         {% endif %}">
                     Заявки
                 </button>
@@ -61,9 +68,12 @@
 {% endblock %}
 {% block buttons %}
     <div class="text-center">
-        <a class="btn btn-light action-button" role="button"
+        <a role="button"
            href="{% url 'worker_slot_form' slug=project.title pk=0 %}">
-            <b>Создать вакансию</b>
+            <button type="button"
+                    class="btn btn-success">
+                Создать вакансию
+            </button>
         </a>
     </div>
 {% endblock %}

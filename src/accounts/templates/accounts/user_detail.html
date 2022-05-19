@@ -38,6 +38,10 @@
                        href="{% url 'invitations' %}">
                         <b>Куда меня пригласили</b>
                     </a>
+                    {% if profile.get_invited_slots %}
+                        <img alt="Alert!" src="{% static 'img/alert.png' %}"
+                             style="width: 35px">
+                    {% endif %}
                 </li>
                 <li style="list-style-type: none; margin: 20px 0 0 20px">
                     <a class="btn btn-light action-button" role="button"
@@ -53,9 +57,10 @@
                 </li>
             {% elif user.profile.project %}
                 <li style="list-style-type: none; margin: 20px 0 0 20px">
-                    <a class="btn btn-light action-button" role="button"
+                    <a role="button"
                        href="{% url 'project_invite' title=user.profile.project.title profile=profile.user.username %}">
-                        <b>Пригласить в проект</b>
+                        <button class="btn btn-success"> Пригласить в проект
+                        </button>
                     </a>
                 </li>
             {% endif %}

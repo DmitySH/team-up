@@ -4,12 +4,20 @@
     <div class="justify-content-center">
         <h1 class="page-header text-center">
             <b>Проект {{ project.title }}</b></h1>
+
         <ul class="list-group">
+            {% if user.profile.project.title == project.title %}
+                <li class="text-center"
+                    style="list-style: none; margin-bottom: 10px">
+                    {% block buttons %}
+                    {% endblock buttons %}
+                </li>
+            {% endif %}
             <li class="text-center"
                 style="list-style: none; margin-bottom: 10px">
                 <a href="{% url 'analyze_team' title=project.title %}">
-                    <button type="button" onclick=""
-                            class="btn btn-success">Анализ эффективности
+                    <button type="button"
+                            class="btn btn-info">Анализ эффективности
                     </button>
                 </a>
             </li>
@@ -125,9 +133,5 @@
                 </div>
             {% endfor %}
         </div>
-        {% if user.profile.project.title == project.title %}
-            {% block buttons %}
-            {% endblock buttons %}
-        {% endif %}
     </div>
 {% endblock %}
