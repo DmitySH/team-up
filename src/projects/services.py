@@ -248,7 +248,7 @@ def analyzer(project):
     final_result = 0
     if bad_count > 2:
         final_result = -1
-    elif good_count == 5:
+    elif good_count >= 4 and bad_count == 0:
         final_result = 1
 
     return result, final_result
